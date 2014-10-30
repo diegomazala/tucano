@@ -92,3 +92,4 @@ add_library(
 ###########################################
 
 add_subdirectory(${SAMPLES_DIR}/imgproc)
+add_subdirectory(${SAMPLES_DIR}/phongViewer)
