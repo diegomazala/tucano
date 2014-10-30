@@ -11,11 +11,16 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = simpleTextureViewer
 TEMPLATE = app
 
-TUCANO_PATH = ../..
-EIGEN_PATH  =  ../../../eigen
-GLEW_PATH = ../../../glew
+TUCANO_PATH = ../../../../
 
-INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects $$EIGEN_PATH $$GLEW_PATH/include
+INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects
+
+EIGEN_PATH  =  /usr/include/eigen3
+INCLUDEPATH += $$EIGEN_PATH
+
+#GLEW_PATH = ../../../glew
+#INCLUDEPATH += $$GLEW_PATH/include
+#LIBS += -L$$GLEW_PATH/lib
 
 LIBS += -L$$GLEW_PATH/lib
 LIBS += -lGLEW -lGLU

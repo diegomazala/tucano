@@ -11,14 +11,21 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = imgproc
 TEMPLATE = app
 
-TUCANO_PATH = ../..
-EIGEN_PATH  =  ../../../eigen
-GLEW_PATH = ../../../glew
+TUCANO_PATH = ../../../../
 
-INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects $$EIGEN_PATH $$GLEW_PATH/include
+INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects
 
-LIBS += -L$$GLEW_PATH/lib
+EIGEN_PATH  =  /usr/include/eigen3
+INCLUDEPATH += $$EIGEN_PATH
+
+#GLEW_PATH = ../../../glew
+#INCLUDEPATH += $$GLEW_PATH/include
+#LIBS += -L$$GLEW_PATH/lib
+
 LIBS += -lGLEW -lGLU
+
+OBJECTS_DIR = ./obj
+DESTDIR = $$TUCANO_PATH/bin
 
 OBJECTS_DIR = ./obj
 DESTDIR = $$TUCANO_PATH/bin

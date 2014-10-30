@@ -109,6 +109,7 @@ public:
     virtual void resizeGL (void)
     {
         camera_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        camera_trackball->setPerspectiveMatrix(60.0, this->width()/this->height(), 1.0f, 100.0f);
         light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
         updateGL();
     }
