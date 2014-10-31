@@ -663,6 +663,7 @@ INPUT                  = ./src/ \
 			 ./doc/examples.md \
 			 ./doc/effects.md \
 			 ./doc/effectTutorial.md \
+			 ./doc/textureTutorial.md \
  			 ./doc/framebufferTutorial.md \
 			 ./doc/meshTutorial.md
 

@@ -3,10 +3,10 @@ Effects Collection                         {#effects}
 
 In the *effects* folder you can find a few useful Shader Effects that can be used directly with your own projects, or used as inspiration or for learning. Note that these Effects don't depend on the window manager.
 
-All *effects* are composed of a simple class that inherits from the [Effect Class](@ref Effect), and
-contains one or more [Shaders](@ref Shader). 
+All *effects* are composed of a simple class that inherits from the [Effect Class](@ref Tucano::Effect), and
+contains one or more [Shaders](@ref Tucano::Shader).
 
-* phongShader - a simple Phong Shader that receives a [Mesh](@ref Mesh) and two [Trackballs](@ref Trackball), one for the camera and one for the light direction.
+* phongShader - a simple Phong Shader that receives a [Mesh](@ref Tucano::Mesh) and two [Trackballs](@ref Tucano::Trackball), one for the camera and one for the light direction.
 
 * renderTexture - a simple shader that renders a given texture using a quad as proxy geometry.
 
