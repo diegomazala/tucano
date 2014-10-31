@@ -26,7 +26,11 @@
 #include <tucano.hpp>
 
 using namespace std;
+
 using namespace Tucano;
+
+namespace Effects
+{
 
 /**
  * @brief A simple effect to render a texture.
@@ -84,5 +88,7 @@ private:
     /// A quad to be rendered forcing one call of the fragment shader per image pixel (its just a proxy geometry)
     Mesh* quad;
 };
+
+}
 
 #endif

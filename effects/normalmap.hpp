@@ -25,6 +25,12 @@
 
 #include <tucano.hpp>
 
+
+using namespace Tucano;
+
+namespace Effects
+{
+
 /**
  * @brief Renders a mesh using a normal map as colors
  */
@@ -87,5 +93,6 @@ private:
     Tucano::Shader *normalmap_shader;
 };
 
+}
 
 #endif

@@ -26,7 +26,12 @@
 #include <tucano.hpp>
 
 using namespace std;
+
 using namespace Tucano;
+
+namespace Effects
+{
+
 
 /**
  * @brief A simple Sobel filter for image processing.
@@ -102,4 +107,5 @@ private:
   bool vertical;
 };
 
+}
 #endif

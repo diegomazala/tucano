@@ -26,7 +26,12 @@
 #include <tucano.hpp>
 
 using namespace std;
+
 using namespace Tucano;
+
+
+namespace Effects
+{
 
 /**
  * @brief A simple mean filter for image processing.
@@ -99,5 +104,7 @@ private:
   /// A quad to be rendered forcing one call of the fragment shader per image pixel
   Mesh* quad;
 };
+
+}
 
 #endif

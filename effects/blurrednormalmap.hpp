@@ -25,6 +25,9 @@
 
 #include <tucano.hpp>
 
+namespace Effects
+{
+
 /**
  * @brief Renders a mesh using a normal map as colors
  */
@@ -116,6 +119,9 @@ private:
     Tucano::Mesh* quad;
     Tucano::Framebuffer* fbo;
 };
+
+}
+
 
 
 #endif

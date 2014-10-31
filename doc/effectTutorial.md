@@ -1,24 +1,22 @@
 Using the Effect and Shader Classes       {#effect_tutorial}
 ===================================
 
-The Effect and Shader Classes hold the core GLSL applications.
-A typical application has a Class (that inherit from the Effect Class) that
-contains Shaders. Many Effects are multipass and contain many Shaders.
+The [Effect](@ref Tucano::Effect) and [Shader](@ref Tucano::Shader) Classes hold the core of the OpenGL/GLSL applications.
+A typical application has a Class (inheriting from [Effect](@ref Tucano::Effect)) that contains [Shader](@ref Tucano::Shader) objects. Many Effects are multipass and contain many shaders.
 
-It is possible to build an application without using the Effect Class at all, however there
-a few advantages in using the Effect:
+It is possible to build an application without using the Effect Class at all, however there a few advantages in using the Effect:
 
-- Keeps all Shaders belonging to the same effect encapsulated
-- Keeps all variables for the effect encapsulated
-- Keeps your application API simple
-- Enables reloading all the effect's shaders with a single command
-- Enhances portability, to use the same effect in another application, only needs to include one header
+- keeps all shaders belonging to the same effect encapsulated
+- keeps all variables for the effect encapsulated
+- keeps your application API simple
+- enables reloading all the effect's shaders with a single command
+- enhances portability, to use the same effect in another application, only need to include one header
 
 # A simple example effect 
 
-Let's say we want to create an effect called NormalMap. 
+Let's look at a simple Effect from Tucano's Collection, the [NormalMap](@ref Effects::NormalMap). 
 This effect renders a mesh using normals directions as color (normal map).
-We need only one Shader to create this effect.
+We only need one Shader to create this effect.
 
 First we create our class:
 
@@ -28,16 +26,15 @@ class NormalMap : public Tucano::Effect {
 ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-This class should contain one Shader:
+This class contains a single [Shader](@ref Tucano::Effect):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Tucano::Shader* normalmap_shader;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-* It's probably a good idea to initialize **normalmap_shader = 0** in your class constructor. If you use the effect loadShader method (explained below) the destructor will take care of deleting your shaders.
+> It's probably a good idea to initialize **normalmap_shader = 0** in your class constructor. If you use the effect loadShader method (explained below) the destructor will take care of deleting your shaders.
 
-We need to overload the initialization method to load the shader. The loadShader method will look in the set shader directory for files beginning with "normalmap" and shader extensions, in this case it will find two (.vert and .frag). The method also initializes the shaders
-and keeps references to them for reloading and deleting.
+We need to overload the initialization method to load the shader. The `loadShader` method will look in the set shader directory for files beginning with "normalmap" and shader extensions, in this case it will find two (.vert and .frag). The method also initializes the shaders and keeps references to them for reloading and deleting.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 virtual void initialize ()
@@ -46,9 +43,9 @@ virtual void initialize ()
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* note that the above method assumes that the shader files (.vert, .frag, etc...) are in the "/shaders" directory relative to your executing directory. You may need to change this directory before calling the initialization using the **setShadersDir** method.
+> Note that the above method assumes that the shader files (.vert, .frag, etc...) are in the "/shaders" directory relative to your executing directory. You may need to change this directory before calling the initialization using the **setShadersDir** method.
 
-Now, all you need to do is write the core of your NormalMap application. We can implement it as a method that receives a Mesh and a camera Trackball, and renders the Mesh using the normal directions as colors:
+Now, all we need is the core of the NormalMap application. We can implement it as a method that receives a [Mesh](@ref Tucano::Mesh) and a camera [Trackball](@ref Tucano::Trackball), and renders the Mesh using the normal directions as colors:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
@@ -74,17 +71,17 @@ virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
 And that's it. 
-In your application draw method, all you need to do is clear the screen, and call the render method above. If you want to see a visual representation of the trackball just render it! Just make sure that you have depth test enabled. Here is a sample code for a typical draw method:
+In the application's draw routine, we clear the screen and call the render method above. To see a visual representation of the trackball just render it! Just make sure that depth test is enabled. Here is a sample code for a typical draw method (you can find a similar method in the GlWidget Class of the phongViewer sample):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 glClearColor(1.0, 1.0, 1.0, 0.0);
 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-phong->render(mesh, camera_trackball);
+normalmap_shader->render(mesh, camera_trackball);
 camera_trackball->render();
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here are the *vertex* and *fragment* shader codes for the files "normalmap.vert" and "normalmap.frag":
+Here are the *vertex* and *fragment* shader codes for the files "normalmap.vert" and "normalmap.frag" (they are all included in the `effects/shaders` directory):
 
 ### normalmap.vert
 
@@ -125,7 +122,7 @@ void main(void)
 Let's say we want to create an effect called BlurredNormals. Its only an illustrative example.
 This effect uses the normalmap above and then blurs the final resulting image.
 It's a two pass method: first pass stores the normalmap result in an FBO; second pass blurs the
-resulting image from the first pass. If you are not familiar with FBOs, check out the [Framebuffer Tutorial](@ref framebuffer_tutorial).
+resulting image from the first pass. If you are not familiar with FBOs, check out the [Framebuffer Tutorial](@ref framebuffer_tutorial).    
     
 We now need two Shaders plus a Quad Mesh and an FBO for the screen space blur:
 
@@ -149,8 +146,9 @@ virtual void initialize ()
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* note that you need to pass the size of your viewport to initialize the FBO, we assume we know this and its (w,h). The last parameter of the FBO says that we only need one texture attachment. It's usually a good idea to initialize and re-initialize the FBO every time your window is resized.
-We show another way to set the FBO size after the example.
+> note that you need to pass the size of your viewport to initialize the FBO, we assume we know this and its (w,h). The last parameter of the FBO says that we only need one texture attachment. It's usually a good idea to initialize and re-initialize the FBO every time your window is resized (checkout the [QtTrackballWidget](@ref Tucano::QtTrackballWidget) for an example).
+
+We show another way to set the FBO size below, after this example.
 
 The render method now needs two passes, one to store the result in a FBO, and the second to blur the image:
 
@@ -182,9 +180,11 @@ virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
     fbo->unbind(); // automatically returns the draw buffer to GL_BACK
     
     blur_shader->bind();
+    // makes the FBO attachment read available from the shader
     blur_shader->setUniform("imageTexture", fbo->bindAttachment(0));
-    blur_shader->setUniform("kernelsize", 5); // sets the blur kernel (higher == more blur)
-    blur_shader->setUniform("viewportSize", viewport);
+    // sets the blur kernel (higher == more
+    blur_shader->setUniform("kernelsize", 5);
+
     quad->render();
     blur_shader->unbind();
     fbo->unbindAttachments();
@@ -212,5 +212,4 @@ if (fbo->getWidth() != (viewport[2]-viewport[1]) || fbo->getHeight() != (viewpor
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
-* note that usually the first two elements of the viewport vector are zero (ex. [0, 0, w, h]). However, we have left it like
-this for completeness.
+> note that usually the first two elements of the viewport vector are zero (ex. [0, 0, w, h]). However, we have left it with as four elements for completeness.

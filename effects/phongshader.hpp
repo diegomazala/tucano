@@ -25,6 +25,11 @@
 
 #include <tucano.hpp>
 
+using namespace Tucano;
+
+namespace Effects
+{
+
 /**
  * @brief Renders a mesh using a Phong shader
  */
@@ -91,6 +96,8 @@ private:
     /// Phong Shader
     Tucano::Shader *phong_shader;
 };
+
+}
 
 
 #endif

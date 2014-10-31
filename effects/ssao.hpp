@@ -29,6 +29,9 @@ using namespace std;
 
 using namespace Tucano;
 
+namespace Effects
+{
+
 /**
  * Screen Space Ambient Occlusion effect class. Handles the pre-computations needed in order to use this effect, as well as handles the rendering with this effect. 
  * This class handles sampling kernel generation used in occlusion computation, noise texture generation used to remove banding caused by the low number of sample points.
@@ -402,5 +405,7 @@ private:
     Eigen::Vector2i viewportSize;
 
 };
+}
+
 
 #endif

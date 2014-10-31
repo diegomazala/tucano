@@ -657,6 +657,7 @@ WARN_LOGFILE           =
 
 INPUT                  = ./src/ \
 			 ./src/utils/ \
+			 ./effects/ \
 			 ./doc/ \
 			 ./doc/welcome.md \
 			 ./doc/examples.md \
