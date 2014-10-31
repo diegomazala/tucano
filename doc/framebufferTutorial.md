@@ -29,7 +29,7 @@ Tucano::Framebuffer *fbo;
 fbo = new Tucano::Framebuffer(w, h, n);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Second method:
+Second method:s
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Tucano::Framebuffer *fbo;
 fbo = new Tucano::Framebuffer(w, h, n);
@@ -43,7 +43,7 @@ fbo.create(w, h, n);
 
 # Reading from an FBO
 
-Usually FBO are accessed as textures from the Shaders. Any Texture attachment can be handled directly as a Texture (see the [Texture Tutorial](@ref texture_tutorial) for more details).
+Usually FBO are accessed as textures from the Shaders. Any Texture attachment can be handled directly as a [Texture](@ref Tucano::Texture) (see the [Texture Tutorial](@ref texture_tutorial) for more details).
 It is possible to bind an Attachment and make it accessible in the Shader program with a single call:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

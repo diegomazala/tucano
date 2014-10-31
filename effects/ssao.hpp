@@ -49,7 +49,6 @@ class SSAO: public Effect {
      * User must pass the viewport width and height used for framebuffer initialization and noise scale factor computation and can optionally pass the number of samples used for
 	 * occlusion computation, dimension of the noise texture and kernel radius. It's important to notice that if the number of samples is changed here, it also needs to be changed in the shader code. It 
 	 * can't be passed as a uniform to the shader because it represents the size of the sample points' array.
-	 * @param name The name of the effect.
 	 * @param currentWidth the current Viewport Width.
 	 * @param currentHeight the current Viewport Height.
 	 * @param noiseTextureDimension The dimension of the noise texture to be generated.

@@ -32,6 +32,12 @@ Tucano makes everything transparent by using the [TextureManager](@ref Tucano::T
 shader->setUniform("imageTexture", image_texture->bind());
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The Texture is readily available in the Shader code as:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uniform sampler2D imageTexture;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Don't forget to `unbind` the Texture after usage, otherwise you might quickly run out of Texture Slots.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

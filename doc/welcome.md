@@ -25,6 +25,15 @@ By keeping the code **clean** and **compact**, Tucano also renders the code **le
 
 * examples and a collection of common effects (Phong, Image filters, SSAO ...)
 
+## Downloading
+
+Tucano is distributed under GPL Version 3,
+and is available at [github](https://github.com/LCG-UFRJ/tucano)
+
+You can clone Tucano directly from:
+
+> git clone https://github.com/LCG-UFRJ/tucano.git
+
 ## Requirements
 
 Tucano has only two library dependencies (make sure you have recent version):
@@ -46,16 +55,25 @@ Check out the [Samples](@ref examples) page for the examples
 
 Check out the [Effects](@ref effects) Collection
 
+## Devolpment Notice
+
+Even though **Tucano 0.1** is out, there are still some features that are not implemented, such as encapsulation of 
+*Tesselation Shaders*, and some *Buffers Objects* types. Some examples are still missing, but will soon be included
+in Tucano. Documentation is almost up-to-date, but not 100%, completion is underway.
+
+Please help us improve Tucano using github's [Issue Tracker] (https://github.com/LCG-UFRJ/tucano/issues).
+
+
 ## Developers
 
 Tucano is maintained by the [Computer Graphics Lab](http://www.lcg.ufrj.br) at [UFRJ](http://www.ufrj.br)
 
 Tucano was initially developed by:
 
-- Ricardo Marroquim
-- Vitor Andrade
+- [Ricardo Marroquim](http://www.lcg.ufrj.br/Members/ricardo)
+- [Vitor de Andrade](http://www.lcg.ufrj.br/Members/vitorandrade)
 
 A list of Tucano's contributors:
 
-- Felipe Moura
-- Thiago Perrotta
+- [Thiago Perrotta](http://www.lcg.ufrj.br/Members/thiago)
+- [Felipe Moura de Carvalho](http://www.lcg.ufrj.br/Members/fmc)

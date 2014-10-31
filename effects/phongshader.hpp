@@ -40,9 +40,8 @@ public:
 
     /**
      * @brief Default constructor.
-     * @param current_size Viewport size.
      */
-    Phong ()
+    Phong (void)
     {
         phong_shader = 0;
     }
