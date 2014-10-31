@@ -662,6 +662,7 @@ INPUT                  = ./src/ \
 			 ./doc/examples.md \
 			 ./doc/effects.md \
 			 ./doc/effectTutorial.md \
+ 			 ./doc/framebufferTutorial.md \
 			 ./doc/meshTutorial.md
 
 # This tag can be used to specify the character encoding of the source files

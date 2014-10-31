@@ -125,7 +125,7 @@ void main(void)
 Let's say we want to create an effect called BlurredNormals. Its only an illustrative example.
 This effect uses the normalmap above and then blurs the final resulting image.
 It's a two pass method: first pass stores the normalmap result in an FBO; second pass blurs the
-resulting image from the first pass.
+resulting image from the first pass. If you are not familiar with FBOs, check out the [Framebuffer Tutorial](@ref framebuffer_tutorial).
     
 We now need two Shaders plus a Quad Mesh and an FBO for the screen space blur:
 

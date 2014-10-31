@@ -4,6 +4,10 @@ Using the Framebuffer Classe       {#framebuffer_tutorial}
 The Framebuffer Class holds a common and very useful OpenGL FBO.
 FBOs are used mainly, but certainly not only, for offscreen rendering,
 that is, tunneling the rendered image to a Texture instead to the screen.
+This is very useful for multipass effects, where the output of the first render
+pass is saved to a FBO Texture Attachment, that is received as input for the second pass.
+The second pass might render directly to the screen buffer, or yet to another Texture
+Attachment to serve as input for a third pass, and so on.
 
 An FBO can hold up to a maximum number of textures (Attachments), having the restriction
 that all of them have the same size.
@@ -37,9 +41,23 @@ Tucano::Framebuffer fbo;
 fbo.create(w, h, n);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Attachments
+# Reading from an FBO
 
-Any Texture attachment can be handled directly as a Texture, see the [Texture Tutorial](@ref texture_tutorial) for more info.
+Usually FBO are accessed as textures from the Shaders. Any Texture attachment can be handled directly as a Texture (see the [Texture Tutorial](@ref texture_tutorial) for more details).
+It is possible to bind an Attachment and make it accessible in the Shader program with a single call:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+shader.setUniform("textureName", fbo.bindAttachment(attachID));
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In your Shader, the Texture will be available as a sampler. For a 2D texture for example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uniform sampler2D textureName;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+However, sometimes for debugging facility it is useful to read back the pixels from a given attachment. This can be easily achieve using the readPixels methods.
+
 
 # Rendering to the FBO
 
@@ -58,3 +76,5 @@ fbo.bindRenderBuffers(attachID1, attachID2);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are overloads to render up to 8 attachments, or passing a list of attachments as a reference.
+
+
