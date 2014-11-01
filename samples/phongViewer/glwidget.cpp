@@ -17,7 +17,7 @@ GLWidget::~GLWidget()
 void GLWidget::initialize (void)
 {
     // initialize the shader effect
-    phong = new Phong();
+    phong = new Effects::Phong();
     phong->setShadersDir("../effects/shaders/");
     phong->initialize();
 
