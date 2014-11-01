@@ -35,15 +35,15 @@ void GLWidget::initialize (void)
     string shaders_dir("../effects/shaders/");
 
     // initialize the shader effects
-    meanfilter = new MeanFilter();
+    meanfilter = new Effects::MeanFilter();
     meanfilter->setShadersDir(shaders_dir);
     meanfilter->initialize();
 
-    gradientfilter = new GradientFilter();
+    gradientfilter = new Effects::GradientFilter();
     gradientfilter->setShadersDir(shaders_dir);
     gradientfilter->initialize();
 
-    rendertexture = new RenderTexture();
+    rendertexture = new Effects::RenderTexture();
     rendertexture->setShadersDir(shaders_dir);
     rendertexture->initialize();
 
