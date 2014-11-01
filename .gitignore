@@ -1,6 +1,9 @@
 # The main executable
 main/
 
+# Common cmake build folder
+build/
+
 # Created by https://www.gitignore.io
 
 ### C ###
