@@ -127,7 +127,7 @@ public:
     /**
      * @brief Reset view matrix
      */
-    void resetViewMatrix(void)
+    void resetViewMatrix (void)
     {
         viewMatrix = Eigen::Affine3f::Identity();
     }
@@ -135,7 +135,7 @@ public:
     /**
      * @brief Reset projection matrix
      */
-    void resetProjectionMatrix(void)
+    void resetProjectionMatrix (void)
     {
         projectionMatrix = Eigen::Matrix4f::Identity();
     }
@@ -143,7 +143,7 @@ public:
     /**
      * @brief Resets trackball to initial position and orientation
      */
-    void reset(void)
+    void reset (void)
     {
         resetViewMatrix();
         resetProjectionMatrix();
@@ -154,17 +154,18 @@ public:
      * @brief Returns the center of the camera in world space.
      * @return Camera center
      */
-    Eigen::Vector3f getCenter()
+    Eigen::Vector3f getCenter (void)
     {
         return viewMatrix.linear().inverse() * (-viewMatrix.translation());
     }
 
     /**
      * @brief Return the modelview matrix as a GLdouble array.
+     *
      * Similar to OpenGL old method using glGet**(GL_MODELVIEW_MATRIX)
      * @param matrix A pointer to a GLdouble of at least 16 elements to fill with view matrix.
      */
-    void getViewMatrix(GLdouble *matrix)
+    void getViewMatrix (GLdouble *matrix)
     {
         Eigen::Matrix4f mv = viewMatrix.matrix();
         for (int i = 0; i < 16; ++i)
@@ -175,10 +176,11 @@ public:
 
     /**
      * @brief Return the projection matrix as a GLdouble array.
+     *
      * Similar to OpenGL old method using glGet**(GL_PROJECTION_MATRIX)
      * @param matrix A pointer to a GLdouble of at least 16 elements to fill with projection matrix.
      */
-    void getProjectionMatrix(GLdouble *matrix)
+    void getProjectionMatrix (GLdouble *matrix)
     {
         for (int i = 0; i < 16; ++i)
         {
@@ -188,6 +190,7 @@ public:
 
     /**
      * @brief Returns screen space coordinates of a 3D point.
+     *
      * Projects a given point to screen space using given viewport coordinates.
      * @param pt Given point to be projected.
      * @param viewport Vector containing viewport coordinates in following order [minX, minY, maxX, maxY]
@@ -228,7 +231,6 @@ public:
 
     /**
      * @brief Returns a 3x3 matrix containing only the rotation of the view matrix.
-     * @todo re-implement this method without quaternion.
      * @return The rotation part of the view matrix as a 3x3 matrix.
      */
     Eigen::Matrix3f getRotationMatrix (void)
@@ -248,6 +250,7 @@ public:
 
     /**
      * @brief Returns the perspective scale.
+     *
      * Usually this is element(1,1) of the projection matrix.
      * @return The perspective scale factor
      */
@@ -258,6 +261,7 @@ public:
 
     /**
      * @brief Returns the viewport coordinates.
+     *
      * Viewport vector is as follows [minX, minY, maxX, maxY]
      * @return Viewport coordinates.
      */
@@ -277,6 +281,7 @@ public:
 
     /**
      * @brief Sets the viewport coordinates considering that the minimum coordinates are zero.
+     *
      * Sets the new viewport as [0, 0, vp[0], vp[1]]
      * @param vp Viewport coordinates.
      */
@@ -349,7 +354,7 @@ public:
      * @brief Default constructor
      * @param shader_dir Optional directory containing camera shaders, otherwise uses default shaders
      */
-    Camera(string shader_dir = "")
+    Camera (string shader_dir = "")
     {
 
         // creates the mesh that will be used to represent the trackball's sphere.
@@ -358,12 +363,12 @@ public:
         // initialize the shader used for trackball rendering:
         if (shader_dir.empty())
         {
-            cameraShader = new Shader("trackballShader");
+            cameraShader = new Shader("cameraShader");
             use_default_shaders = true;
         }
         else
         {
-            cameraShader = new Shader(shader_dir, "trackballShader");
+            cameraShader = new Shader(shader_dir, "cameraShader");
             use_default_shaders = false;
         }
 
@@ -390,7 +395,7 @@ public:
      * @param in_far_plane Far plane
      * @return The created perspective matrix.
      */
-    static Eigen::Matrix4f createPerspectiveMatrix(float fy, float in_aspect_ratio, float in_near_plane,float in_far_plane)
+    static Eigen::Matrix4f createPerspectiveMatrix (float fy, float in_aspect_ratio, float in_near_plane,float in_far_plane)
     {
         Eigen::Matrix4f out = Eigen::Matrix4f::Zero();
 
@@ -418,7 +423,7 @@ public:
      * @param in_far_plane Far plane
      * @return The created perspective matrix.
      */
-    Eigen::Matrix4f setPerspectiveMatrix(float fy, float in_aspect_ratio, float in_near_plane,float in_far_plane)
+    Eigen::Matrix4f setPerspectiveMatrix (float fy, float in_aspect_ratio, float in_near_plane,float in_far_plane)
     {
         Eigen::Matrix4f proj = createPerspectiveMatrix(fy, in_aspect_ratio, in_near_plane, in_far_plane);
         setProjectionMatrix(proj);
@@ -430,7 +435,7 @@ public:
      * @brief Changes the fovy and computes new perspective projection matrix.
      * @param new_fovy New value for field of view.
      */
-    void changeFovy(float new_fovy)
+    void changeFovy (float new_fovy)
     {
         fovy = new_fovy;
         if (use_perspective)
@@ -449,7 +454,7 @@ public:
      * @param far Far plane for orthographic view.
      * @return The created orthographic matrix.
      */
-    static Eigen::Matrix4f createOrthographicMatrix(float left, float right, float bottom, float top, float near, float far)
+    static Eigen::Matrix4f createOrthographicMatrix (float left, float right, float bottom, float top, float near, float far)
     {
         Eigen::Matrix4f out = Eigen::Matrix4f::Zero();
 
@@ -466,6 +471,7 @@ public:
 
     /**
      * @brief Sets the projection matrix as a orthographic matrix.
+     *
      * Creates an orthographic projection matrix with the given parameters and sets as the projection matrix.
      * @param left Left plane for orthographic view.
      * @param right Right plane for orthographic view.
@@ -475,7 +481,7 @@ public:
      * @param far Far plane for orthographic view.
      * @return The created orthographic matrix.
      */
-    Eigen::Matrix4f setOrthographicMatrix(float left, float right, float bottom, float top, float near, float far)
+    Eigen::Matrix4f setOrthographicMatrix (float left, float right, float bottom, float top, float near, float far)
     {
         Eigen::Matrix4f proj = createOrthographicMatrix(left, right, bottom, top, near, far);
         setProjectionMatrix(proj);
@@ -487,7 +493,7 @@ public:
      * @brief Increases the fov of the perspective matrix by a given increment.
      * @param inc Given increment to increase fov
      */
-    void incrementFov(float inc)
+    void incrementFov (float inc)
     {
         fovy += inc;
         if (use_perspective)
@@ -500,7 +506,7 @@ public:
      * @brief Translates the view matrix by a given vector.
      * @param translation Translation to apply to view matrix.
      */
-    void translate(const Eigen::Vector3f& translation)
+    void translate (const Eigen::Vector3f& translation)
     {
         viewMatrix.translate(translation);
     }
@@ -509,7 +515,7 @@ public:
      * @brief Rotate the view matrix by a given quaternion.
      * @param rotation Rotation to apply to view matrix.
      */
-    void rotate(const Eigen::Quaternion<float>& rotation)
+    void rotate (const Eigen::Quaternion<float>& rotation)
     {
         viewMatrix.rotate(rotation);
     }
@@ -518,7 +524,7 @@ public:
      * @brief Scales the view matrix by given factors.
      * @param scale_factors Scale factors in x, y, and z axis.
      */
-    void scale(const Eigen::Vector3f& scale_factors)
+    void scale (const Eigen::Vector3f& scale_factors)
     {
         viewMatrix.scale(scale_factors);
     }
@@ -527,7 +533,7 @@ public:
      * @brief Scales the view matrix by given factor in all axis.
      * @param scale_factor Scale factors in all axis.
      */
-    void scale(float scale_factor)
+    void scale (float scale_factor)
     {
         viewMatrix.scale(scale_factor);
     }
@@ -571,6 +577,7 @@ public:
 
     /**
      * @brief Renders the camera representation.
+     *
      * Renders a truncated pyramid (frustum) to represent the camera.
      * It will be placed and oriented according to the view matrix.
      */

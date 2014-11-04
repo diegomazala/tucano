@@ -233,9 +233,13 @@ public:
     void loadShader (void)
     {
         if (use_default_shaders)
+        {
             trackballShader->initializeFromStrings(trackball_vertex_code, trackball_fragment_code);
+        }
         else
+        {
             trackballShader->initialize();
+        }
     }
 
     ///Default destructor.
