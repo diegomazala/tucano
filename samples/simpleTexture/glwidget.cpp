@@ -19,7 +19,7 @@ void GLWidget::initialize (void)
     // the default is /shaders from your running dir
     string shaders_dir("../effects/shaders/");
 
-    rendertexture = new RenderTexture();
+    rendertexture = new Effects::RenderTexture();
     rendertexture->setShadersDir(shaders_dir);
     rendertexture->initialize();
 

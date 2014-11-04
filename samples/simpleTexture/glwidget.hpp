@@ -36,7 +36,7 @@ public slots:
 private:
 
     /// Render image effect (simply renders a texture)
-    RenderTexture *rendertexture;
+    Effects::RenderTexture *rendertexture;
 
     /// Texture to hold input image
     Texture image_texture;
