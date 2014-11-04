@@ -1,4 +1,4 @@
-Tucano                         {#mainpage}
+Tucano
 ======
 
 ### Welcome to Tucano, a Library for rapid prototyping with modern OpenGL and GLSL.
@@ -53,7 +53,7 @@ in Tucano. Documentation is almost up-to-date, but not 100%, completion is under
 
 Please help us improve Tucano using github's [Issue Tracker] (https://github.com/LCG-UFRJ/tucano/issues).
 
-
+s
 ## Developers
 
 Tucano is maintained by the [Computer Graphics Lab](http://www.lcg.ufrj.br) at [UFRJ](http://www.ufrj.br)
