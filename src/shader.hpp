@@ -23,12 +23,10 @@
 #ifndef __TUCANOSHADER__
 #define __TUCANOSHADER__
 
-#include <GL/glew.h>
-#include <GL/glu.h>
+#include "utils/misc.hpp"
+
 #include <fstream>
 #include <vector>
-#include <iostream>
-#include <string>
 #include <Eigen/Dense>
 
 using namespace std;
@@ -46,25 +44,6 @@ namespace Tucano
 class Shader {
 
 public:
-
-    /**
-     * @brief errorCheckFunc
-     * @todo remove this from here!
-     * @param file
-     * @param line
-     * @param message
-     */
-    static void errorCheckFunc (string file, int line, string message = "")
-    {
-        //OpenGL Error Handling Function:
-        GLenum ErrorCheckValue = glGetError();
-        if (ErrorCheckValue != GL_NO_ERROR)
-        {
-            cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << endl;
-            cerr << message.c_str() << endl;
-            exit(-1);
-        }
-    }
 
     /**
      * @brief Empty constructor.
@@ -275,18 +254,10 @@ public:
         }
 
         // if no shader was found, emit an warning
-        if (!found) {
+        if (!found)
+        {
             cerr << "Warning: no shader " << name.c_str() << " file found in directory : " << shader_dir.c_str() << endl;
         }
-        #ifdef TUCANODEBUG
-        else
-        {
-            if (vertex_file.good()) cout << "found Vertex Shader " << vs_name.c_str() << endl;
-            if (geom_file.good()) cout << "found Geometry Shader " << gs_name.c_str() << endl;
-            if (fragment_file.good()) cout << "found Fragment Shader " << fs_name.c_str() << endl;
-            if (comp_file.good()) cout << "found Compute Shader " << cs_name.c_str() << endl;
-        }
-        #endif
 
         vertexShader = 0;
         fragmentShader = 0;
@@ -332,7 +303,7 @@ public:
         glLinkProgram(shaderProgram);
 
         #ifdef TUCANODEBUG
-        errorCheckFunc(__FILE__, __LINE__);
+        Misc::errorCheckFunc(__FILE__, __LINE__);
         #endif
     }
 
@@ -375,7 +346,7 @@ public:
         glLinkProgram(shaderProgram);
 
         #ifdef TUCANODEBUG
-        errorCheckFunc(__FILE__, __LINE__);
+        Misc::errorCheckFunc(__FILE__, __LINE__);
         #endif
     }
 
@@ -406,7 +377,7 @@ public:
         glLinkProgram(shaderProgram);
 
         #ifdef TUCANODEBUG
-        errorCheckFunc(__FILE__, __LINE__);
+        Misc::errorCheckFunc(__FILE__, __LINE__);
         #endif
     }
 
@@ -491,7 +462,7 @@ public:
         glAttachShader(shaderProgram, vertexShader);
 
         #ifdef TUCANODEBUG
-        errorCheckFunc(__FILE__, __LINE__, "error loading vertex shader code");
+        Misc::errorCheckFunc(__FILE__, __LINE__, "error loading vertex shader code");
         #endif
 
     }
@@ -566,7 +537,7 @@ public:
         glAttachShader(shaderProgram, geometryShader);
 
         #ifdef TUCANODEBUG
-        errorCheckFunc(__FILE__, __LINE__, "error loading geometry shader code");
+        Misc::errorCheckFunc(__FILE__, __LINE__, "error loading geometry shader code");
         #endif
 
     }
@@ -639,7 +610,7 @@ public:
         glAttachShader(shaderProgram, fragmentShader);
 
         #ifdef TUCANODEBUG
-        errorCheckFunc(__FILE__, __LINE__, "error loading fragment shader code");
+        Misc::errorCheckFunc(__FILE__, __LINE__, "error loading fragment shader code");
         #endif
 
     }
@@ -731,7 +702,7 @@ public:
             glAttachShader(shaderProgram, computeShaders[position]);
 
             #ifdef TUCANODEBUG
-            errorCheckFunc(__FILE__, __LINE__, "error loading compute shader code");
+            Misc::errorCheckFunc(__FILE__, __LINE__, "error loading compute shader code");
             #endif
 
             position++;

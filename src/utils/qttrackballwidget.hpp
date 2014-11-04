@@ -32,6 +32,7 @@
 
 #include <QGLWidget>
 #include <QMouseEvent>
+#include <QFileDialog>
 
 using namespace std;
 
@@ -85,22 +86,12 @@ public:
     {
         makeCurrent();
 
+        #ifdef TUCANODEBUG
         QGLFormat glCurrentFormat = this->format();
-        cout << "set version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << endl;
-        cout << "set profile : " << glCurrentFormat.profile() << endl;
-        // Glew Initialization:
-        cout << "initializing glew ..." << endl;
+        cout << "QT GL version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << endl;
+        #endif
 
-        glewExperimental = true;
-        GLenum glewInitResult = glewInit();
-
-        //errorCheckFunc(__FILE__, __LINE__);
-        if (GLEW_OK != glewInitResult) {
-            cerr << "Error: " << glewGetErrorString(glewInitResult) << endl;
-            exit(EXIT_FAILURE);
-        }
-        cout << "INFO: OpenGL Version: " << glGetString(GL_VERSION) << endl << endl;
-
+        Misc::initGlew();
     }
 
     /**
@@ -116,17 +107,11 @@ public:
 
     /**
      * @brief Initializes the trackball and the mesh with a given filename
-     * @todo move modelmatrix to mesh class.
      */
-    void initialize (string filename)
+    void initialize (void)
     {
         Eigen::Vector2i size;
         size << this->width(), this->height();
-
-        mesh = new Mesh();
-        MeshImporter::loadObjFile(mesh, filename);
-        //ShaderLib::MeshImporter::loadPlyFile(mesh, filename);
-        mesh->normalizeModelMatrix();
 
         camera_trackball = new Trackball();
         camera_trackball->setPerspectiveMatrix(60.0, this->width()/this->height(), 1.0f, 100.0f);
@@ -139,30 +124,45 @@ public:
         light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
         updateGL();
-        //ShaderLib::errorCheckFunc(__FILE__, __LINE__);
+    }
+
+    /**
+     * @brief Opens a mesh from file.
+     *
+     * @param filename Given mesh file.
+     */
+    void openMesh (string filename)
+    {
+        if (mesh)
+            delete mesh;
+        mesh = new Mesh();
+        MeshImporter::loadObjFile(mesh, filename);
+        //ShaderLib::MeshImporter::loadPlyFile(mesh, filename);
+        mesh->normalizeModelMatrix();
     }
 
 protected:
 
-    /**
-     * @brief Callback for mouse double click.
-     * @param event The mouse event that triggered the callback.
-     */
-    void mouseDoubleClickEvent (QMouseEvent * event)
-    {
-        event->ignore();
-        updateGL();
-    }
+//    /**
+//     * @brief Callback for mouse double click.
+//     * @param event The mouse event that triggered the callback.
+//     */
+//    void mouseDoubleClickEvent (QMouseEvent * event)
+//    {
+//        event->ignore();
+//        updateGL();
+//    }
 
-    /**
-     * @brief Callback for key release event.
-     * @param event The key event that triggered the callback.
-     */
-    void keyReleaseEvent (QKeyEvent * event)
-    {
-        event->ignore();
-        updateGL ();
-    }
+//    /**
+//     * @brief Callback for key release event.
+//     * @param event The key event that triggered the callback.
+//     */
+//    void keyReleaseEvent (QKeyEvent * event)
+//    {
+//        event->ignore();
+//        updateGL ();
+//    }
+
 
     /**
      * @brief Callback for key press event.
@@ -170,12 +170,22 @@ protected:
      */
     void keyPressEvent (QKeyEvent * event)
     {
+        if (event->key() == Qt::Key_O)
+        {
+            QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("OBJ Files (*.obj)"));
+            if (!filename.isEmpty())
+            {
+                openMesh (filename.toStdString());
+            }
+        }
         event->ignore();
         updateGL();
     }
 
     /**
      * @brief Callback for mouse press event.
+     *
+     * The mouse press starts a rotation or a translation if Shift is pressed.
      * @param event The mouse event that triggered the callback.
      */
     void mousePressEvent (QMouseEvent * event)
@@ -204,7 +214,9 @@ protected:
     }
 
     /**
-     * @brief Callback for mouse mouse event.
+     * @brief Callback for mouse move event.
+     *
+     * If rotating or translating, this method updates the trackball position.
      * @param event The mouse event that triggered the callback.
      */
     void mouseMoveEvent (QMouseEvent * event)
@@ -230,6 +242,12 @@ protected:
 
     }
 
+    /**
+     * @brief Callback for mouse release event.
+     *
+     * Stops rotation or translation.
+     * @param event The mouse event that triggered the callback.
+     */
     void mouseReleaseEvent (QMouseEvent * event)
     {
         if (event->button() == Qt::LeftButton)
@@ -245,6 +263,12 @@ protected:
         updateGL ();
     }
 
+    /**
+     * @brief Callback for mouse wheel event.
+     *
+     * Changes the camera zoom, or the camera FOV is Shift is pressed.
+     * @param event The mouse event that triggered the callback.
+     */
     void wheelEvent (QWheelEvent * event)
     {
         const int WHEEL_STEP = 120;

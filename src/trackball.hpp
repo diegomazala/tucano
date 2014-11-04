@@ -78,20 +78,6 @@ const string trackball_vertex_code = "\n"
  **/
 class Trackball : public Tucano::Camera {
 
-    /**
-     * @brief errorCheckFunc
-     * @todo remove this method from here!
-     */
-    void errorCheckFunc(string file, int line)
-    {
-        //OpenGL Error Handling Function:
-        GLenum ErrorCheckValue = glGetError();
-        if (ErrorCheckValue != GL_NO_ERROR)
-        {
-            cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << endl;
-            exit(-1);
-        }
-    }
 
 private:
 

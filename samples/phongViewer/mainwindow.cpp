@@ -16,6 +16,8 @@ MainWindow::~MainWindow()
 void MainWindow::initialize( void )
 {
     ui->glwidget->initialize();
+
+
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *ke)

@@ -25,8 +25,6 @@
 
 #include <Eigen/Dense>
 #include <vector>
-#include <iostream>
-#include <GL/glew.h>
 #include <shader.hpp>
 
 namespace Tucano

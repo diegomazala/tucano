@@ -69,21 +69,6 @@ const string camera_vertex_code = "\n"
  **/
 class Camera {
 
-    /**
-     * @brief errorCheckFunc
-     * @todo remove this method from here!!
-     */
-    void errorCheckFunc(string file, int line)
-    {
-        //OpenGL Error Handling Function:
-        GLenum ErrorCheckValue = glGetError();
-        if (ErrorCheckValue != GL_NO_ERROR)
-        {
-            cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << endl;
-            exit(-1);
-        }
-    }
-
 protected:
 
     /// Projection, or intrinsic, matrix.
@@ -605,7 +590,7 @@ public:
         cameraShader->setUniform("modelMatrix",(Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(PI/2.0,Eigen::Vector3f(0.0,1.0,0.0))).data(), 4, GL_FALSE, 1);
         cameraShader->setUniform("in_Color",colorVector.data(),4,1);
         glDrawArrays(GL_LINE_LOOP, 0, 200);
-        errorCheckFunc(__FILE__, __LINE__);
+        Misc::errorCheckFunc(__FILE__, __LINE__);
 
         unbindBuffers();
 

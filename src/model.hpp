@@ -1,10 +1,9 @@
 #ifndef __MODEL__
 #define __MODEL__
 
-#include <GL/glew.h>
-#include <GL/glu.h>
+#include <utils/misc.hpp>
+
 #include <vector>
-#include <iostream>
 #include <fstream>
 #include <Eigen/Dense>
 
@@ -49,22 +48,6 @@ public:
         centroid = Eigen::Vector3f::Zero();
         radius = 1.0;
         scale = 1.0;
-    }
-
-    /**
-     * @brief errorCheckFunc
-     * @todo remove this method from here!
-     * @param file
-     * @param line
-     */
-    void errorCheckFunc(string file, int line){
-        //OpenGL Error Handling Function:
-        GLenum ErrorCheckValue = glGetError();
-        if (ErrorCheckValue != GL_NO_ERROR)
-        {
-            cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << endl;
-            exit(-1);
-        }
     }
 
     /**

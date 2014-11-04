@@ -223,22 +223,6 @@ public:
     }
 
     /**
-     * @brief errorCheckFunc
-     * @todo remove this method from here!
-     * @param file
-     * @param line
-     */
-    void errorCheckFunc(string file, int line){
-        //OpenGL Error Handling Function:
-        GLenum ErrorCheckValue = glGetError();
-        if (ErrorCheckValue != GL_NO_ERROR)
-        {
-            cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << endl;
-            exit(-1);
-        }
-    }
-
-    /**
      * @brief Returns the number of elements (primitives such as triangles) of the mesh.
      * @return Number of primitives.
      */
@@ -678,12 +662,14 @@ public:
 
 
     /**
-     * @brief Binds all buffers for OpenGL usage.
+     * @brief Binds all buffers.
+     *
      * If no Vertex Array has been generated yet, one will be created.
      * If there is a index buffer it will also be binded.
      * Then, binds one buffer for each vertex attribute.
      */
-    virtual void bindBuffers() {
+    virtual void bindBuffers (void)
+    {
 
         if (vao_id == 0)
         {
@@ -703,7 +689,9 @@ public:
             vertex_attributes[i].enable();
         }
 
-        errorCheckFunc(__FILE__, __LINE__);
+        #ifdef TUCANODEBUG
+        Misc::errorCheckFunc(__FILE__, __LINE__);
+        #endif
     }
 
     /**
@@ -745,11 +733,10 @@ public:
 
 
     /**
-     * @brief createParallelepiped
-     * @todo create a parallelepiped class to remove this from here.
-     * @param x
-     * @param y
-     * @param z
+     * @brief Sets the mesh as a Parallelpiped with given dimensions, scales so larger side is equal to 1.
+     * @param x Width
+     * @param y Height
+     * @param z Depth
      */
     void createParallelepiped(float x, float y, float z)
     {
@@ -807,10 +794,9 @@ public:
     }
 
     /**
-     * @brief createQuad
-     * @todo create quad class, remove this from here.
+     * @brief Sets the mesh as Unit Quad.
      */
-    void createQuad(void)
+    void createQuad (void)
     {
         vector<Eigen::Vector4f> vert;
         vector<Eigen::Vector2f> texCoord;

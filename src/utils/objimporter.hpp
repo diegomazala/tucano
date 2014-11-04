@@ -23,7 +23,7 @@
 #ifndef __OBJIMPORTER__
 #define __OBJIMPORTER__
 
-#include <mesh.hpp>
+#include "mesh.hpp"
 
 using namespace std;
 
@@ -36,7 +36,6 @@ namespace MeshImporter
 /**
  * @brief Loads a mesh from an OBJ file.
  *
- * @todo check if color really exists or not
  * Loads vertex coordinates and normals, texcoords and color when available.
  * @param mesh Pointer to mesh instance to load file.
  * @param filename Given filename of the OBJ file.
@@ -52,18 +51,24 @@ static void loadObjFile (Mesh* mesh, string filename)
     vector<GLuint> elementsTexIDs;
 
     //Opening file:
+    #ifdef TUCANODEBUG
     cout << "Opening Wavefront obj file " << filename.c_str() << endl << endl;
+    #endif
+
     ifstream in(filename.c_str(),ios::in);
-    if (!in) {
+    if (!in)
+    {
         cerr << "Cannot open " << filename.c_str() << endl; exit(1);
     }
 
     //Reading file:
     string line;
-    while(getline(in,line)) {
+    while(getline(in,line))
+    {
 
         //Vertices reading:
-        if(line.substr(0,2) == "v ") {
+        if(line.substr(0,2) == "v ")
+        {
 
             istringstream s(line.substr(2));
             Eigen::Vector4f v;
@@ -79,7 +84,8 @@ static void loadObjFile (Mesh* mesh, string filename)
         }
 
         //Normals reading:
-        else if(line.substr(0,2) == "vn") {
+        else if(line.substr(0,2) == "vn")
+        {
             istringstream s(line.substr(3));
             Eigen::Vector3f vn;
             s >> vn[0]; s >> vn[1]; s >> vn[2];
@@ -87,7 +93,8 @@ static void loadObjFile (Mesh* mesh, string filename)
         }
 
         //Texture Coordinates reading:
-        else if(line.substr(0,2) == "vt") {
+        else if(line.substr(0,2) == "vt")
+        {
             istringstream s(line.substr(2));
             Eigen::Vector2f vt;
             s >> vt[0]; s >> vt[1];
@@ -95,29 +102,34 @@ static void loadObjFile (Mesh* mesh, string filename)
         }
 
         //Elements reading: Elements are given through a string: "f vertexID/TextureID/NormalID". If no texture is given, then the string will be: "vertexID//NormalID".
-        else if(line.substr(0,2) == "f ") {
+        else if(line.substr(0,2) == "f ")
+        {
             GLuint vertexID1, normalID1, textureID1;
             istringstream s(line.substr(2));
-            while(!s.eof()){
+            while(!s.eof())
+            {
                 s >> vertexID1;
                 elementsVertices.push_back(vertexID1-1);
-                if(s.peek() == '/') {
+                if(s.peek() == '/')
+                {
                     s.get();
-                    if(s.peek() == '/') {
+                    if(s.peek() == '/')
+                    {
                         s.get();
                         s >> normalID1;
                         elementsNormals.push_back(normalID1-1);
                     }
-                    else {
+                    else
+                    {
                         s >> textureID1;
                         elementsTexIDs.push_back(textureID1-1);
-                        if(s.peek() == '/') {
+                        if(s.peek() == '/')
+                        {
                             s.get();
                             s >> normalID1;
                             elementsNormals.push_back(normalID1-1);
                         }
                     }
-
                 }
             }
         }
@@ -128,26 +140,39 @@ static void loadObjFile (Mesh* mesh, string filename)
         //Ignoring any other lines:
         else {};
     }
-    if(in.is_open()) {
+    if(in.is_open())
+    {
         in.close();
     }
 
     // load attributes found in file
     if (vert.size() > 0)
+    {
         mesh->loadVertices(vert);
+    }
     if (norm.size() > 0)
+    {
         mesh->loadNormals(norm);
+    }
     if (texCoord.size() > 0)
+    {
         mesh->loadTexCoords(texCoord);
+    }
     if (color.size() > 0)
+    {
         mesh->loadColors(color);
+    }
     if (elementsVertices.size() > 0)
+    {
         mesh->loadIndices(elementsVertices);
+    }
 
     // sets the default locations for accesing attributes in shaders
     mesh->setDefaultAttribLocations();
 
-    //errorCheckFunc(__FILE__, __LINE__);
+    #ifdef TUCANODEBUG
+    Misc::errorCheckFunc(__FILE__, __LINE__);
+    #endif
 }
 
 }
