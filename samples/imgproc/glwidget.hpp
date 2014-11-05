@@ -81,13 +81,13 @@ public slots:
 private:
 
     /// Mean filter effect.
-    MeanFilter *meanfilter;
+    Effects::MeanFilter *meanfilter;
 
     /// Gradient filter effect.
-    GradientFilter *gradientfilter;
+    Effects::GradientFilter *gradientfilter;
 
     /// Render image effect (simply renders a texture)
-    RenderTexture *rendertexture;
+    Effects::RenderTexture *rendertexture;
 
     /// FBO for multipass (enables applying more than one filter in sequence)
     Framebuffer fbo;
