@@ -25,6 +25,10 @@ By keeping the code **clean** and **compact**, Tucano also renders the code **le
 
 * examples and a collection of common effects (Phong, Image filters, SSAO...)
 
+## Documentation
+
+Documentation is available at http://lcg-ufrj.github.io/tucano
+
 
 ## Requirements
 
