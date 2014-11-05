@@ -7,7 +7,6 @@ All *effects* are composed of a simple class that inherits from the [Effect Clas
 contains one or more [Shaders](@ref Tucano::Shader).
 
 * phongShader - a simple Phong Shader that receives a [Mesh](@ref Tucano::Mesh) and two [Trackballs](@ref Tucano::Trackball), one for the camera and one for the light direction.
-
 * renderTexture - a simple shader that renders a given texture using a quad as proxy geometry.
 
 ## Using an Effect
@@ -35,10 +34,10 @@ Once the effect is initialized it can be used to render a mesh. The Phong Shader
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 glClearColor(1.0, 1.0, 1.0, 0.0);
-glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 phong->render(mesh, camera_trackball, light_trackball);
 camera_trackball->render(); // renders the trackball visual representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-Some effects have set methods for the parameters, the usage is straightforward.
+Some effects have set methods for the parameters, their usage is straightforward.

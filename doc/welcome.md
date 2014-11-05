@@ -55,7 +55,7 @@ Check out the [Samples](@ref examples) page for the examples
 
 Check out the [Effects](@ref effects) Collection
 
-## Devolpment Notice
+## Development Notice
 
 Even though **Tucano 0.1** is out, there are still some features that are not implemented, such as encapsulation of 
 *Tesselation Shaders*, and some *Buffers Objects* types. Some examples are still missing, but will soon be included

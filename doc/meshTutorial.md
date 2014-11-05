@@ -3,13 +3,13 @@ Using the Mesh Class                         {#mesh_tutorial}
 
 The Mesh Class contains many basic methods to quickly load and use a mesh.
 
-A Mesh Object contains Vertex Attributes, that are translated into OpenGL Arrays. Vertex Attributes are information per vertex, such as coordinates, normals, color, etc ...
+A Mesh Object contains Vertex Attributes, that are translated into OpenGL Arrays. Vertex Attributes are information per vertex, such as coordinates, normals, color, etc...
 
 ---
 
 ## Importers
 
-If you have an OBJ file, you can simple load it by:
+If you have an `OBJ` file, you can simple load it by:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
 #include "utils/objimporter.hpp"
@@ -20,7 +20,7 @@ Tucano::Mesh * mymesh = new Tucano::Mesh();
 Tucano::MeshImporter::loadObjFile(mesh, filename);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
 
-The PLY importer is under construction ...
+The PLY importer is under construction...
 
 
 ## Vertex Attributes

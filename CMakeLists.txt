@@ -9,7 +9,15 @@ set(TUCANO_EFFECTS_DIR "${PROJECT_SOURCE_DIR}/effects")
 set(TUCANO_SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
 find_package(GLEW REQUIRED)
+if(NOT GLEW_FOUND)
+  message(SEND_ERROR "GLEW not found on your system.")
+endif()
+
 find_package(OpenGL REQUIRED)
+if(NOT OPENGL_FOUND)
+  message(SEND_ERROR "OpenGL not found on your system.")
+endif()
+
 find_package(Qt5OpenGL REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 if (Qt5_POSITION_INDEPENDENT_CODE)
@@ -17,13 +25,6 @@ if (Qt5_POSITION_INDEPENDENT_CODE)
 endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-if(NOT GLEW_FOUND)
-  message(SEND_ERROR "GLEW not found on your system.")
-endif()
-if(NOT OPENGL_FOUND)
-  message(SEND_ERROR "OpenGL not found on your system.")
-endif()
 
 include_directories(
   ${GLEW_INCLUDE_DIRS}
@@ -91,6 +92,7 @@ add_library(
 # EFFECTS END
 ###########################################
 
+# You might comment out the examples you don't want to compile.
 add_subdirectory(${SAMPLES_DIR}/imgproc)
 add_subdirectory(${SAMPLES_DIR}/phongViewer)
 add_subdirectory(${SAMPLES_DIR}/simpleTexture)

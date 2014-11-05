@@ -71,11 +71,11 @@ virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
 And that's it. 
-In the application's draw routine, we clear the screen and call the render method above. To see a visual representation of the trackball just render it! Just make sure that depth test is enabled. Here is a sample code for a typical draw method (you can find a similar method in the GlWidget Class of the phongViewer sample):
+In the application's draw routine, we clear the screen and call the render method above. To see a visual representation of the trackball just render it! Just make sure that depth test is enabled. Here is a sample code for a typical draw method (you can find a similar method in the GLWidget Class of the phongViewer sample):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 glClearColor(1.0, 1.0, 1.0, 0.0);
-glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 normalmap_shader->render(mesh, camera_trackball);
 camera_trackball->render();
@@ -146,7 +146,7 @@ virtual void initialize ()
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-> note that you need to pass the size of your viewport to initialize the FBO, we assume we know this and its (w,h). The last parameter of the FBO says that we only need one texture attachment. It's usually a good idea to initialize and re-initialize the FBO every time your window is resized (checkout the [QtTrackballWidget](@ref Tucano::QtTrackballWidget) for an example).
+> Note that you need to pass the size of your viewport to initialize the FBO, we assume we know this and its (w,h). The last parameter of the FBO says that we only need one texture attachment. It's usually a good idea to initialize and re-initialize the FBO every time your window is resized (checkout the [QtTrackballWidget](@ref Tucano::QtTrackballWidget) for an example).
 
 We show another way to set the FBO size below, after this example.
 
@@ -192,7 +192,7 @@ virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
 And that is all!!
-The blur shaders files ("meanfilter.vert and meanfilter.frag) are in the *effects/shaders* directory of the Tucano Lib.
+The blur shaders files (meanfilter.vert and meanfilter.frag) are in the *effects/shaders* directory of the Tucano Lib.
 
 ## Alternative to setting the FBO size during the initialization.
 
@@ -212,4 +212,4 @@ if (fbo->getWidth() != (viewport[2]-viewport[1]) || fbo->getHeight() != (viewpor
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
-> note that usually the first two elements of the viewport vector are zero (ex. [0, 0, w, h]). However, we have left it with as four elements for completeness.
+> Note that usually the first two elements of the viewport vector are zero (ex. [0, 0, w, h]). However, we have left it with as four elements for completeness.

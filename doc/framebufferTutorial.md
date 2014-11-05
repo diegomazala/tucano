@@ -14,14 +14,14 @@ that all of them have the same size.
 
 The Framebuffer Class makes FBO creation and usage very easy:
 
-- hides most of the usual burden of setting up an FBO
+- hides most of the usual burden of setting up a FBO
 - easily bind one or more FBO Texture Attachment as output buffers
-- easily bind an FBO Texture for accessing inside Shaders
+- easily bind a FBO Texture for accessing inside Shaders
 
 
-# Creating an FBO
+# Creating a FBO
 
-Creating an FBO with size *(w,h)* and *n* texture attachments.
+Creating a FBO with size *(w,h)* and *n* texture attachments.
 
 First method:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -41,7 +41,7 @@ Tucano::Framebuffer fbo;
 fbo.create(w, h, n);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Reading from an FBO
+# Reading from a FBO
 
 Usually FBO are accessed as textures from the Shaders. Any Texture attachment can be handled directly as a [Texture](@ref Tucano::Texture) (see the [Texture Tutorial](@ref texture_tutorial) for more details).
 It is possible to bind an Attachment and make it accessible in the Shader program with a single call:

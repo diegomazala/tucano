@@ -9,11 +9,11 @@ The Texture Class is useful for easily:
 
 * creating and updating Texture data
 * changing and querying Texture parameters
-* binding and unbind
+* binding and unbinding
 
 ## Creating a Texture
 
-Tucano does not read image files (jpg, png, tiff, etc..), you need an external library for this. The Texture receives an array with the image data. For example, with Qt:
+Tucano does not read image files (jpg, png, tiff, etc...), you need an external library for this. The Texture receives an array with the image data. For example, with Qt:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 QImage image (filename);
