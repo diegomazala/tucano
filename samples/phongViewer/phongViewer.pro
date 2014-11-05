@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = phongViewer
 TEMPLATE = app
 
-TUCANO_PATH = ../../../../
+TUCANO_PATH = ../../
 
 INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects
 
@@ -35,11 +35,11 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \        
         glwidget.hpp \
-        $$TUCANO_PATH/effects/phongShader.hpp \
+        $$TUCANO_PATH/effects/phongshader.hpp \
         $$TUCANO_PATH/src/utils/qttrackballwidget.hpp
 
 FORMS    += mainwindow.ui
 
 OTHER_FILES += \
-        $$TUCANO_PATH/effects/shaders/phongShader.frag \
-        $$TUCANO_PATH/effects/shaders/phongShader.vert
+        $$TUCANO_PATH/effects/shaders/phongshader.frag \
+        $$TUCANO_PATH/effects/shaders/phongshader.vert

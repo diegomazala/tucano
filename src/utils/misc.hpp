@@ -47,7 +47,7 @@ namespace Misc
  * @param line Line in file.
  * @param message A custom message to be exhibited.
  */
-static void errorCheckFunc (std::string file, int line, std::string message = "")
+inline void errorCheckFunc (std::string file, int line, std::string message = "")
 {
     //OpenGL Error Handling Function:
     GLenum ErrorCheckValue = glGetError();
@@ -62,7 +62,7 @@ static void errorCheckFunc (std::string file, int line, std::string message = ""
 /**
  * @brief Initialize Glew
  */
-static void initGlew (void)
+inline void initGlew (void)
 {
 
     glewExperimental = true;

@@ -65,24 +65,13 @@ public:
     {
         makeCurrent();
 
-        QGLFormat glCurrentFormat = this->format();
         #ifdef TUCANODEBUG
+        QGLFormat glCurrentFormat = this->format();
         cout << "set version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << endl;
         cout << "set profile : " << glCurrentFormat.profile() << endl;
         #endif
 
-        glewExperimental = true;
-        GLenum glewInitResult = glewInit();
-
-        //errorCheckFunc(__FILE__, __LINE__);
-        if (GLEW_OK != glewInitResult)
-        {
-            cerr << "Error: " << glewGetErrorString(glewInitResult) << endl;
-            exit(EXIT_FAILURE);
-        }
-        #ifdef TUCANODEBUG
-        cout << "INFO: OpenGL Version: " << glGetString(GL_VERSION) << endl << endl;
-        #endif
+        Misc::initGlew();
 
     }
 
