@@ -1,4 +1,4 @@
-# The main executable
+doc/html/
 main/
 
 # Common cmake build folder
