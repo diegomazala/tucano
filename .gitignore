@@ -1,8 +1,7 @@
+bin/
+build/
 doc/html/
 main/
-
-# Common cmake build folder
-build/
 
 # Created by https://www.gitignore.io
 

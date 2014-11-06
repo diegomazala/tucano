@@ -35,3 +35,7 @@ target_link_libraries(
   Qt5::Widgets
   )
 
+install(
+  TARGETS phongViewer
+  RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin
+  )
