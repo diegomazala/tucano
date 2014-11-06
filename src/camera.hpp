@@ -271,6 +271,17 @@ public:
     }
 
     /**
+     * @brief Returns the dimensions of the viewport.
+     *
+     * Viewport dimensions are as follows [maxX - minX, maxY - minY]
+     * @return Viewport dimensions.
+     */
+    Eigen::Vector2i getViewportSize (void)
+    {
+        return Eigen::Vector2i(viewport[2]-viewport[0], viewport[3]-viewport[1]);
+    }
+
+    /**
      * @brief Sets the viewport coordinates.
      * @param vp Viewport coordinates.
      */

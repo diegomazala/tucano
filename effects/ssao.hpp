@@ -41,30 +41,77 @@ namespace Effects
 **/
 class SSAO: public Effect {
 
-	public:
+protected:
+    ///Noise texture dimension. It will be a noiseSize x noiseSize texture.
+    int noise_size;
+
+    ///Scale used to tile the noise texture through screen.
+    Eigen::Vector2f noise_scale;
+
+    ///Noise texture
+    Texture noiseTexture;
+
+    ///Array of sample points generated inside a unit hemisphere around z axis.
+    float *kernel;
+
+    ///Number of sample points that will be used per fragment for occlusion computation.
+    int numberOfSamples;
+
+    ///Kernel radius. If the distance between a sample point and the point for which the occlusion is being computed is larger than radius, the occlusion for this sample will be neglected.
+    float radius;
+
+    ///
+    Framebuffer* fbo;
+
+    ///
+    Shader* ssaoShader;
+
+    ///The shader used to store the depth information in the framebuffer.
+    Shader* deferredShader;
+
+    ///The shader used to blur the result from the second pass, removing the noise pattern.
+    Shader* blurShader;
+
+    /// A quad mesh for framebuffer rendering
+    Mesh* quad;
+
+    ///Flag indicating wether blur shall be applied or not.
+    bool apply_blur;
+
+    ///Flag indicating if the mesh should be rendered only with ambient occlusion pass or with full illumination. If True, mesh will be rendered only with the ambient occlusion pass.
+    bool displayAmbientPass;
+
+    ///Number of neighbour pixels used in blurring. The blur will be applied to a blurRange x blurRange square around the current pixel. It's important to notice that blurRange must be an odd number.
+    int blurRange;
+
+    ///The ID defining the color attachment to which the depth texture is bound in the framebuffer.
+    int depthTextureID;
+
+    ///The ID defining the color attachment to which the blur texture is bound in the framebuffer.
+    GLuint blurTextureID;
+
+
+public:
 
     /**
      * @brief Default constructor.
      *
-     * User must pass the viewport width and height used for framebuffer initialization and noise scale factor computation and can optionally pass the number of samples used for
-	 * occlusion computation, dimension of the noise texture and kernel radius. It's important to notice that if the number of samples is changed here, it also needs to be changed in the shader code. It 
+     * It's important to notice that if the number of samples is modified here, it also needs to be changed in the shader code. It
 	 * can't be passed as a uniform to the shader because it represents the size of the sample points' array.
-	 * @param currentWidth the current Viewport Width.
-	 * @param currentHeight the current Viewport Height.
 	 * @param noiseTextureDimension The dimension of the noise texture to be generated.
 	 * @param sampleKernelSize The size of the kernel array that will store the sample points. This means that a number of points equal to
 	 * sampleKernelSize will be sampled in order to compute occlusion.
 	 * @param rad The kernel radius. This is used to define the max distance between the current point and the samples that will be considered for occlusion computation.
 	**/
-    SSAO (int currentWidth, int currentHeight, int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 0.0001):
-         noiseSize(noiseTextureDimension), numberOfSamples(sampleKernelSize), radius(rad), applyBlur(true), displayAmbientPass(true), blurRange(3), depthTextureID(0), blurTextureID(1){
-
-        computeNoiseScale();
-        viewportSize << currentWidth, currentHeight;
+    SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 0.0001):
+         noise_size(noiseTextureDimension), numberOfSamples(sampleKernelSize), radius(rad), apply_blur(true), displayAmbientPass(true), blurRange(3), depthTextureID(0), blurTextureID(1){
 
         ssaoShader = 0;
         blurShader = 0;
         deferredShader = 0;
+        fbo = 0;
+        quad = 0;
+        noise_scale = Eigen::Vector2f::Zero();
 
 	}
 
@@ -79,7 +126,7 @@ class SSAO: public Effect {
         generateKernel();
         generateNoiseTexture();
 
-        fbo = new Framebuffer(viewportSize[0], viewportSize[1], 2);
+        fbo = new Framebuffer();
 
         quad = new Mesh();
         quad->createQuad();
@@ -94,7 +141,17 @@ class SSAO: public Effect {
      */
     virtual void render(Mesh* mesh, Trackball* cameraTrackball, Trackball* lightTrackball)
     {
-        glViewport(0, 0, viewportSize[0], viewportSize[1]);
+        Eigen::Vector4f viewport = cameraTrackball->getViewport();
+        Eigen::Vector2i viewport_size = cameraTrackball->getViewportSize();
+
+        glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
+        // check if viewport was modified, if so, regenerate fbo
+        if (fbo->getWidth() != viewport_size[0] || fbo->getHeight() != viewport_size[1])
+        {
+            fbo->create(viewport_size[0], viewport_size[1], 2);
+            computeNoiseScale(viewport_size);
+        }
 
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.7, 0.7, 0.7, 0.0);
@@ -118,7 +175,7 @@ class SSAO: public Effect {
         deferredShader->unbind();
         fbo->unbind();
 
-        Shader::errorCheckFunc(__FILE__, __LINE__);
+        Misc::errorCheckFunc(__FILE__, __LINE__);
 
         // ******************** Second pass - SSAO Computation:
 
@@ -126,27 +183,28 @@ class SSAO: public Effect {
         Eigen::Vector4f colorVector;
         colorVector << 0.686, 0.933, 0.933, 1.0;
 
-        if(applyBlur)
+        if(apply_blur)
         {
             //Set draw buffer to blur texture:
             fbo->bindRenderBuffer(blurTextureID);
         }
 
-        ssaoShader->bind();
+        ssaoShader->bind();        
 
         //Setting Uniforms:
         ssaoShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
         ssaoShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
         ssaoShader->setUniform("modelMatrix",mesh->getModelMatrix());
 
-        ssaoShader->setUniform("in_Color", colorVector);
-        ssaoShader->setUniform("noiseScale", noiseScale);
+        ssaoShader->setUniform("default_color", colorVector);
+        ssaoShader->setUniform("noiseScale", noise_scale);
         ssaoShader->setUniform("radius", radius);
+
         ssaoShader->setUniform("kernel", kernel, 3, numberOfSamples);
         ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
         ssaoShader->setUniform("depthTexture", fbo->bindAttachment( depthTextureID ));
         ssaoShader->setUniform("displayAmbientPass", displayAmbientPass);
-        ssaoShader->setUniform("viewportSize", viewportSize);
+        ssaoShader->setUniform("viewportSize", viewport_size);
 
         mesh->setAttributeLocation(ssaoShader);
 
@@ -157,13 +215,13 @@ class SSAO: public Effect {
         noiseTexture.unbind();
         fbo->unbind();
 
-        if(applyBlur)
+        if(apply_blur)
         {
             //Third Pass - Blurring the scene:
 
             blurShader->bind();
 
-            Eigen::Vector2f texelSize (1.0/(float)viewportSize[0], 1.0/(float)viewportSize[1]);
+            Eigen::Vector2f texelSize (1.0/(float)viewport_size[0], 1.0/(float)viewport_size[1]);
 
             //Setting Uniforms:
             blurShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
@@ -173,7 +231,7 @@ class SSAO: public Effect {
             blurShader->setUniform("texelSize", texelSize);
             blurShader->setUniform("blurTexture", fbo->bindAttachment(blurTextureID));
             //blurShader->setUniform("blurTexture", fbo->bindAttachment( depthTextureID ));
-            blurShader->setUniform("viewportSize", viewportSize);
+            blurShader->setUniform("viewportSize", viewport_size);
             blurShader->setUniform("blurRange", blurRange);
 
             mesh->setAttributeLocation(blurShader);
@@ -185,11 +243,11 @@ class SSAO: public Effect {
     }
 
     /**
-     * @brief Toggles the current state of applyBlur flag.
+     * @brief Toggles the current state of apply_blur flag.
      */
     void changeBlurFlag (void)
     {
-        applyBlur = !applyBlur;
+        apply_blur = !apply_blur;
     }
 
     /**
@@ -257,16 +315,16 @@ class SSAO: public Effect {
 private:
 
 	///Computes the noise scale factor, that will be used for tiling the noise texture through the screen.
-    void computeNoiseScale (void)
+    void computeNoiseScale (const Eigen::Vector2i &viewport_size)
     {
-        noiseScale = Eigen::Vector2f((float)viewportSize[0]/(float)noiseSize, (float)viewportSize[1]/(float)noiseSize);
+        noise_scale = Eigen::Vector2f(viewport_size[0]/(float)noise_size, viewport_size[1]/(float)noise_size);
     }
 
 	///Creates and loads all shaders.
     void initializeShaders()
     {
         //SSAO Computation Shader:
-        ssaoShader = loadShader("ssaoShader");
+        ssaoShader = loadShader("ssao");
         ssaoShader->initialize();
 
         //Deferred Shader, used to store depth information:
@@ -274,7 +332,7 @@ private:
         deferredShader->initialize();
 
         //Blur Shader:
-        blurShader = loadShader("blurShader");
+        blurShader = loadShader("blur");
         blurShader->initialize();
 
     }
@@ -307,7 +365,7 @@ private:
     void generateNoiseTexture()
     {
 
-        float noise[noiseSize*noiseSize*4];//Noise is a texture with dimensions noiseSize x noiseSize.
+        float noise[noise_size*noise_size*4];//Noise is a texture with dimensions noiseSize x noiseSize.
         Eigen::Vector3f randomVector;
 
         for(int i = 0; i<numberOfSamples; i++) {
@@ -353,55 +411,6 @@ private:
         return ret;
     }
 
-	///Noise texture dimension. It will be a noiseSize x noiseSize texture.
-	int noiseSize;
-
-	///Scale used to tile the noise texture through screen.
-	Eigen::Vector2f noiseScale;
-
-	///Noise texture
-	Texture noiseTexture;
-
-	///Array of sample points generated inside a unit hemisphere around z axis.
-	float *kernel;
-
-	///Kernel radius. If the distance between a sample point and the point for which the occlusion is being computed is larger than radius, the occlusion for this sample will be neglected.
-	float radius;
-
-	///Number of sample points that will be used per fragment for occlusion computation.
-	int numberOfSamples;
-
-	///
-	Framebuffer* fbo;
-
-	///
-    Shader* ssaoShader;
-
-	///The shader used to store the depth information in the framebuffer.
-	Shader* deferredShader;
-
-	///The shader used to blur the result from the second pass, removing the noise pattern.
-	Shader* blurShader;
-
-    /// A quad mesh for framebuffer rendering
-    Mesh* quad;
-
-	///Flag indicating wether blur shall be applied or not.
-	bool applyBlur;
-
-	///Flag indicating if the mesh should be rendered only with ambient occlusion pass or with full illumination. If True, mesh will be rendered only with the ambient occlusion pass.
-	bool displayAmbientPass;
-
-	///Number of neighbour pixels used in blurring. The blur will be applied to a blurRange x blurRange square around the current pixel. It's important to notice that blurRange must be an odd number.
-	int blurRange;
-
-	///The ID defining the color attachment to which the depth texture is bound in the framebuffer.
-	int depthTextureID;
-
-	///The ID defining the color attachment to which the blur texture is bound in the framebuffer.
-	GLuint blurTextureID;
-
-    Eigen::Vector2i viewportSize;
 
 };
 }

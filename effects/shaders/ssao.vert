@@ -3,7 +3,7 @@
 in vec4 in_Position;
 in vec3 in_Normal;
 //layout(location=2) in vec4 in_Color;
-in vec2 in_TexCoords;
+//in vec2 in_TexCoords;
 //layout(binding=0) uniform sampler2D noiseTexture;//Segmentation fault when reloading shaders. Why?
 uniform sampler2D noiseTexture;
 
@@ -15,7 +15,7 @@ out vec4 vert;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform vec4 in_Color;
+uniform vec4 default_color;
 	 
 void main(void)
 {
@@ -26,6 +26,6 @@ void main(void)
     vert = modelViewMatrix*in_Position;
 
     gl_Position = (projectionMatrix * modelViewMatrix) * in_Position;
-    ex_Color = in_Color;
+    ex_Color = default_color;
 
 }
