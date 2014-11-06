@@ -24,7 +24,6 @@
 #define __SSAO__
 
 #include "tucano.hpp"
-#include "rendertexture.hpp"
 
 using namespace std;
 
@@ -88,6 +87,9 @@ protected:
     ///The ID defining the color attachment to which the depth texture is bound in the framebuffer.
     int depthTextureID;
 
+    ///The ID defining the color attachment to which the normal texture is bound in the framebuffer.
+    int normalTextureID;
+
     ///The ID defining the color attachment to which the blur texture is bound in the framebuffer.
     GLuint blurTextureID;
 
@@ -104,15 +106,20 @@ public:
 	 * sampleKernelSize will be sampled in order to compute occlusion.
 	 * @param rad The kernel radius. This is used to define the max distance between the current point and the samples that will be considered for occlusion computation.
 	**/
-    SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 0.0001):
-         noise_size(noiseTextureDimension), numberOfSamples(sampleKernelSize), radius(rad), blurRange(3)
+    SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 0.0001)
     {
-
         depthTextureID = 0;
-        blurTextureID = 1;
+        normalTextureID = 1;
+        blurTextureID = 2;
 
-        apply_blur = true;
-        displayAmbientPass = false;
+        noise_size = noiseTextureDimension;
+        numberOfSamples = sampleKernelSize;
+        radius = rad;
+
+        blurRange = 3;
+
+        apply_blur = false;
+        displayAmbientPass = true;
 
         ssaoShader = 0;
         blurShader = 0;
@@ -120,7 +127,6 @@ public:
         fbo = 0;
         quad = 0;
         noise_scale = Eigen::Vector2f::Zero();
-
 	}
 
     /**
@@ -157,19 +163,19 @@ public:
         // check if viewport was modified, if so, regenerate fbo
         if (fbo->getWidth() != viewport_size[0] || fbo->getHeight() != viewport_size[1])
         {
-            fbo->create(viewport_size[0], viewport_size[1], 2);
+            fbo->create(viewport_size[0], viewport_size[1], 3);
             computeNoiseScale(viewport_size);
         }
 
         glEnable(GL_DEPTH_TEST);
         glClearColor(1.0, 1.0, 1.0, 0.0);
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //First pass - Depth Storage:
 
         //Bind buffer to store depth information in framebuffer:
         fbo->clearAttachments();
-        fbo->bindRenderBuffer(depthTextureID);
+        fbo->bindRenderBuffers(depthTextureID, normalTextureID);
 
         deferredShader->bind();
         deferredShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
@@ -189,8 +195,8 @@ public:
 
         //Define standard color for mesh rendering:
         Eigen::Vector4f colorVector;
-        colorVector << 0.686, 0.933, 0.933, 1.0;
-
+        //colorVector << 0.686, 0.933, 0.933, 1.0;
+        colorVector << 0.5, 0.5, 0.9, 1.0;
 
         if(apply_blur)
         {
@@ -200,7 +206,6 @@ public:
 
         ssaoShader->bind();
 
-        //Setting Uniforms:
         ssaoShader->setUniform("modelMatrix", mesh->getModelMatrix());
         ssaoShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
         ssaoShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
@@ -208,41 +213,39 @@ public:
 
         ssaoShader->setUniform("default_color", colorVector);
         ssaoShader->setUniform("noiseScale", noise_scale);
-        ssaoShader->setUniform("radius", radius);
-
         ssaoShader->setUniform("kernel", kernel, 3, numberOfSamples);
-        ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
-        ssaoShader->setUniform("depthTexture", fbo->bindAttachment(depthTextureID));
-        ssaoShader->setUniform("displayAmbientPass", displayAmbientPass);
-        ssaoShader->setUniform("viewportSize", viewport_size);
 
-        mesh->setAttributeLocation(ssaoShader);
+        ssaoShader->setUniform("depthTexture", fbo->bindAttachment(depthTextureID));
+        ssaoShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
+        ssaoShader->setUniform("displayAmbientPass", displayAmbientPass);
+
+        ssaoShader->setUniform("radius", radius);
+        ssaoShader->setUniform("viewportSize", viewport_size);
+        ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
+
+        quad->setAttributeLocation(ssaoShader);
 
         //Second pass mesh rendering:
-        mesh->render();
+        quad->render();
 
         ssaoShader->unbind();
         noiseTexture.unbind();
         fbo->unbind();
         fbo->clearDepth();
 
+        Misc::errorCheckFunc(__FILE__, __LINE__);
 
         if(apply_blur)
         {
             //Third Pass - Blurring the scene:
             blurShader->bind();
 
-            //Eigen::Vector2f texelSize (1.0/(float)viewport_size[0], 1.0/(float)viewport_size[1]);
-
             //Setting Uniforms:
             blurShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
             blurShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
             blurShader->setUniform("modelMatrix", mesh->getModelMatrix());
 
-            //blurShader->setUniform("texelSize", texelSize);
             blurShader->setUniform("blurTexture", fbo->bindAttachment(blurTextureID));
-            //blurShader->setUniform("blurTexture", fbo->bindAttachment( depthTextureID ));
-            //blurShader->setUniform("viewportSize", viewport_size);
             blurShader->setUniform("blurRange", blurRange);
 
             mesh->setAttributeLocation(blurShader);
@@ -251,8 +254,6 @@ public:
             blurShader->unbind();
             fbo->unbind();
         }
-
-        Misc::errorCheckFunc(__FILE__, __LINE__);
     }
 
     /**
@@ -336,18 +337,9 @@ private:
 	///Creates and loads all shaders.
     void initializeShaders()
     {
-        //SSAO Computation Shader:
         ssaoShader = loadShader("ssao");
-        ssaoShader->initialize();
-
-        //Deferred Shader, used to store depth information:
         deferredShader = loadShader("deferredShader");
-        deferredShader->initialize();
-
-        //Blur Shader:
         blurShader = loadShader("blur");
-        blurShader->initialize();
-
     }
 
 	///Generates a sampling kernel.
@@ -355,45 +347,45 @@ private:
     {
         float scale;
         Eigen::Vector3f sample;
-        kernel = new float[numberOfSamples*3];
+        kernel = new float[numberOfSamples * 3];
 
         int temp = 0;
-        for (int i = 0; i<numberOfSamples; i++)
+        for (int i = 0; i < numberOfSamples; i++)
         {
             sample = Eigen::Vector3f( random(-1.0f,1.0f) , random(-1.0f,1.0f) , random(0.0f,1.0f) );
             sample.normalize();
             //cout << "Kernel: " << sample.transpose() << endl;
-            sample *= random(0.0f,1.0f); //Distribute sample points randomly around the kernel.
-            scale = float(i)/float(numberOfSamples);
-            scale = lerp(0.1f, 1.0f, scale * scale);//Cluster sample points towards origin.
-            sample *= scale;
-            kernel[temp] = sample[0];
+//            sample *= random(0.0f,1.0f); //Distribute sample points randomly around the kernel.
+//            scale = float(i)/float(numberOfSamples);
+//            scale = lerp(0.1f, 1.0f, scale * scale);//Cluster sample points towards origin.
+//            sample *= scale;
+            kernel[temp+0] = sample[0];
             kernel[temp+1] = sample[1];
             kernel[temp+2] = sample[2];
             temp += 3;
         }
     }
 
-	///Generates a random noise texture.
-    void generateNoiseTexture()
+    /**
+     * @brief Generates a random noise texture.
+     */
+    void generateNoiseTexture (void)
     {
-
-        float noise[noise_size*noise_size*4];//Noise is a texture with dimensions noiseSize x noiseSize.
+        float noise[noise_size*noise_size*4];
         Eigen::Vector3f randomVector;
 
-        for(int i = 0; i<numberOfSamples; i++) {
-
+        for(int i = 0; i < noise_size*noise_size; i++)
+        {
             randomVector = Eigen::Vector3f ( random(-1.0f,1.0f), random(-1.0f,1.0f), 0.0f);
             randomVector.normalize();
-            (randomVector + Eigen::Vector3f(1.0,1.0,1.0)) * 0.5;
-            noise[(i*4)] = randomVector[0];
+            //(randomVector + Eigen::Vector3f(1.0,1.0,1.0)) * 0.5;
+            noise[(i*4)+0] = randomVector[0];
             noise[(i*4)+1] = randomVector[1];
             noise[(i*4)+2] = 0.0;
             noise[(i*4)+3] = 1.0f;
         }
 
-        //Generate Texture:
-        noiseTexture.create( GL_TEXTURE_2D, GL_RGBA32F, 4, 4, GL_RGBA, GL_FLOAT, &noise[0]);
+        noiseTexture.create( GL_TEXTURE_2D, GL_RGBA32F, noise_size, noise_size, GL_RGBA, GL_FLOAT, &noise[0]);
         noiseTexture.setTexParameters( GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
     }
 
@@ -417,7 +409,7 @@ private:
     {
         //srand ( time(NULL) );
         int random = rand();
-        float ret = random/float(RAND_MAX);
+        float ret = random / float(RAND_MAX);
         ret *= (max - min);
         ret += min;
         assert(ret >= min && ret <= max);

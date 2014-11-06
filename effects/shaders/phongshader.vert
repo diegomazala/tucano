@@ -20,7 +20,7 @@ uniform mat4 projectionMatrix;
 // if attribute in_Color exists or not
 uniform bool has_color;
 
-const vec4 default_color = vec4(0.5, 0.5, 0.9, 1.0);
+const vec4 default_color = vec4(0.7, 0.7, 0.7, 1.0);
 
 void main(void)
 {

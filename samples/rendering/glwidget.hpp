@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 
 #include <ssao.hpp>
+#include <phongshader.hpp>
 #include <utils/qttrackballwidget.hpp>
 
 using namespace std;
@@ -29,13 +30,28 @@ public:
 
 
 signals:
-    
+
 public slots:
+
+    /**
+     * @brief Toggles mean filter flag
+     */
+    void toggleEffect (int id)
+    {
+        active_effect = id;
+        updateGL();
+    }
     
 private:
 
     /// Screen-Space Ambient Occlusion Effect
     Effects::SSAO *ssao;
+
+    /// Simple Phong Shader
+    Effects::Phong *phong;
+
+    /// ID of active effect
+    int active_effect;
 
 };
 

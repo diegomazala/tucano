@@ -36,6 +36,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \        
         glwidget.hpp \
         $$TUCANO_PATH/effects/ssao.hpp \
+        $$TUCANO_PATH/effects/phongshader.hpp \
         $$TUCANO_PATH/src/utils/qttrackballwidget.hpp
 
 FORMS    += mainwindow.ui
@@ -46,5 +47,7 @@ OTHER_FILES += \
         $$TUCANO_PATH/effects/shaders/deferredShader.frag \
         $$TUCANO_PATH/effects/shaders/deferredShader.vert \
         $$TUCANO_PATH/effects/shaders/blur.frag \
-        $$TUCANO_PATH/effects/shaders/blur.vert
+        $$TUCANO_PATH/effects/shaders/blur.vert \
+        $$TUCANO_PATH/effects/shaders/phongshader.frag \
+        $$TUCANO_PATH/effects/shaders/phongshader.vert
 

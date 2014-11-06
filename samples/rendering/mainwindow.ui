@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>641</width>
+    <width>830</width>
     <height>485</height>
    </rect>
   </property>
@@ -24,13 +24,48 @@
      </rect>
     </property>
    </widget>
+   <widget class="QRadioButton" name="radio_phong">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>20</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Phong Shader</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">group_effects</string>
+    </attribute>
+   </widget>
+   <widget class="QRadioButton" name="radio_ssao">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>70</y>
+      <width>117</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SSAO</string>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">group_effects</string>
+    </attribute>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>641</width>
+     <width>830</width>
      <height>25</height>
     </rect>
    </property>
@@ -67,4 +102,7 @@
  </customwidgets>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="group_effects"/>
+ </buttongroups>
 </ui>

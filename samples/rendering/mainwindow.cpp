@@ -16,6 +16,13 @@ MainWindow::~MainWindow()
 void MainWindow::initialize( void )
 {
     ui->glwidget->initialize();
+
+    ui->group_effects->setId(ui->radio_phong, 0);
+    ui->group_effects->setId(ui->radio_ssao, 1);
+    connect(ui->group_effects, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), ui->glwidget, &GLWidget::toggleEffect);
+//    connect(ui->spinbox_kernelsize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), ui->glwidget, &GLWidget::setMeanKernel);
+//    connect(ui->checkbox_hgradient, &QCheckBox::toggled, ui->glwidget, &GLWidget::toggleHGradient);
+//    connect(ui->checkbox_vgradient, &QCheckBox::toggled, ui->glwidget, &GLWidget::toggleVGradient);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *ke)

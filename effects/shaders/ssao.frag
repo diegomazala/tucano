@@ -2,35 +2,33 @@
 #define numberOfSamples 16
 
 in vec4 ex_Color;
-in vec3 normalDirection;
-in vec4 vert;
 
 out vec4 out_Color;
 
 uniform mat4 lightViewMatrix;
 
 uniform vec2 noiseScale;
-uniform float radius;
 uniform vec3 kernel[numberOfSamples];
-uniform sampler2D noiseTexture;
 uniform sampler2D depthTexture;
-uniform mat4 projectionMatrix;
+uniform sampler2D normalTexture;
 uniform bool displayAmbientPass;
+
+uniform float radius;
+uniform sampler2D noiseTexture;
+uniform mat4 projectionMatrix;
 uniform ivec2 viewportSize;
 
-uniform vec2 randomTest;
-
+/*
 float computeOcclusion(void)
 {
 
-    //origin is the fragment's position in view space:
+    // origin is the vertex position in view space:
     vec3 origin = vert.xyz;
 
-    //normal is in view space.
-    vec3 normal = normalDirection;
-    normal = normalize(normal);
+    // normal is in view space.
+    vec3 normal = normalize(normalDirection);
 
-    //Retrieve texCoord for random vector generation.
+    // retrieve texCoord for random vector generation.
     vec2 texCoord = vec2(gl_FragCoord.x/float(viewportSize[0]), gl_FragCoord.y/float(viewportSize[1]));
     texCoord *= noiseScale;
 
@@ -59,7 +57,7 @@ float computeOcclusion(void)
         float sampleDepth = texture(depthTexture,offset.xy).r;
 
         //sampleDepth = (1 - sampleDepth) * -1.0;
-        sampleDepth = sampleDepth * 2.0 - 3.0;
+        sampleDepth = sampleDepth * 2.0 - 4.0;
 
         //range check & accumulate:
         float range_check = abs(origin.z - sampleDepth) < radius ? 1.0 : 0.0;
@@ -74,40 +72,73 @@ float computeOcclusion(void)
     return occlusion;
 
 }
+*/
 
-void main(void)
+float ambientOcclusion (vec3 vert, vec3 normal)
 {
+    vec2 texCoord = gl_FragCoord.xy;
+    float occlusion = 0.0;
 
-    float occlusion = computeOcclusion();
+    for(int i = 0; i < numberOfSamples; i++)
+    {
+        vec3 samplePosition = kernel[i];
+        vec2 randCoord = texCoord + samplePosition.xy * 100;
+
+        randCoord /= vec2(viewportSize.xy);
+        vec4 point = texture(depthTexture, randCoord);
+
+        if (point != vec4(0.0))
+        {
+            vec3 v = point.xyz - vert.xyz;
+            float dist_factor = 1.0 / (1.0 + length(v));
+            occlusion += max(0.0, dot (normal, v)) * dist_factor;
+        }
+    }
+
+    occlusion = 1 - (occlusion / float(numberOfSamples));
+    return occlusion;
+}
+
+void main (void)
+{
+    vec4 vert = texelFetch(depthTexture, ivec2(gl_FragCoord.xy), 0);
+    if (vert.w == 0.0)
+        discard;
+
+    vec3 normal = texelFetch(normalTexture, ivec2(gl_FragCoord.xy), 0).xyz;
+
+    //float occlusion = computeOcclusion();
+    float occlusion = ambientOcclusion(vert.xyz, normal);
 
     vec3 lightDirection = (lightViewMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz;
     lightDirection = normalize(lightDirection);
 
-    vec3 lightReflection = reflect(-lightDirection, normalDirection);
+    vec3 lightReflection = reflect(-lightDirection, normal);
     vec3 eyeDirection = -normalize(vert.xyz);
     float shininess = 100.0;
 
-    vec4 ambientLight = vec4(1.0);
+    vec4 ambientLight = vec4(0.5);
 
-    if(displayAmbientPass)
+    vec4 color = vec4(0.7, 0.7, 0.7, 1.0);
+
+    if(!displayAmbientPass)
     {
-        ambientLight *= occlusion;
+        ambientLight = vec4(1.0) * occlusion;
     }
     else
     {
-        ambientLight *= ex_Color * occlusion * 0.5;
+        ambientLight *= color;// * occlusion;
     }
 
-    vec4 diffuseLight = ex_Color * 0.4 * max(dot(lightDirection, normalDirection),0.0);
+    vec4 diffuseLight = color * 0.4 * max(dot(lightDirection, normal),0.0);
     vec4 specularLight = vec4(1.0) *  max(pow(dot(lightReflection,eyeDirection),shininess),0.0);
 
-    if(displayAmbientPass)
+    if(!displayAmbientPass)
     {
         out_Color = vec4(ambientLight.xyz, 1.0);
     }
     else
     {
-        out_Color = vec4(ambientLight.xyz + diffuseLight.xyz + specularLight.xyz, 1.0);
+        out_Color = occlusion*vec4(ambientLight.xyz + diffuseLight.xyz + specularLight.xyz, 1.0);
     }
-
 }
