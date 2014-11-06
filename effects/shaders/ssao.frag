@@ -7,7 +7,7 @@ in vec4 vert;
 
 out vec4 out_Color;
 
-uniform mat3 lightViewMatrix;
+uniform mat4 lightViewMatrix;
 
 uniform vec2 noiseScale;
 uniform float radius;
@@ -80,7 +80,7 @@ void main(void)
 
     float occlusion = computeOcclusion();
 
-    vec3 lightDirection = lightViewMatrix * vec3(0.0, 0.0, 1.0);
+    vec3 lightDirection = (lightViewMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz;
     lightDirection = normalize(lightDirection);
 
     vec3 lightReflection = reflect(-lightDirection, normalDirection);

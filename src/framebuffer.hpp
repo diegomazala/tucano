@@ -764,6 +764,14 @@ public:
     }
 
     /**
+     * @brief Returns the number of attachments.
+     * @return Numbre of attachments.
+     */
+    int getNumAttachments (void) {
+        return fboTextures.size();
+    }
+
+    /**
      * @brief Returns wether the FBO is currently binded or not.
      * @return True if FBO is binded, false otherwise.
      */

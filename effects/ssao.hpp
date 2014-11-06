@@ -24,6 +24,7 @@
 #define __SSAO__
 
 #include "tucano.hpp"
+#include "rendertexture.hpp"
 
 using namespace std;
 
@@ -104,7 +105,14 @@ public:
 	 * @param rad The kernel radius. This is used to define the max distance between the current point and the samples that will be considered for occlusion computation.
 	**/
     SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 0.0001):
-         noise_size(noiseTextureDimension), numberOfSamples(sampleKernelSize), radius(rad), apply_blur(true), displayAmbientPass(false), blurRange(3), depthTextureID(0), blurTextureID(1){
+         noise_size(noiseTextureDimension), numberOfSamples(sampleKernelSize), radius(rad), blurRange(3)
+    {
+
+        depthTextureID = 0;
+        blurTextureID = 1;
+
+        apply_blur = true;
+        displayAmbientPass = false;
 
         ssaoShader = 0;
         blurShader = 0;
@@ -154,7 +162,7 @@ public:
         }
 
         glEnable(GL_DEPTH_TEST);
-        glClearColor(0.7, 0.7, 0.7, 0.0);
+        glClearColor(1.0, 1.0, 1.0, 0.0);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //First pass - Depth Storage:
@@ -168,12 +176,14 @@ public:
         deferredShader->setUniform("modelMatrix",mesh->getModelMatrix());
         deferredShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
         deferredShader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
+        deferredShader->setUniform("camera_translation", cameraTrackball->getDefaultTranslation()[2]);
 
         mesh->setAttributeLocation(deferredShader);
         mesh->render();
 
         deferredShader->unbind();
-        fbo->unbind();        
+        fbo->unbind();
+        fbo->clearDepth();
 
         // ******************** Second pass - SSAO Computation:
 
@@ -181,18 +191,20 @@ public:
         Eigen::Vector4f colorVector;
         colorVector << 0.686, 0.933, 0.933, 1.0;
 
+
         if(apply_blur)
         {
             // Set draw buffer to blur texture:
             fbo->bindRenderBuffer(blurTextureID);
-        }
+        }        
 
-        ssaoShader->bind();        
+        ssaoShader->bind();
 
         //Setting Uniforms:
-        ssaoShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
+        ssaoShader->setUniform("modelMatrix", mesh->getModelMatrix());
         ssaoShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-        ssaoShader->setUniform("modelMatrix",mesh->getModelMatrix());
+        ssaoShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
+        ssaoShader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
 
         ssaoShader->setUniform("default_color", colorVector);
         ssaoShader->setUniform("noiseScale", noise_scale);
@@ -200,7 +212,7 @@ public:
 
         ssaoShader->setUniform("kernel", kernel, 3, numberOfSamples);
         ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
-        ssaoShader->setUniform("depthTexture", fbo->bindAttachment( depthTextureID ));
+        ssaoShader->setUniform("depthTexture", fbo->bindAttachment(depthTextureID));
         ssaoShader->setUniform("displayAmbientPass", displayAmbientPass);
         ssaoShader->setUniform("viewportSize", viewport_size);
 
@@ -212,24 +224,25 @@ public:
         ssaoShader->unbind();
         noiseTexture.unbind();
         fbo->unbind();
+        fbo->clearDepth();
+
 
         if(apply_blur)
         {
             //Third Pass - Blurring the scene:
-
             blurShader->bind();
 
-            Eigen::Vector2f texelSize (1.0/(float)viewport_size[0], 1.0/(float)viewport_size[1]);
+            //Eigen::Vector2f texelSize (1.0/(float)viewport_size[0], 1.0/(float)viewport_size[1]);
 
             //Setting Uniforms:
             blurShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
             blurShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
             blurShader->setUniform("modelMatrix", mesh->getModelMatrix());
 
-            blurShader->setUniform("texelSize", texelSize);
+            //blurShader->setUniform("texelSize", texelSize);
             blurShader->setUniform("blurTexture", fbo->bindAttachment(blurTextureID));
             //blurShader->setUniform("blurTexture", fbo->bindAttachment( depthTextureID ));
-            blurShader->setUniform("viewportSize", viewport_size);
+            //blurShader->setUniform("viewportSize", viewport_size);
             blurShader->setUniform("blurRange", blurRange);
 
             mesh->setAttributeLocation(blurShader);

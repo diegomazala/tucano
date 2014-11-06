@@ -21,8 +21,8 @@ void main(void)
     mat4 modelViewMatrix = viewMatrix*modelMatrix;
     mat4 normalMatrix = transpose(inverse(modelViewMatrix));
 
-    normalDirection = normalize(vec3(normalMatrix * vec4(in_Normal,0.0)).xyz);
-    vert = modelViewMatrix*in_Position;
+    normalDirection = normalize(vec3(normalMatrix * vec4(in_Normal, 0.0)).xyz);
+    vert = modelViewMatrix * in_Position;
 
     gl_Position = (projectionMatrix * modelViewMatrix) * in_Position;
     ex_Color = default_color;
