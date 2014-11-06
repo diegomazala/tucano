@@ -429,6 +429,21 @@ public:
     }
 
     /**
+     * @brief Clears the FBO depthbuffer.
+     */
+    void clearDepth (void)
+    {
+        bool was_binded = is_binded;
+        bind();
+        glClear(GL_DEPTH_BUFFER_BIT);
+        if (!was_binded)
+        {
+            unbindFBO();
+        }
+    }
+
+
+    /**
     * @brief Binds a texture attachment to a given texture unit.
     * @param attachment Number of color attachment.
     * @param texture_unit Number of unit to bind texture.

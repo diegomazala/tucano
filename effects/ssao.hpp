@@ -104,7 +104,7 @@ public:
 	 * @param rad The kernel radius. This is used to define the max distance between the current point and the samples that will be considered for occlusion computation.
 	**/
     SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 0.0001):
-         noise_size(noiseTextureDimension), numberOfSamples(sampleKernelSize), radius(rad), apply_blur(true), displayAmbientPass(true), blurRange(3), depthTextureID(0), blurTextureID(1){
+         noise_size(noiseTextureDimension), numberOfSamples(sampleKernelSize), radius(rad), apply_blur(true), displayAmbientPass(false), blurRange(3), depthTextureID(0), blurTextureID(1){
 
         ssaoShader = 0;
         blurShader = 0;
@@ -173,9 +173,7 @@ public:
         mesh->render();
 
         deferredShader->unbind();
-        fbo->unbind();
-
-        Misc::errorCheckFunc(__FILE__, __LINE__);
+        fbo->unbind();        
 
         // ******************** Second pass - SSAO Computation:
 
@@ -185,7 +183,7 @@ public:
 
         if(apply_blur)
         {
-            //Set draw buffer to blur texture:
+            // Set draw buffer to blur texture:
             fbo->bindRenderBuffer(blurTextureID);
         }
 
@@ -240,6 +238,8 @@ public:
             blurShader->unbind();
             fbo->unbind();
         }
+
+        Misc::errorCheckFunc(__FILE__, __LINE__);
     }
 
     /**

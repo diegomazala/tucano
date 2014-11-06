@@ -7,7 +7,6 @@ in vec3 in_Normal;
 //layout(binding=0) uniform sampler2D noiseTexture;//Segmentation fault when reloading shaders. Why?
 uniform sampler2D noiseTexture;
 
-
 out vec4 ex_Color;
 out vec3 normalDirection;
 out vec4 vert;
