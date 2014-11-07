@@ -92,6 +92,12 @@ protected:
     /// The ID defining the color attachment to which the normal texture is bound in the framebuffer.
     int normalTextureID;
 
+    /// The ID defining the color attachment to which the color texture is bound in the framebuffer.
+    int colorTextureID;
+
+    /// Global intensity value.
+    int intensity;
+
     /// The ID defining the color attachment to which the blur texture is bound in the framebuffer.
     GLuint blurTextureID;
 
@@ -108,17 +114,19 @@ public:
 	 * sampleKernelSize will be sampled in order to compute occlusion.
 	 * @param rad The kernel radius. This is used to define the max distance between the current point and the samples that will be considered for occlusion computation.
 	**/
-    SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 0.0001)
+    SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 20.0)
     {
         depthTextureID = 0;
         normalTextureID = 1;
-        blurTextureID = 2;
+        colorTextureID = 2;
+        blurTextureID = 3;
 
         noise_size = noiseTextureDimension;
         numberOfSamples = sampleKernelSize;
         radius = rad;
 
         blurRange = 3;
+        intensity = 20;
 
         apply_blur = false;
         displayAmbientPass = false;
@@ -184,14 +192,14 @@ public:
 
         //Bind buffer to store depth information in framebuffer:
         fbo->clearAttachments();
-        fbo->bindRenderBuffers(depthTextureID, normalTextureID);
+        fbo->bindRenderBuffers(depthTextureID, normalTextureID, colorTextureID);
 
         deferredShader->bind();
         deferredShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
         deferredShader->setUniform("modelMatrix",mesh->getModelMatrix());
         deferredShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
         deferredShader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
-        deferredShader->setUniform("camera_translation", cameraTrackball->getDefaultTranslation()[2]);
+        deferredShader->setUniform("has_color", mesh->hasAttribute("in_Color"));
 
         mesh->setAttributeLocation(deferredShader);
         mesh->render();
@@ -201,11 +209,6 @@ public:
         fbo->clearDepth();
 
         // ******************** Second pass - SSAO Computation:
-
-        //Define standard color for mesh rendering:
-        Eigen::Vector4f colorVector;
-        //colorVector << 0.686, 0.933, 0.933, 1.0;
-        colorVector << 0.5, 0.5, 0.9, 1.0;
 
         if(apply_blur)
         {
@@ -220,15 +223,16 @@ public:
         ssaoShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
         ssaoShader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
 
-        ssaoShader->setUniform("default_color", colorVector);
         ssaoShader->setUniform("noiseScale", noise_scale);
         ssaoShader->setUniform("kernel", kernel, 2, numberOfSamples);
 
-        ssaoShader->setUniform("depthTexture", fbo->bindAttachment(depthTextureID));
+        ssaoShader->setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
         ssaoShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
+        ssaoShader->setUniform("colorTexture", fbo->bindAttachment(colorTextureID));
         ssaoShader->setUniform("displayAmbientPass", displayAmbientPass);
 
         ssaoShader->setUniform("radius", radius);
+        ssaoShader->setUniform("intensity", (float)intensity);
         ssaoShader->setUniform("viewportSize", viewport_size);
         ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
 
@@ -263,6 +267,15 @@ public:
             blurShader->unbind();
             fbo->unbind();
         }
+    }
+
+    /**
+     * @brief Set intensity values.
+     * @param value New intensity value.
+     */
+    void setIntensity (int value)
+    {
+        intensity = value;
     }
 
     /**

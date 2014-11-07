@@ -53,6 +53,16 @@ public slots:
         updateGL();
     }
 
+    /**
+     * @brief Modifies the SSAO global intensity value.
+     * @param value New intensity value.
+     */
+    void setSSAOIntensity (int value)
+    {
+        ssao->setIntensity(value);
+        updateGL();
+    }
+
 private:
 
     /// Screen-Space Ambient Occlusion Effect

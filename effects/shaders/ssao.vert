@@ -3,12 +3,8 @@
 in vec4 in_Position;
 
 out vec4 ex_Color;
-
-uniform vec4 default_color;
 	 
 void main(void)
 {
     gl_Position = in_Position;
-    ex_Color = default_color;
-
 }
