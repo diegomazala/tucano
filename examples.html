@@ -121,18 +121,19 @@ $(document).ready(function(){initNavTree('examples.html','');});
 <h3>cmake</h3>
 <p>To compile the examples with cmake, first make sure you have a recent version of it (2.8.12+) installed on your system.</p>
 <p>Now, create a <code>build</code> directory inside the tucano directory, cd into it, then run cmake in the standard way:</p>
-<div class="fragment"><div class="line">cd tucano/</div>
+<div class="fragment"><div class="line">cd tucano/ # top-level directory of tucano</div>
 <div class="line">mkdir build/</div>
 <div class="line">cd build/</div>
 <div class="line">cmake ..</div>
 <div class="line">make</div>
-</div><!-- fragment --><p>This will compile all tucano examples at once. They will be located under the <code>samples/</code> directory. </p>
+<div class="line">make install</div>
+</div><!-- fragment --><p>This will compile all tucano examples at once. They will be located under the <code>build/samples/</code> directory. However, <code>make install</code> conveniently puts them all under an easier location: the <code>bin/</code> folder, inside the tucano top-level directory. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Nov 7 2014 15:12:04 for Tucano by
+    <li class="footer">Generated on Fri Nov 7 2014 15:42:10 for Tucano by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
