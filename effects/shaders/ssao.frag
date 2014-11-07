@@ -8,7 +8,7 @@ out vec4 out_Color;
 uniform mat4 lightViewMatrix;
 
 uniform vec2 noiseScale;
-uniform vec3 kernel[numberOfSamples];
+uniform vec2 kernel[numberOfSamples];
 uniform sampler2D depthTexture;
 uniform sampler2D normalTexture;
 uniform bool displayAmbientPass;
@@ -18,84 +18,41 @@ uniform sampler2D noiseTexture;
 uniform mat4 projectionMatrix;
 uniform ivec2 viewportSize;
 
-/*
-float computeOcclusion(void)
-{
-
-    // origin is the vertex position in view space:
-    vec3 origin = vert.xyz;
-
-    // normal is in view space.
-    vec3 normal = normalize(normalDirection);
-
-    // retrieve texCoord for random vector generation.
-    vec2 texCoord = vec2(gl_FragCoord.x/float(viewportSize[0]), gl_FragCoord.y/float(viewportSize[1]));
-    texCoord *= noiseScale;
-
-    //tbn will reorient the kernel to the normal's direction, as well as apply a random rotation to reduce banding.
-    vec3 randomVector = normalize(texture(noiseTexture, texCoord).xyz * 2.0 - 1.0);
-    vec3 tangent = normalize(randomVector - normal * dot(randomVector, normal));
-    vec3 bitangent = cross(normal, tangent);
-    mat3 tbn = mat3(tangent, bitangent, normal);
-
-    //Loop through the sample kernel, sampling the depth buffer and accumulating the occlusion:
-    float occlusion = 0.0;
-    for(int i = 0; i < numberOfSamples; i++)
-    {
-
-        //samplePosition is in view space.
-        vec3 samplePosition = tbn * kernel[i];
-        samplePosition = samplePosition * radius + origin;
-
-        //Offset is the projection of samplePosition in screen space, that will be used in order to sample the depth texture.
-        vec4 offset = vec4(samplePosition,1.0);
-        offset = projectionMatrix * offset;
-        offset.xy /= offset.w;
-        offset.xy = offset.xy * 0.5 + 0.5;
-
-        //sampleDepth is the actual depth of the sample point in view space.
-        float sampleDepth = texture(depthTexture,offset.xy).r;
-
-        //sampleDepth = (1 - sampleDepth) * -1.0;
-        sampleDepth = sampleDepth * 2.0 - 4.0;
-
-        //range check & accumulate:
-        float range_check = abs(origin.z - sampleDepth) < radius ? 1.0 : 0.0;
-
-        //This test compares wether the sampleDepth is in front of samplePosition. If it is, then samplePosition is inside geometry and contributes to occlusion.
-        occlusion += (sampleDepth > samplePosition.z ? 1.0 : 0.0) * range_check;
-
-    }
-
-    occlusion = 1 - (occlusion / float(numberOfSamples));
-
-    return occlusion;
-
-}
-*/
 
 float ambientOcclusion (vec3 vert, vec3 normal)
 {
     vec2 texCoord = gl_FragCoord.xy;
     float occlusion = 0.0;
 
-    for(int i = 0; i < numberOfSamples; i++)
+    float rad = 30;// / abs(vert.z + 5);
+
+    //for(int i = 0; i < numberOfSamples; i++)
+    // depth with value in range [0,1] (camera_translations places depth in [-1,1])
+    int camera_translation = 4;
+    float depth = abs(vert.z);
+    float max_v = 21.0;
+    int w = max(5, min(int(max_v), int(max_v/depth)));
+    for (int i = -w; i <= w; ++i)
     {
-        vec3 samplePosition = kernel[i];
-        vec2 randCoord = texCoord + samplePosition.xy * 100;
-
-        randCoord /= vec2(viewportSize.xy);
-        vec4 point = texture(depthTexture, randCoord);
-
-        if (point != vec4(0.0))
+        for (int j = -w; j <= w; ++j)
         {
-            vec3 v = point.xyz - vert.xyz;
-            float dist_factor = 1.0 / (1.0 + length(v));
-            occlusion += max(0.0, dot (normal, v)) * dist_factor;
+            vec2 randCoord = texCoord + vec2(i,j);// * rad;
+            randCoord /= vec2(viewportSize.xy);
+            vec4 point = texture(depthTexture, randCoord);
+
+            if (point != vec4(0.0)) // not background
+            {
+                vec3 v = point.xyz - vert.xyz;
+                if (length(v) < 0.2)
+                {
+                    float dist_factor = 1.0 / (1.0 + length(v));
+                    occlusion += max(0.0, dot (normal, v)) * dist_factor * rad;
+                }
+            }
         }
     }
 
-    occlusion = 1 - (occlusion / float(numberOfSamples));
+    occlusion = 1 - (occlusion / float(4*w*w));
     return occlusion;
 }
 

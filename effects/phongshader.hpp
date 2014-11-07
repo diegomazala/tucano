@@ -48,6 +48,8 @@ public:
 
     /**
      * @brief Default destructor
+     *
+     * No need to delete phong_shader, operation performed by inherited Effect class
      */
     virtual ~Phong (void ) {}
 

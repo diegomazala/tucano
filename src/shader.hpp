@@ -43,6 +43,53 @@ namespace Tucano
  */
 class Shader {
 
+private:
+
+    /// Stores an user mainteined identification for the shader. If the shader is created with the autoloader, the name is equal to the filename, without extensions.
+    string shaderName;
+
+    /// Stores the path to the vertex shader file.
+    string vertexShaderPath;
+
+    /// Stores the path to the geometry shader file.
+    string geometryShaderPath;
+
+    /// Stores the path to the fragment shader file.
+    string fragmentShaderPath;
+
+    /// Stores the paths to the compute shaders files.
+    vector<string> computeShaderPaths;
+
+    /// The Projection Matrix uniform location.
+    GLuint projectionMatrixUniformLocation;
+
+    /// The View Matrix uniform location.
+    GLuint viewMatrixUniformLocation;
+
+    /// The Model Matrix uniform location.
+    GLuint modelMatrixUniformLocation;
+
+    /// Mesh's Color uniform location.
+    GLuint colorUniformLocation;
+
+    /// Array that contains all the compute shaders identifications.
+    vector<GLuint> computeShaders;
+
+    /// Vertex Shader identification.
+    GLuint vertexShader;
+
+    /// Geometry Shader identification.
+    GLuint geometryShader;
+
+    /// Fragment Shader identification.
+    GLuint fragmentShader;
+
+    /// Shader program identification.
+    GLuint shaderProgram;
+
+    /// Debug level for outputing warnings and messages
+    int debug_level;
+
 public:
 
     /**
@@ -74,7 +121,9 @@ public:
      * Default destructor.
      */
     ~Shader (void)
-    {}
+    {
+        deleteShaders();
+    }
 
     /**
      * @brief Returns a string with the shader name.
@@ -131,53 +180,6 @@ public:
         return computeShaders;
     }
 
-
-private:
-
-    /// Stores an user mainteined identification for the shader. If the shader is created with the autoloader, the name is equal to the filename, without extensions.
-    string shaderName;
-
-    /// Stores the path to the vertex shader file.
-    string vertexShaderPath;
-
-    /// Stores the path to the geometry shader file.
-    string geometryShaderPath;
-
-    /// Stores the path to the fragment shader file.
-    string  fragmentShaderPath;
-
-    /// Stores the paths to the compute shaders files.
-    vector<string> computeShaderPaths;
-
-    /// The Projection Matrix uniform location.
-    GLuint projectionMatrixUniformLocation;
-
-    /// The View Matrix uniform location.
-    GLuint viewMatrixUniformLocation;
-
-    /// The Model Matrix uniform location.
-    GLuint modelMatrixUniformLocation;
-
-    /// Mesh's Color uniform location.
-    GLuint colorUniformLocation;
-
-    /// Array that contains all the compute shaders identifications.
-    vector<GLuint> computeShaders;
-
-    /// Vertex Shader identification.
-    GLuint vertexShader;
-
-    /// Geometry Shader identification.
-    GLuint geometryShader;
-
-    /// Fragment Shader identification.
-    GLuint fragmentShader;
-
-    /// Shader program identification.
-    GLuint shaderProgram;
-
-    /// Debug level for outputing warnings and messages
-    int debug_level;
 
 public:
 
@@ -1306,9 +1308,8 @@ public:
      * The vector will be passed as int, ivec2, ivec3, or ivec4 depending on the number of values.
      * @param location Location handle of uniform variable.
      * @param v Integer array holding the values.
-     * @param nvalues Number of values in the vector v.
-     * @param count Number of elements of the uniform vector array to be modified.
-     *       a count of 1 should be used if modifying the value of a single vector.
+     * @param nvalues Number of elements per vector.
+     * @param count Number of vectors.
      */
     void setUniform (GLint location, const GLint* v, GLuint nvalues, GLsizei count = 1)
     {
@@ -1327,8 +1328,8 @@ public:
      * @param location Location handle of uniform variable.
      * @param v Float array holding the values.
      * @param nvalues Number of values in the vector v.
-     * @param count Number of elements of the uniform vector array to be modified.
-     *       a count of 1 should be used if modifying the value of a single vector.
+     * @param nvalues Number of elements per vector.
+     * @param count Number of vectors.
      */
     void setUniform (GLint location, const GLfloat* v, GLuint nvalues, GLsizei count = 1)
     {
@@ -1347,9 +1348,8 @@ public:
      * The vector will be passed as int, ivec2, ivec3, or ivec4 depending on the number of values.
      * @param name Name of uniform variable in the shader code.
      * @param v Integer array holding the values.
-     * @param nvalues Number of values in the vector v.
-     * @param count Number of elements of the uniform vector array to be modified.
-     *       a count of 1 should be used if modifying the value of a single vector.
+     * @param nvalues Number of elements per vector.
+     * @param count Number of vectors.
      */
     void setUniform (const GLchar* name, const GLint* v, GLuint nvalues, GLsizei count = 1)
     {
@@ -1364,8 +1364,8 @@ public:
      * @param name Name of uniform variable in the shader code.
      * @param v Float array holding the values.
      * @param nvalues Number of values in the vector v.
-     * @param count Number of elements of the uniform vector array to be modified.
-     *       a count of 1 should be used if modifying the value of a single vector.
+     * @param nvalues Number of elements per vector.
+     * @param count Number of vectors.
      */
     void setUniform (const GLchar* name, const GLfloat* v, GLuint nvalues, GLsizei count = 1)
     {

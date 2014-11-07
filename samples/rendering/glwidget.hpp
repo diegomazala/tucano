@@ -42,6 +42,17 @@ public slots:
         updateGL();
     }
     
+
+    /**
+     * @brief Reload effect shaders.
+     */
+    void reloadShaders (void)
+    {
+        ssao->reloadShaders();
+        phong->reloadShaders();
+        updateGL();
+    }
+
 private:
 
     /// Screen-Space Ambient Occlusion Effect

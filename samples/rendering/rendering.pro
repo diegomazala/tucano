@@ -44,10 +44,10 @@ FORMS    += mainwindow.ui
 OTHER_FILES += \
         $$TUCANO_PATH/effects/shaders/ssao.frag \
         $$TUCANO_PATH/effects/shaders/ssao.vert \
-        $$TUCANO_PATH/effects/shaders/deferredShader.frag \
-        $$TUCANO_PATH/effects/shaders/deferredShader.vert \
-        $$TUCANO_PATH/effects/shaders/blur.frag \
-        $$TUCANO_PATH/effects/shaders/blur.vert \
+        $$TUCANO_PATH/effects/shaders/viewspacebuffer.frag \
+        $$TUCANO_PATH/effects/shaders/viewspacebuffer.vert \
+        $$TUCANO_PATH/effects/shaders/gaussianblurfilter.frag \
+        $$TUCANO_PATH/effects/shaders/gaussianblurfilter.vert \
         $$TUCANO_PATH/effects/shaders/phongshader.frag \
         $$TUCANO_PATH/effects/shaders/phongshader.vert
 

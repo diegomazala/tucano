@@ -129,6 +129,14 @@ public:
         noise_scale = Eigen::Vector2f::Zero();
 	}
 
+    ///Default destructor. Destroy the FBO, deletes the shaders and the sampling kernel.
+    ~SSAO()
+    {
+        delete fbo;
+        delete kernel;
+        delete quad;
+    }
+
     /**
      * @brief Initializes the SSAO effects,
      *
@@ -144,7 +152,6 @@ public:
 
         quad = new Mesh();
         quad->createQuad();
-
     }
 
 	/**
@@ -213,7 +220,7 @@ public:
 
         ssaoShader->setUniform("default_color", colorVector);
         ssaoShader->setUniform("noiseScale", noise_scale);
-        ssaoShader->setUniform("kernel", kernel, 3, numberOfSamples);
+        ssaoShader->setUniform("kernel", kernel, 2, numberOfSamples);
 
         ssaoShader->setUniform("depthTexture", fbo->bindAttachment(depthTextureID));
         ssaoShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
@@ -299,32 +306,7 @@ public:
         blurShader->reloadShaders();
     }
 
-	///Default destructor. Destroy the FBO, deletes the shaders and the sampling kernel.
-    ~SSAO()
-    {
-        if (fbo)
-        {
-            delete fbo;
-        }
 
-        if(ssaoShader)
-        {
-            delete ssaoShader;
-		}
-
-		if(deferredShader) {
-			delete deferredShader;
-		}
-
-		if(blurShader) {
-			delete blurShader;
-		}
-
-		if(kernel) {
-			delete kernel;
-		}
-
-	}
 
 private:
 
@@ -338,31 +320,28 @@ private:
     void initializeShaders()
     {
         ssaoShader = loadShader("ssao");
-        deferredShader = loadShader("deferredShader");
-        blurShader = loadShader("blur");
+        deferredShader = loadShader("viewspacebuffer");
+        blurShader = loadShader("gaussianblurfilter");
     }
 
 	///Generates a sampling kernel.
     void generateKernel (void)
     {
         float scale;
-        Eigen::Vector3f sample;
-        kernel = new float[numberOfSamples * 3];
+        Eigen::Vector2f sample;
+        kernel = new float[numberOfSamples * 2];
 
-        int temp = 0;
         for (int i = 0; i < numberOfSamples; i++)
         {
-            sample = Eigen::Vector3f( random(-1.0f,1.0f) , random(-1.0f,1.0f) , random(0.0f,1.0f) );
-            sample.normalize();
+            sample = Eigen::Vector2f( random(-1.0f,1.0f) , random(-1.0f,1.0f) );
+            //sample.normalize();
             //cout << "Kernel: " << sample.transpose() << endl;
 //            sample *= random(0.0f,1.0f); //Distribute sample points randomly around the kernel.
 //            scale = float(i)/float(numberOfSamples);
 //            scale = lerp(0.1f, 1.0f, scale * scale);//Cluster sample points towards origin.
 //            sample *= scale;
-            kernel[temp+0] = sample[0];
-            kernel[temp+1] = sample[1];
-            kernel[temp+2] = sample[2];
-            temp += 3;
+            kernel[i*2+0] = sample[0];
+            kernel[i*2+1] = sample[1];
         }
     }
 

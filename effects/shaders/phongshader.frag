@@ -25,4 +25,5 @@ void main(void)
     vec4 specularLight = vec4(1.0) *  max(pow(dot(lightReflection,eyeDirection),shininess),0.0);
 
     out_Color = vec4(ambientLight.xyz + diffuseLight.xyz + specularLight.xyz,1.0);
+
 }
