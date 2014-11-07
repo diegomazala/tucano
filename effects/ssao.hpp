@@ -38,6 +38,8 @@ namespace Effects
  * Three rendering passes are needed in order to use this effect: in the first pass, the eye-space depth information of the mesh is stored in one channel of a 2D texture. In the second pass, using this
  * depth information, the occlusion factor is computed and used to scale the ambient light. A small noise texture is tiled through thw whole mesh to remove banding due to low number of samples needed to 
  * keep computational cost low. In the third pass, a gaussian blur is applied in order to remove the high frequency noise.
+ *
+ * Based on http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/a-simple-and-practical-approach-to-ssao-r2753
 **/
 class SSAO: public Effect {
 
@@ -60,37 +62,37 @@ protected:
     ///Kernel radius. If the distance between a sample point and the point for which the occlusion is being computed is larger than radius, the occlusion for this sample will be neglected.
     float radius;
 
-    ///
+    /// Framebuffer to store coord/normal buffer
     Framebuffer* fbo;
 
-    ///
+    /// The per pixel AO computation shader
     Shader* ssaoShader;
 
-    ///The shader used to store the depth information in the framebuffer.
+    ///
     Shader* deferredShader;
 
-    ///The shader used to blur the result from the second pass, removing the noise pattern.
+    ///
     Shader* blurShader;
 
     /// A quad mesh for framebuffer rendering
     Mesh* quad;
 
-    ///Flag indicating wether blur shall be applied or not.
+    /// Flag indicating wether blur shall be applied or not.
     bool apply_blur;
 
-    ///Flag indicating if the mesh should be rendered only with ambient occlusion pass or with full illumination. If True, mesh will be rendered only with the ambient occlusion pass.
+    /// Flag indicating if the mesh should be rendered only with ambient occlusion pass or with full illumination. If True, mesh will be rendered only with the ambient occlusion pass.
     bool displayAmbientPass;
 
-    ///Number of neighbour pixels used in blurring. The blur will be applied to a blurRange x blurRange square around the current pixel. It's important to notice that blurRange must be an odd number.
+    /// Number of neighbour pixels used in blurring. The blur will be applied to a blurRange x blurRange square around the current pixel. It's important to notice that blurRange must be an odd number.
     int blurRange;
 
-    ///The ID defining the color attachment to which the depth texture is bound in the framebuffer.
+    /// The ID defining the color attachment to which the depth texture is bound in the framebuffer.
     int depthTextureID;
 
-    ///The ID defining the color attachment to which the normal texture is bound in the framebuffer.
+    /// The ID defining the color attachment to which the normal texture is bound in the framebuffer.
     int normalTextureID;
 
-    ///The ID defining the color attachment to which the blur texture is bound in the framebuffer.
+    /// The ID defining the color attachment to which the blur texture is bound in the framebuffer.
     GLuint blurTextureID;
 
 
@@ -119,7 +121,7 @@ public:
         blurRange = 3;
 
         apply_blur = false;
-        displayAmbientPass = true;
+        displayAmbientPass = false;
 
         ssaoShader = 0;
         blurShader = 0;
