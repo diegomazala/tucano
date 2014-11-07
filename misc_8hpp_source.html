@@ -127,7 +127,7 @@ $(document).ready(function(){initNavTree('misc_8hpp_source.html','');});
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="namespaceTucano_1_1Misc.html#a2a283221f1943e4fd0e2949107a0e3f1">   50</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="namespaceTucano_1_1Misc.html#a2a283221f1943e4fd0e2949107a0e3f1">errorCheckFunc</a> (std::string file, <span class="keywordtype">int</span> line, std::string message = <span class="stringliteral">&quot;&quot;</span>)</div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="namespaceTucano_1_1Misc.html#a503213c6201a2f9da5cc5dc63a2e2138">   50</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespaceTucano_1_1Misc.html#a503213c6201a2f9da5cc5dc63a2e2138">errorCheckFunc</a> (std::string file, <span class="keywordtype">int</span> line, std::string message = <span class="stringliteral">&quot;&quot;</span>)</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;{</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">//OpenGL Error Handling Function:</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    GLenum ErrorCheckValue = glGetError();</div>
@@ -139,7 +139,7 @@ $(document).ready(function(){initNavTree('misc_8hpp_source.html','');});
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="namespaceTucano_1_1Misc.html#ab843911f1f2bb15fc026ae048c241b95">   65</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="namespaceTucano_1_1Misc.html#ab843911f1f2bb15fc026ae048c241b95">initGlew</a> (<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="namespaceTucano_1_1Misc.html#a44e3b395f453cd7f9da3915d3aeda834">   65</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespaceTucano_1_1Misc.html#a44e3b395f453cd7f9da3915d3aeda834">initGlew</a> (<span class="keywordtype">void</span>)</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;{</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    glewExperimental = <span class="keyword">true</span>;</div>
@@ -151,7 +151,7 @@ $(document).ready(function(){initNavTree('misc_8hpp_source.html','');});
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">    #ifdef TUCANODEBUG</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor"></span>    <a class="code" href="namespaceTucano_1_1Misc.html#a2a283221f1943e4fd0e2949107a0e3f1">errorCheckFunc</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor"></span>    <a class="code" href="namespaceTucano_1_1Misc.html#a503213c6201a2f9da5cc5dc63a2e2138">errorCheckFunc</a>(__FILE__, __LINE__);</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    std::cout &lt;&lt; <span class="stringliteral">&quot;GLEW INFO: OpenGL Version: &quot;</span> &lt;&lt; glGetString(GL_VERSION) &lt;&lt; std::endl &lt;&lt; std::endl;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">    #endif</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor"></span></div>
@@ -160,15 +160,15 @@ $(document).ready(function(){initNavTree('misc_8hpp_source.html','');});
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;}</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="namespaceTucano_1_1Misc_html_ab843911f1f2bb15fc026ae048c241b95"><div class="ttname"><a href="namespaceTucano_1_1Misc.html#ab843911f1f2bb15fc026ae048c241b95">Tucano::Misc::initGlew</a></div><div class="ttdeci">static void initGlew(void)</div><div class="ttdoc">Initialize Glew. </div><div class="ttdef"><b>Definition:</b> misc.hpp:65</div></div>
-<div class="ttc" id="namespaceTucano_1_1Misc_html_a2a283221f1943e4fd0e2949107a0e3f1"><div class="ttname"><a href="namespaceTucano_1_1Misc.html#a2a283221f1943e4fd0e2949107a0e3f1">Tucano::Misc::errorCheckFunc</a></div><div class="ttdeci">static void errorCheckFunc(std::string file, int line, std::string message=&quot;&quot;)</div><div class="ttdoc">GL error check method. </div><div class="ttdef"><b>Definition:</b> misc.hpp:50</div></div>
+<div class="ttc" id="namespaceTucano_1_1Misc_html_a503213c6201a2f9da5cc5dc63a2e2138"><div class="ttname"><a href="namespaceTucano_1_1Misc.html#a503213c6201a2f9da5cc5dc63a2e2138">Tucano::Misc::errorCheckFunc</a></div><div class="ttdeci">void errorCheckFunc(std::string file, int line, std::string message=&quot;&quot;)</div><div class="ttdoc">GL error check method. </div><div class="ttdef"><b>Definition:</b> misc.hpp:50</div></div>
+<div class="ttc" id="namespaceTucano_1_1Misc_html_a44e3b395f453cd7f9da3915d3aeda834"><div class="ttname"><a href="namespaceTucano_1_1Misc.html#a44e3b395f453cd7f9da3915d3aeda834">Tucano::Misc::initGlew</a></div><div class="ttdeci">void initGlew(void)</div><div class="ttdoc">Initialize Glew. </div><div class="ttdef"><b>Definition:</b> misc.hpp:65</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_313caf1132e152dd9b58bea13a4052ca.html">utils</a></li><li class="navelem"><a class="el" href="misc_8hpp.html">misc.hpp</a></li>
-    <li class="footer">Generated on Wed Nov 5 2014 14:57:51 for Tucano by
+    <li class="footer">Generated on Fri Nov 7 2014 15:12:04 for Tucano by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
