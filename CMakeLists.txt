@@ -52,10 +52,11 @@ if (DOXYGEN_FOUND)
   if(EXISTS /usr/bin/git)
   add_custom_target(
     webdoc
+    COMMAND git add -A .
     COMMAND git add -u .
     COMMAND git status --short
     COMMAND git commit -m "update web documentation"
-    COMMAND git push origin gh-pages:gh-pages
+    COMMAND git push --force origin gh-pages:gh-pages
     DEPENDS doc
     WORKING_DIRECTORY ${DOCUMENTATION_DIR}/html
     COMMENT "Generating ${PROJECT_NAME} documentation for the web with Doxygen."
