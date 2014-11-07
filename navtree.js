@@ -4,8 +4,8 @@ var NAVTREE =
     [ "Samples", "examples.html", null ],
     [ "Effects Collection", "effects.html", null ],
     [ "Using the Effect and Shader Classes", "effect_tutorial.html", null ],
-    [ "Using the Texture Classe", "texture_tutorial.html", null ],
-    [ "Using the Framebuffer Classe", "framebuffer_tutorial.html", null ],
+    [ "Using the Texture Class", "texture_tutorial.html", null ],
+    [ "Using the Framebuffer Class", "framebuffer_tutorial.html", null ],
     [ "Using the Mesh Class", "mesh_tutorial.html", null ],
     [ "Todo List", "todo.html", null ],
     [ "Namespaces", null, [
