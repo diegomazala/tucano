@@ -31,11 +31,12 @@ To compile the examples with cmake, first make sure you have a recent version of
 Now, create a `build` directory inside the tucano directory, cd into it, then run cmake in the standard way:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd tucano/
+cd tucano/ # top-level directory of tucano
 mkdir build/
 cd build/
 cmake ..
 make
+make install
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This will compile all tucano examples at once. They will be located under the `samples/` directory.
+This will compile all tucano examples at once. They will be located under the `build/samples/` directory. However, `make install` conveniently puts them all under an easier location: the `bin/` folder, inside the tucano top-level directory.
