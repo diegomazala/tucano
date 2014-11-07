@@ -63,6 +63,16 @@ public slots:
         updateGL();
     }
 
+    /**
+     * @brief Modifies the SSAO global maximum distance value.
+     * @param value New max dist value.
+     */
+    void setSSAOMaxDist (int value)
+    {
+        ssao->setMaxDist((float)value/100.0);
+        updateGL();
+    }
+
 private:
 
     /// Screen-Space Ambient Occlusion Effect

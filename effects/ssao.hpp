@@ -98,6 +98,9 @@ protected:
     /// Global intensity value.
     int intensity;
 
+    /// Global maximum distance value, distance in view space to consider a neighbor or not
+    float max_dist;
+
     /// The ID defining the color attachment to which the blur texture is bound in the framebuffer.
     GLuint blurTextureID;
 
@@ -127,6 +130,7 @@ public:
 
         blurRange = 3;
         intensity = 20;
+        max_dist = 0.15;
 
         apply_blur = false;
         displayAmbientPass = false;
@@ -233,6 +237,7 @@ public:
 
         ssaoShader->setUniform("radius", radius);
         ssaoShader->setUniform("intensity", (float)intensity);
+        ssaoShader->setUniform("max_dist", max_dist);
         ssaoShader->setUniform("viewportSize", viewport_size);
         ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
 
@@ -276,6 +281,15 @@ public:
     void setIntensity (int value)
     {
         intensity = value;
+    }
+
+    /**
+     * @brief Set max dist values.
+     * @param value New max dist value.
+     */
+    void setMaxDist (float value)
+    {
+        max_dist = value;
     }
 
     /**

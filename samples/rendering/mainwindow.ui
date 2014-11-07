@@ -104,7 +104,7 @@
      <string>AO intensity</string>
     </property>
    </widget>
-   <widget class="QSlider" name="slider_ssao_radius">
+   <widget class="QSlider" name="slider_ssao_maxdist">
     <property name="geometry">
      <rect>
       <x>640</x>
@@ -112,6 +112,9 @@
       <width>160</width>
       <height>29</height>
      </rect>
+    </property>
+    <property name="sliderPosition">
+     <number>15</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -127,7 +130,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>AO radius</string>
+     <string>AO max dist</string>
     </property>
    </widget>
   </widget>

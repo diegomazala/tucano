@@ -22,6 +22,7 @@ void MainWindow::initialize( void )
     connect(ui->group_effects, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), ui->glwidget, &GLWidget::toggleEffect);
     connect(ui->button_reload_shaders, &QPushButton::clicked, ui->glwidget, &GLWidget::reloadShaders);
     connect(ui->slider_ssao_intensity, &QSlider::valueChanged, ui->glwidget, &GLWidget::setSSAOIntensity);
+    connect(ui->slider_ssao_maxdist, &QSlider::valueChanged, ui->glwidget, &GLWidget::setSSAOMaxDist);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *ke)

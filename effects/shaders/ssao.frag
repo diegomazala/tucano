@@ -16,6 +16,8 @@ uniform bool displayAmbientPass;
 
 uniform float radius;
 uniform float intensity;
+uniform float max_dist;
+
 uniform sampler2D noiseTexture;
 uniform mat4 projectionMatrix;
 uniform ivec2 viewportSize;
@@ -41,7 +43,7 @@ float ambientOcclusion (vec3 vert, vec3 normal)
             if (point != vec4(0.0)) // not background
             {
                 vec3 v = point.xyz - vert.xyz;
-                if (length(v) < 0.2)
+                if (length(v) < max_dist)
                 {
                     float dist_factor = 1.0 / (1.0 + length(v));
                     occlusion += max(0.0, dot (normal, v)) * dist_factor * intensity;
