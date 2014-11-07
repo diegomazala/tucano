@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.8.12)
-set(PROJECT_NAME "tucanoSamples")
+set(PROJECT_NAME "Tucano")
 project(${PROJECT_NAME} C CXX)
 
 add_definitions(-DTUCANODEBUG)
 
+set(DOCUMENTATION_DIR "${PROJECT_SOURCE_DIR}/doc")
 set(SAMPLES_DIR "${PROJECT_SOURCE_DIR}/samples")
 set(TUCANO_EFFECTS_DIR "${PROJECT_SOURCE_DIR}/effects")
 set(TUCANO_SRC_DIR "${PROJECT_SOURCE_DIR}/src")
@@ -35,6 +36,38 @@ include_directories(
   ${TUCANO_SRC_DIR}
   "/usr/include/eigen3"
   )
+
+###########################################
+# DOCUMENTATION BEGIN
+###########################################
+
+find_package(Doxygen QUIET)
+if (DOXYGEN_FOUND)
+  add_custom_target(
+    doc
+    ${DOXYGEN_EXECUTABLE}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMENT "Generating ${PROJECT_NAME} documentation with Doxygen."
+  )    
+  if(EXISTS /usr/bin/git)
+  add_custom_target(
+    webdoc
+    COMMAND git add -u .
+    COMMAND git status --short
+    COMMAND git commit -m "update web documentation"
+    COMMAND git push origin gh-pages:gh-pages
+    DEPENDS doc
+    WORKING_DIRECTORY ${DOCUMENTATION_DIR}/html
+    COMMENT "Generating ${PROJECT_NAME} documentation for the web with Doxygen."
+    )
+  else()
+    message(WARNING "git not found on your system.")
+  endif()
+endif()
+
+###########################################
+# DOCUMENTATION END
+###########################################
 
 ###########################################
 # TUCANO BEGIN
@@ -72,24 +105,24 @@ add_library(
 ###########################################
 
 ###########################################
-# EFFECTS BEGIN
+# TUCANO_EFFECTS BEGIN
 ###########################################
 
 set(
-  EFFECTS_SOURCES
+  TUCANO_EFFECTS_SOURCES
   ${TUCANO_EFFECTS_DIR}/gradientfilter.hpp
   ${TUCANO_EFFECTS_DIR}/meanfilter.hpp
   ${TUCANO_EFFECTS_DIR}/rendertexture.hpp
   )
 
 add_library(
-  EFFECTS_LIBRARY
+  TUCANO_EFFECTS_LIBRARY
   OBJECT
-  ${EFFECTS_SOURCES}
+  ${TUCANO_EFFECTS_SOURCES}
   )
 
 ###########################################
-# EFFECTS END
+# TUCANO_EFFECTS END
 ###########################################
 
 # You might comment out the examples you don't want to compile.
