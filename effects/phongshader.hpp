@@ -31,10 +31,15 @@ namespace Effects
 {
 
 /**
- * @brief Renders a mesh using a Phong shader
+ * @brief Renders a mesh using a Phong shader.
  */
-class Phong : public Tucano::Effect
+class Phong : public Effect
 {
+
+private:
+
+    /// Phong Shader
+    Shader *phong_shader;
 
 public:
 
@@ -51,7 +56,7 @@ public:
      *
      * No need to delete phong_shader, operation performed by inherited Effect class
      */
-    virtual ~Phong (void ) {}
+    virtual ~Phong (void) {}
 
     /**
      * @brief Load and initialize shaders
@@ -92,10 +97,7 @@ public:
         phong_shader->unbind();
     }
 
-private:
 
-    /// Phong Shader
-    Tucano::Shader *phong_shader;
 };
 
 }

@@ -117,7 +117,7 @@ public:
 	 * sampleKernelSize will be sampled in order to compute occlusion.
 	 * @param rad The kernel radius. This is used to define the max distance between the current point and the samples that will be considered for occlusion computation.
 	**/
-    SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 20.0)
+    SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 64, float rad = 20.0)
     {
         depthTextureID = 0;
         normalTextureID = 1;
@@ -184,7 +184,7 @@ public:
         // check if viewport was modified, if so, regenerate fbo
         if (fbo->getWidth() != viewport_size[0] || fbo->getHeight() != viewport_size[1])
         {
-            fbo->create(viewport_size[0], viewport_size[1], 3);
+            fbo->create(viewport_size[0], viewport_size[1], 4);
             computeNoiseScale(viewport_size);
         }
 
@@ -284,15 +284,6 @@ public:
     }
 
     /**
-     * @brief Set max dist values.
-     * @param value New max dist value.
-     */
-    void setMaxDist (float value)
-    {
-        max_dist = value;
-    }
-
-    /**
      * @brief Toggles the current state of apply_blur flag.
      */
     void changeBlurFlag (void)
@@ -335,8 +326,6 @@ public:
         blurShader->reloadShaders();
     }
 
-
-
 private:
 
 	///Computes the noise scale factor, that will be used for tiling the noise texture through the screen.
@@ -356,19 +345,15 @@ private:
 	///Generates a sampling kernel.
     void generateKernel (void)
     {
-        float scale;
         Eigen::Vector2f sample;
         kernel = new float[numberOfSamples * 2];
 
         for (int i = 0; i < numberOfSamples; i++)
         {
             sample = Eigen::Vector2f( random(-1.0f,1.0f) , random(-1.0f,1.0f) );
-            //sample.normalize();
-            //cout << "Kernel: " << sample.transpose() << endl;
-//            sample *= random(0.0f,1.0f); //Distribute sample points randomly around the kernel.
-//            scale = float(i)/float(numberOfSamples);
-//            scale = lerp(0.1f, 1.0f, scale * scale);//Cluster sample points towards origin.
-//            sample *= scale;
+//          sample.normalize();
+//          cout << "Kernel: " << sample.transpose() << endl;
+//          sample *= random(0.0f,1.0f); //Distribute sample points randomly around the kernel.
             kernel[i*2+0] = sample[0];
             kernel[i*2+1] = sample[1];
         }

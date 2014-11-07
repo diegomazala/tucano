@@ -5,6 +5,7 @@
 
 #include <ssao.hpp>
 #include <phongshader.hpp>
+#include <toon.hpp>
 #include <utils/qttrackballwidget.hpp>
 
 using namespace std;
@@ -50,6 +51,7 @@ public slots:
     {
         ssao->reloadShaders();
         phong->reloadShaders();
+        toon->reloadShaders();
         updateGL();
     }
 
@@ -63,15 +65,17 @@ public slots:
         updateGL();
     }
 
+
     /**
-     * @brief Modifies the SSAO global maximum distance value.
-     * @param value New max dist value.
+     * @brief Modifies the Toon quantization level.
+     * @param value New quantization level.
      */
-    void setSSAOMaxDist (int value)
+    void setToonQuantLevel (int value)
     {
-        ssao->setMaxDist((float)value/100.0);
+        toon->setQuantizationLevel(value);
         updateGL();
     }
+
 
 private:
 
@@ -80,6 +84,9 @@ private:
 
     /// Simple Phong Shader
     Effects::Phong *phong;
+
+    /// Simple Phong Shader
+    Effects::Toon *toon;
 
     /// ID of active effect
     int active_effect;

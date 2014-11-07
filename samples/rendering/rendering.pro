@@ -37,11 +37,14 @@ HEADERS  += mainwindow.h \
         glwidget.hpp \
         $$TUCANO_PATH/effects/ssao.hpp \
         $$TUCANO_PATH/effects/phongshader.hpp \
+        $$TUCANO_PATH/effects/toon.hpp \
         $$TUCANO_PATH/src/utils/qttrackballwidget.hpp
 
 FORMS    += mainwindow.ui
 
 OTHER_FILES += \
+        $$TUCANO_PATH/effects/shaders/toonshader.frag \
+        $$TUCANO_PATH/effects/shaders/toonshader.vert \
         $$TUCANO_PATH/effects/shaders/ssao.frag \
         $$TUCANO_PATH/effects/shaders/ssao.vert \
         $$TUCANO_PATH/effects/shaders/viewspacebuffer.frag \

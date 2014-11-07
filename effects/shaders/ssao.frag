@@ -1,17 +1,18 @@
 #version 430
-#define numberOfSamples 16
-
-in vec4 ex_Color;
+#define numberOfSamples 64
 
 out vec4 out_Color;
 
 uniform mat4 lightViewMatrix;
+uniform mat4 projectionMatrix;
+uniform ivec2 viewportSize;
 
 uniform vec2 noiseScale;
 uniform vec2 kernel[numberOfSamples];
 uniform sampler2D coordsTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D colorTexture;
+
 uniform bool displayAmbientPass;
 
 uniform float radius;
@@ -19,40 +20,34 @@ uniform float intensity;
 uniform float max_dist;
 
 uniform sampler2D noiseTexture;
-uniform mat4 projectionMatrix;
-uniform ivec2 viewportSize;
-
 
 float ambientOcclusion (vec3 vert, vec3 normal)
 {
-    vec2 texCoord = gl_FragCoord.xy;
+    ivec2 texCoord = ivec2(gl_FragCoord.xy);
     float occlusion = 0.0;
-
 
     float depth = abs(vert.z);
     float max_v = 21.0;
-    int w = max(5, min(int(max_v), int(max_v/depth)));
-    for (int i = -w; i <= w; ++i)
+    // smaller radius for points farther away
+    int rad = max(5, min(int(max_v), int(max_v/depth)));
+    for (int i = 0; i <= numberOfSamples; ++i)
     {
-        for (int j = -w; j <= w; ++j)
-        {
-            vec2 randCoord = texCoord + vec2(i,j);
-            randCoord /= vec2(viewportSize.xy);
-            vec4 point = texture(coordsTexture, randCoord);
+        ivec2 randCoord = texCoord + ivec2(kernel[i] * rad);
 
-            if (point != vec4(0.0)) // not background
+        vec4 point = texelFetch(coordsTexture, randCoord, 0);
+
+        if (point != vec4(0.0)) // check if not background
+        {
+            vec3 v = point.xyz - vert.xyz;
+            if (length(v) < max_dist) // check distance in view space (remember model is normalized by modelmatrix)
             {
-                vec3 v = point.xyz - vert.xyz;
-                if (length(v) < max_dist)
-                {
-                    float dist_factor = 1.0 / (1.0 + length(v));
-                    occlusion += max(0.0, dot (normal, v)) * dist_factor * intensity;
-                }
+                float dist_factor = 1.0 / (1.0 + length(v));
+                occlusion += max(0.0, dot (normal, v)) * dist_factor * intensity;
             }
         }
     }
 
-    occlusion = 1 - (occlusion / float(4*w*w));
+    occlusion = 1 - (occlusion / float(numberOfSamples));
     return occlusion;
 }
 
@@ -69,6 +64,7 @@ void main (void)
     // compute ambient occlusion
     float occlusion = ambientOcclusion(vert.xyz, normal);
 
+    // from now on, compute Phong Shader
     vec3 lightDirection = (lightViewMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz;
     lightDirection = normalize(lightDirection);
 
@@ -86,7 +82,7 @@ void main (void)
         vec4 ambientLight = vec4(0.5) * color;
 
         vec4 diffuseLight = color * 0.4 * max(dot(lightDirection, normal),0.0);
-        vec4 specularLight = vec4(1.0) *  max(pow(dot(lightReflection,eyeDirection),shininess),0.0);
+        vec4 specularLight = vec4(1.0) *  max(pow(dot(lightReflection, eyeDirection), shininess),0.0);
 
         out_Color = occlusion*vec4(ambientLight.xyz + diffuseLight.xyz + specularLight.xyz, 1.0);
     }

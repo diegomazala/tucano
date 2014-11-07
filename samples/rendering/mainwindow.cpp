@@ -18,11 +18,13 @@ void MainWindow::initialize( void )
     ui->glwidget->initialize();
 
     ui->group_effects->setId(ui->radio_phong, 0);
-    ui->group_effects->setId(ui->radio_ssao, 1);
+    ui->group_effects->setId(ui->radio_toon, 1);
+    ui->group_effects->setId(ui->radio_ssao, 2);
+
     connect(ui->group_effects, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), ui->glwidget, &GLWidget::toggleEffect);
     connect(ui->button_reload_shaders, &QPushButton::clicked, ui->glwidget, &GLWidget::reloadShaders);
     connect(ui->slider_ssao_intensity, &QSlider::valueChanged, ui->glwidget, &GLWidget::setSSAOIntensity);
-    connect(ui->slider_ssao_maxdist, &QSlider::valueChanged, ui->glwidget, &GLWidget::setSSAOMaxDist);
+    connect(ui->slider_toon_level, &QSlider::valueChanged, ui->glwidget, &GLWidget::setToonQuantLevel);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *ke)
