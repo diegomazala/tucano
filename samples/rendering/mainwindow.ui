@@ -155,6 +155,19 @@
      <string>Quantization level</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="check_trackball">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>330</y>
+      <width>141</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Draw trackball</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

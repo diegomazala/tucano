@@ -26,28 +26,39 @@ float ambientOcclusion (vec3 vert, vec3 normal)
     ivec2 texCoord = ivec2(gl_FragCoord.xy);
     float occlusion = 0.0;
 
+    vec2 noisecoords = gl_FragCoord.xy;// / vec2(textureSize(noiseTexture, 0).xy);
+    float noise = texelFetch(noiseTexture, ivec2(noisecoords).xy, 0).x;
+
+    noise *= 3.14;
+    mat2 rotation = mat2(cos(noise), -sin(noise), sin(noise), cos(noise));
+
     float depth = abs(vert.z);
-    float max_v = 21.0;
+    float max_v = 35.0;
     // smaller radius for points farther away
     int rad = max(5, min(int(max_v), int(max_v/depth)));
     for (int i = 0; i <= numberOfSamples; ++i)
     {
-        ivec2 randCoord = texCoord + ivec2(kernel[i] * rad);
+        vec2 rotated = rotation * kernel[i].xy;
+        ivec2 randCoord = texCoord + ivec2(rotated * rad);
+        //ivec2 randCoord = texCoord + ivec2(i,j);
 
         vec4 point = texelFetch(coordsTexture, randCoord, 0);
 
         if (point != vec4(0.0)) // check if not background
         {
             vec3 v = point.xyz - vert.xyz;
-            if (length(v) < max_dist) // check distance in view space (remember model is normalized by modelmatrix)
+            float dist = length(v);
+
+            if (dist < max_dist) // check distance in view space (remember model is normalized by modelmatrix)
             {
-                float dist_factor = 1.0 / (1.0 + length(v));
+                float dist_factor = 1.0 / (1.0 + dist);
                 occlusion += max(0.0, dot (normal, v)) * dist_factor * intensity;
             }
         }
     }
 
     occlusion = 1 - (occlusion / float(numberOfSamples));
+
     return occlusion;
 }
 

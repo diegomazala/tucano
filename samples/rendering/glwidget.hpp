@@ -76,6 +76,15 @@ public slots:
         updateGL();
     }
 
+    /**
+     * @brief Toggle draw trackball flag.
+     */
+    void toggleDrawTrackball (void)
+    {
+        draw_trackball = !draw_trackball;
+        updateGL();
+    }
+
 
 private:
 
@@ -90,6 +99,9 @@ private:
 
     /// ID of active effect
     int active_effect;
+
+    /// Flag to draw or not trackball
+    bool draw_trackball;
 
 };
 

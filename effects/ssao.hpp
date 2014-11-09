@@ -24,6 +24,7 @@
 #define __SSAO__
 
 #include "tucano.hpp"
+#include <math.h>
 
 using namespace std;
 
@@ -117,7 +118,7 @@ public:
 	 * sampleKernelSize will be sampled in order to compute occlusion.
 	 * @param rad The kernel radius. This is used to define the max distance between the current point and the samples that will be considered for occlusion computation.
 	**/
-    SSAO (int noiseTextureDimension = 4, int sampleKernelSize = 64, float rad = 20.0)
+    SSAO (int noiseTextureDimension = 64, int sampleKernelSize = 64, float rad = 20.0)
     {
         depthTextureID = 0;
         normalTextureID = 1;
@@ -161,6 +162,7 @@ public:
         initializeShaders();
         generateKernel();
         generateNoiseTexture();
+        Misc::errorCheckFunc(__FILE__, __LINE__);
 
         fbo = new Framebuffer();
 
@@ -192,9 +194,9 @@ public:
         glClearColor(1.0, 1.0, 1.0, 0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //First pass - Depth Storage:
+        // First pass - Depth Storage:
 
-        //Bind buffer to store depth information in framebuffer:
+        // Bind buffer to store depth information in framebuffer:
         fbo->clearAttachments();
         fbo->bindRenderBuffers(depthTextureID, normalTextureID, colorTextureID);
 
@@ -227,7 +229,7 @@ public:
         ssaoShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
         ssaoShader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
 
-        ssaoShader->setUniform("noiseScale", noise_scale);
+        //ssaoShader->setUniform("noiseScale", noise_scale);
         ssaoShader->setUniform("kernel", kernel, 2, numberOfSamples);
 
         ssaoShader->setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
@@ -312,19 +314,14 @@ public:
 		}
 	}
 
-	///Change the current state of displayAmbientPass flag.
-    void changeAmbientPassFlag()
+    /**
+     * @brief Toggles the displayAmbientPass flag.
+     */
+    void changeAmbientPassFlag (void)
     {
         displayAmbientPass = !displayAmbientPass;
     }
 
-	///Reload all shaders needed for SSAO effect.
-    virtual void reloadShaders (void)
-    {
-        deferredShader->reloadShaders();
-        ssaoShader->reloadShaders();
-        blurShader->reloadShaders();
-    }
 
 private:
 
@@ -334,28 +331,36 @@ private:
         noise_scale = Eigen::Vector2f(viewport_size[0]/(float)noise_size, viewport_size[1]/(float)noise_size);
     }
 
-	///Creates and loads all shaders.
-    void initializeShaders()
+    /**
+     * @brief Creates and loads all shaders.
+     */
+    void initializeShaders (void)
     {
         ssaoShader = loadShader("ssao");
         deferredShader = loadShader("viewspacebuffer");
         blurShader = loadShader("gaussianblurfilter");
     }
 
-	///Generates a sampling kernel.
+    /**
+     * @brief Generates a sampling kernel with random 2D unormalized vectors in range [-1,1].
+     */
     void generateKernel (void)
     {
         Eigen::Vector2f sample;
         kernel = new float[numberOfSamples * 2];
 
-        for (int i = 0; i < numberOfSamples; i++)
-        {
-            sample = Eigen::Vector2f( random(-1.0f,1.0f) , random(-1.0f,1.0f) );
-//          sample.normalize();
-//          cout << "Kernel: " << sample.transpose() << endl;
-//          sample *= random(0.0f,1.0f); //Distribute sample points randomly around the kernel.
-            kernel[i*2+0] = sample[0];
-            kernel[i*2+1] = sample[1];
+        float step = 2.0*M_PI/(float)numberOfSamples;
+
+        // divide in numberOfSamples directions in the unit circle, and multiply each vector by a random radius
+        for (int i = 1; i <= numberOfSamples; i++)
+        {          
+            float r = pow(random(0.01, 1.0f),1.0);
+
+            sample[0] = cos(step*i);
+            sample[1] = sin(step*i);
+
+            kernel[i*2+0] = r*sample[0];
+            kernel[i*2+1] = r*sample[1];
         }
     }
 
@@ -364,41 +369,25 @@ private:
      */
     void generateNoiseTexture (void)
     {
-        float noise[noise_size*noise_size*4];
-        Eigen::Vector3f randomVector;
+        GLfloat *noise = new GLfloat[noise_size*noise_size];
 
         for(int i = 0; i < noise_size*noise_size; i++)
         {
-            randomVector = Eigen::Vector3f ( random(-1.0f,1.0f), random(-1.0f,1.0f), 0.0f);
-            randomVector.normalize();
-            //(randomVector + Eigen::Vector3f(1.0,1.0,1.0)) * 0.5;
-            noise[(i*4)+0] = randomVector[0];
-            noise[(i*4)+1] = randomVector[1];
-            noise[(i*4)+2] = 0.0;
-            noise[(i*4)+3] = 1.0f;
+            noise[i] = random(0.0f,1.0f);
         }
 
-        noiseTexture.create( GL_TEXTURE_2D, GL_RGBA32F, noise_size, noise_size, GL_RGBA, GL_FLOAT, &noise[0]);
+        noiseTexture.create(GL_TEXTURE_2D, GL_RGBA32F, noise_size, noise_size, GL_RGBA, GL_FLOAT, noise);
         noiseTexture.setTexParameters( GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
+        delete [] noise;
     }
 
-    /**
-     * Linear interpolation function. Interpolates between a and b with a scale factor s.
-	 * @param a The minimum point for interpolation.
-	 * @param b The maximum point for interpolation. 
-	 * @param s The scale factor used for interpolation.
-     */
-    float lerp(const float a, const float b, const float s)
-    {
-        return a + s * (b - a);
-    }
 
     /**
-     * Generate random number in range [min,max].
+     * @brief Generates a random number in range [min,max].
 	 * @param min The minimum value for random number generation.
 	 * @param max The maximum value for random number generation.
      */
-    float random(int min, int max)
+    float random(float min, float max)
     {
         //srand ( time(NULL) );
         int random = rand();
@@ -408,8 +397,6 @@ private:
         assert(ret >= min && ret <= max);
         return ret;
     }
-
-
 };
 }
 
