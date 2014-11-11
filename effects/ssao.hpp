@@ -133,7 +133,7 @@ public:
         intensity = 20;
         max_dist = 0.15;
 
-        apply_blur = false;
+        apply_blur = true;
         displayAmbientPass = false;
 
         ssaoShader = 0;
@@ -170,16 +170,110 @@ public:
         quad->createQuad();
     }
 
+    /**
+     * @brief First pass of the SSAO, writes coords, normals and colors to a buffer.
+     * @param mesh A pointer to the mesh that will be rendered.
+     * @param cameraTrackball A pointer to the camera trackball object.
+     * @param lightTrackball A pointer to the light trackball object.
+     */
+    void createViewSpaceBuffer (Mesh* mesh, Trackball* camera_trackball, Trackball* light_trackball)
+    {
+
+        // Bind buffer to store coord, normal and color information
+        fbo->clearAttachments();
+        fbo->bindRenderBuffers(depthTextureID, normalTextureID, colorTextureID);
+
+        deferredShader->bind();
+        deferredShader->setUniform("projectionMatrix", camera_trackball->getProjectionMatrix());
+        deferredShader->setUniform("modelMatrix",mesh->getModelMatrix());
+        deferredShader->setUniform("viewMatrix", camera_trackball->getViewMatrix());
+        deferredShader->setUniform("lightViewMatrix", light_trackball->getViewMatrix());
+        deferredShader->setUniform("has_color", mesh->hasAttribute("in_Color"));
+
+        mesh->setAttributeLocation(deferredShader);
+        mesh->render();
+
+        deferredShader->unbind();
+        fbo->unbind();
+        fbo->clearDepth();
+
+    }
+
+    /**
+     * @brief Compute the Ambient Occlusion factor for each pixel.
+     *
+     * @param mesh A pointer to the mesh that will be rendered.
+     * @param cameraTrackball A pointer to the camera trackball object.
+     * @param lightTrackball A pointer to the light trackball object.
+     */
+    void computeSSAO (Trackball* light_trackball)
+    {
+        ssaoShader->bind();
+
+        ssaoShader->setUniform("lightViewMatrix", light_trackball->getViewMatrix());
+
+        //ssaoShader->setUniform("noiseScale", noise_scale);
+        ssaoShader->setUniform("kernel", kernel, 2, numberOfSamples);
+
+        ssaoShader->setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
+        ssaoShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
+        ssaoShader->setUniform("colorTexture", fbo->bindAttachment(colorTextureID));
+        ssaoShader->setUniform("displayAmbientPass", displayAmbientPass);
+
+        ssaoShader->setUniform("radius", radius);
+        ssaoShader->setUniform("intensity", (float)intensity);
+        ssaoShader->setUniform("max_dist", max_dist);
+        ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
+
+        quad->setAttributeLocation(ssaoShader);
+
+        //Second pass mesh rendering:
+        quad->render();
+
+        ssaoShader->unbind();
+        noiseTexture.unbind();
+        fbo->unbind();
+        fbo->clearDepth();
+    }
+
+
+    /**
+     * @brief Apply a Gaussian Blur in screen space.
+     */
+    void applyBlur (void)
+    {
+
+        blurShader->bind();
+
+        blurShader->setUniform("blurTexture", fbo->bindAttachment(blurTextureID));
+        blurShader->setUniform("blurRange", blurRange);
+
+        quad->setAttributeLocation(blurShader);
+        quad->render();
+
+        blurShader->unbind();
+        fbo->unbind();
+    }
+
 	/**
      * @brief Renders the mesh with the desired effect.
+     *
+     * The algorithm has three passes:
+     * 1. compute buffer with coords, normals and color per pixel
+     * 2. compute AO per pixel
+     * 3. blur the final result
+     * An option to pass an output buffer is available in case of offline rendering.
+     * For example, when taking snapshots of the current result.
 	 * @param mesh A pointer to the mesh that will be rendered.
 	 * @param cameraTrackball A pointer to the camera trackball object.
 	 * @param lightTrackball A pointer to the light trackball object.
+     * @param output_fbo Output buffer, alternative to GL back buffer for offline rendering
+     * @param output_attach In case of offline rendering, the output attachment of the fbo
      */
-    virtual void render(Mesh* mesh, Trackball* cameraTrackball, Trackball* lightTrackball)
+    virtual void render(Mesh* mesh, Trackball* camera_trackball, Trackball* light_trackball, Framebuffer* output_fbo = NULL, int output_attach = 0)
     {
-        Eigen::Vector4f viewport = cameraTrackball->getViewport();
-        Eigen::Vector2i viewport_size = cameraTrackball->getViewportSize();
+        Eigen::Vector4f viewport = camera_trackball->getViewport();
+        Eigen::Vector2i viewport_size = camera_trackball->getViewportSize();
 
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
@@ -194,85 +288,37 @@ public:
         glClearColor(1.0, 1.0, 1.0, 0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // First pass - Depth Storage:
+        // first pass
+        createViewSpaceBuffer (mesh, camera_trackball, light_trackball);
 
-        // Bind buffer to store depth information in framebuffer:
-        fbo->clearAttachments();
-        fbo->bindRenderBuffers(depthTextureID, normalTextureID, colorTextureID);
-
-        deferredShader->bind();
-        deferredShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-        deferredShader->setUniform("modelMatrix",mesh->getModelMatrix());
-        deferredShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-        deferredShader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
-        deferredShader->setUniform("has_color", mesh->hasAttribute("in_Color"));
-
-        mesh->setAttributeLocation(deferredShader);
-        mesh->render();
-
-        deferredShader->unbind();
-        fbo->unbind();
-        fbo->clearDepth();
-
-        // ******************** Second pass - SSAO Computation:
-
-        if(apply_blur)
+        if(blurRange > 1)
         {
-            // Set draw buffer to blur texture:
             fbo->bindRenderBuffer(blurTextureID);
-        }        
+        }
+        else if (output_fbo != NULL)
+        {
+            output_fbo->bindRenderBuffer(output_attach);
+        }
 
-        ssaoShader->bind();
-
-        ssaoShader->setUniform("modelMatrix", mesh->getModelMatrix());
-        ssaoShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-        ssaoShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-        ssaoShader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
-
-        //ssaoShader->setUniform("noiseScale", noise_scale);
-        ssaoShader->setUniform("kernel", kernel, 2, numberOfSamples);
-
-        ssaoShader->setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
-        ssaoShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
-        ssaoShader->setUniform("colorTexture", fbo->bindAttachment(colorTextureID));
-        ssaoShader->setUniform("displayAmbientPass", displayAmbientPass);
-
-        ssaoShader->setUniform("radius", radius);
-        ssaoShader->setUniform("intensity", (float)intensity);
-        ssaoShader->setUniform("max_dist", max_dist);
-        ssaoShader->setUniform("viewportSize", viewport_size);
-        ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
-
-        quad->setAttributeLocation(ssaoShader);
-
-        //Second pass mesh rendering:
-        quad->render();
-
-        ssaoShader->unbind();
-        noiseTexture.unbind();
-        fbo->unbind();
-        fbo->clearDepth();
+        // second pass
+        computeSSAO(light_trackball);
 
         Misc::errorCheckFunc(__FILE__, __LINE__);
 
-        if(apply_blur)
+        if(blurRange > 1)
         {
-            //Third Pass - Blurring the scene:
-            blurShader->bind();
+            if (output_fbo != NULL)
+            {
+                output_fbo->bindRenderBuffer(output_attach);
+            }
 
-            //Setting Uniforms:
-            blurShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-            blurShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-            blurShader->setUniform("modelMatrix", mesh->getModelMatrix());
+            // third pass
+            applyBlur();
+        }
 
-            blurShader->setUniform("blurTexture", fbo->bindAttachment(blurTextureID));
-            blurShader->setUniform("blurRange", blurRange);
-
-            mesh->setAttributeLocation(blurShader);
-            mesh->render();
-
-            blurShader->unbind();
-            fbo->unbind();
+        if (output_fbo != NULL)
+        {
+            output_fbo->unbind();
         }
     }
 
@@ -286,32 +332,11 @@ public:
     }
 
     /**
-     * @brief Toggles the current state of apply_blur flag.
-     */
-    void changeBlurFlag (void)
-    {
-        apply_blur = !apply_blur;
-    }
-
-    /**
      * Increases blur range.
      */
-    void incrementBlurRange (void)
+    void setBlurRange (int value)
     {
-		blurRange += 2;
-	}
-
-    /**
-     * Decreases blur range.
-     */
-    void decrementBlurRange (void)
-    {
-		if(blurRange >=5) {
-			blurRange -= 2;
-		}
-		else {
-			blurRange = 3;
-		}
+        blurRange = value;
 	}
 
     /**

@@ -65,6 +65,16 @@ public slots:
         updateGL();
     }
 
+    /**
+     * @brief Modifies the SSAO blur range value.
+     * @param value New blur range value.
+     */
+    void setSSAOBlur (int value)
+    {
+        ssao->setBlurRange(value);
+        updateGL();
+    }
+
 
     /**
      * @brief Modifies the Toon quantization level.

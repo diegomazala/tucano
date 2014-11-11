@@ -5,7 +5,6 @@ out vec4 out_Color;
 
 uniform mat4 lightViewMatrix;
 uniform mat4 projectionMatrix;
-uniform ivec2 viewportSize;
 
 uniform vec2 noiseScale;
 uniform vec2 kernel[numberOfSamples];
