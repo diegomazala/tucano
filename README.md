@@ -1,6 +1,8 @@
 Tucano
 ======
 
+![tucano](tucano.png)
+
 ### Welcome to Tucano, a Library for rapid prototyping with modern OpenGL and GLSL.
 
 Tucano encapsulates many common OpenGL/GLSL features in C++ classes, saving a lot of coding and allowing the developer to concentrate on the core of the application and the Shader codes.
