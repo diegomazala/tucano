@@ -45,7 +45,7 @@ Tucano has only two library dependencies (make sure you have a recent version of
 
 No need to compile Tucano, just include *tucano.hpp* in your project and be happy!
 
-* use the TUCANODEBUG flag for debugging
+* use the `TUCANODEBUG` flag for debugging
 
 ## Examples
 
