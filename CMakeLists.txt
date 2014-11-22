@@ -27,14 +27,20 @@ endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+find_package(PkgConfig REQUIRED)
+if(NOT PKG_CONFIG_FOUND)
+  message(SEND_ERROR "pkg-config not found on your system")
+endif()
+pkg_check_modules(EIGEN3 REQUIRED eigen3)
+
 include_directories(
+  ${EIGEN3_INCLUDE_DIRS}
   ${GLEW_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5OpenGL_INCLUDE_DIRS}
   ${TUCANO_EFFECTS_DIR}
   ${TUCANO_SRC_DIR}
-  "/usr/include/eigen3"
   )
 
 ###########################################
