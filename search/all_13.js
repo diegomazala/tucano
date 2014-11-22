@@ -1,9 +1,9 @@
 var searchData=
 [
   ['using_20the_20effect_20and_20shader_20classes',['Using the Effect and Shader Classes',['../effect_tutorial.html',1,'']]],
-  ['using_20the_20framebuffer_20class',['Using the Framebuffer Class',['../framebuffer_tutorial.html',1,'']]],
+  ['using_20the_20framebuffer_20classe',['Using the Framebuffer Classe',['../framebuffer_tutorial.html',1,'']]],
   ['using_20the_20mesh_20class',['Using the Mesh Class',['../mesh_tutorial.html',1,'']]],
-  ['using_20the_20texture_20class',['Using the Texture Class',['../texture_tutorial.html',1,'']]],
+  ['using_20the_20texture_20classe',['Using the Texture Classe',['../texture_tutorial.html',1,'']]],
   ['unbind',['unbind',['../classTucano_1_1BufferObject.html#a56c61c951d8fc63e39c23fe17ca1f2d0',1,'Tucano::BufferObject::unbind()'],['../classTucano_1_1Framebuffer.html#a537d685e0467bfc0db7c7018bbde0bd0',1,'Tucano::Framebuffer::unbind()'],['../classTucano_1_1VertexAttribute.html#a3277e7f9d11080f26886b7ac47d0de00',1,'Tucano::VertexAttribute::unbind()'],['../classTucano_1_1Shader.html#afefb582a5b95b91853d3930cb2e13888',1,'Tucano::Shader::unbind()'],['../classTucano_1_1Texture.html#a32a46ee581f0f5433a6da0bfc2222a25',1,'Tucano::Texture::unbind()']]],
   ['unbindattachments',['unbindAttachments',['../classTucano_1_1Framebuffer.html#a4991fecf9dd486869aef1b7c954d65b6',1,'Tucano::Framebuffer']]],
   ['unbindbase',['unbindBase',['../classTucano_1_1BufferObject.html#a8ec67124b04359a35abd1c5455cf989b',1,'Tucano::BufferObject']]],
