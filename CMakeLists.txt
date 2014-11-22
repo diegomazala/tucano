@@ -53,7 +53,7 @@ if (DOXYGEN_FOUND)
     doc
     ${DOXYGEN_EXECUTABLE}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    COMMENT "Generating ${PROJECT_NAME} documentation with Doxygen."
+    COMMENT "Generating ${PROJECT_NAME} local documentation with Doxygen"
   )    
   if(EXISTS /usr/bin/git)
   add_custom_target(
@@ -64,11 +64,11 @@ if (DOXYGEN_FOUND)
     COMMAND git commit -m "update web documentation"
     COMMAND git push --force origin gh-pages:gh-pages
     DEPENDS doc
-    WORKING_DIRECTORY ${DOCUMENTATION_DIR}/html
-    COMMENT "Generating ${PROJECT_NAME} documentation for the web with Doxygen."
+    WORKING_DIRECTORY "${DOCUMENTATION_DIR}/html"
+    COMMENT "Generating and updating ${PROJECT_NAME} documentation for the web with Doxygen"
     )
   else()
-    message(WARNING "git not found on your system.")
+    message(WARNING "git not found on your system")
   endif()
 endif()
 
@@ -132,7 +132,7 @@ add_library(
 # TUCANO_EFFECTS END
 ###########################################
 
-# You might comment out the examples you don't want to compile.
+# You can comment out the examples you don't want to compile.
 add_subdirectory(${SAMPLES_DIR}/imgproc)
 add_subdirectory(${SAMPLES_DIR}/phongViewer)
 add_subdirectory(${SAMPLES_DIR}/simpleTexture)
