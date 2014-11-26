@@ -1,0 +1,25 @@
+# Maintainer: Thiago Perrotta <thiagoperrotta95@gmail.com>
+pkgname=tucano
+pkgver=0.1
+pkgrel=1
+pkgdesc="A library for rapid prototyping with modern OpenGL and GLSL"
+arch=('i686' 'x86_64')
+url="https://github.com/LCG-UFRJ/tucano"
+license=('GPL')
+depends=('eigen' 'glew')
+makedepends=('cmake')
+optdepends=()
+source=("$pkgname.tar.gz")
+        #"git+https://github.com/LCG-UFRJ/$pkgname.git")
+md5sums=('SKIP')
+
+build() {
+  cd "$srcdir/$pkgname"
+  mkdir build/ && cd $_
+  cmake ..
+}
+
+package() {
+  cd "$srcdir/$pkgname"
+  make -C build/ DESTDIR="$pkgdir/" install
+}
