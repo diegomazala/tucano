@@ -72,6 +72,16 @@ if (DOXYGEN_FOUND)
   endif()
 endif()
 
+file(GLOB
+  TUCANO_DOCS
+  ${DOCUMENTATION_DIR}/*.md
+  )
+
+install(
+  FILES ${TUCANO_DOCS}
+  DESTINATION "share/doc/tucano"
+  )
+
 ###########################################
 # DOCUMENTATION END
 ###########################################
@@ -99,6 +109,11 @@ set(
   ${TUCANO_SRC_DIR}/utils/qttrackballwidget.hpp
   ${TUCANO_SRC_DIR}/utils/rply/rply.c
   ${TUCANO_SRC_DIR}/utils/rply/rply.h
+  )
+
+install(
+  FILES ${TUCANO_SOURCES}
+  DESTINATION include/tucano/
   )
 
 add_library(
