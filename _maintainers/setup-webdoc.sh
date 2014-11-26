@@ -1,5 +1,5 @@
 #!/bin/sh
-# Setup the documentation folder, so you can run make webdoc later.
+# Automatically setup the documentation folder, so you can run `make webdoc` later.
 
 confirm() {
   # call with a prompt string or use a default one
@@ -19,8 +19,9 @@ msg() {
 }
 
 CURRENTDIR="$(pwd)"
-TUCANODIR="$(dirname "$(readlink -f "$0")")"
+TUCANODIR="$(dirname "$(readlink -f "../$0")")"
 WEBDOCDIR="${TUCANODIR}/doc/html"
+echo $TUCANODIR
 
 msg "Removing $WEBDOCDIR"
 confirm "Is this right [y/N]?" && rm -rf "$WEBDOCDIR" || exit 0
