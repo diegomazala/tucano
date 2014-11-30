@@ -271,6 +271,17 @@ public:
     }
 
     /**
+     * @brief Returns the dimensions of the viewport.
+     *
+     * Viewport dimensions are as follows [maxX - minX, maxY - minY]
+     * @return Viewport dimensions.
+     */
+    Eigen::Vector2i getViewportSize (void)
+    {
+        return Eigen::Vector2i(viewport[2]-viewport[0], viewport[3]-viewport[1]);
+    }
+
+    /**
      * @brief Sets the viewport coordinates.
      * @param vp Viewport coordinates.
      */
@@ -381,6 +392,7 @@ public:
         frustum_top = -1.0;
         near_plane = 0.1;
         far_plane = 100.0;
+        fovy = 90.0;
 
         loadShader();
         reset();
@@ -425,7 +437,12 @@ public:
      */
     Eigen::Matrix4f setPerspectiveMatrix (float fy, float in_aspect_ratio, float in_near_plane,float in_far_plane)
     {
-        Eigen::Matrix4f proj = createPerspectiveMatrix(fy, in_aspect_ratio, in_near_plane, in_far_plane);
+        fovy = fy;
+        aspect_ratio = in_aspect_ratio;
+        near_plane = in_near_plane;
+        far_plane = in_far_plane;
+
+        Eigen::Matrix4f proj = createPerspectiveMatrix(fovy, aspect_ratio, near_plane, far_plane);
         setProjectionMatrix(proj);
         use_perspective = true;
         return proj;
@@ -438,10 +455,7 @@ public:
     void changeFovy (float new_fovy)
     {
         fovy = new_fovy;
-        if (use_perspective)
-        {
-            setPerspectiveMatrix(fovy, aspect_ratio, near_plane, far_plane);
-        }
+        setPerspectiveMatrix(fovy, aspect_ratio, near_plane, far_plane);
     }
 
     /**
@@ -495,10 +509,9 @@ public:
      */
     void incrementFov (float inc)
     {
-        fovy += inc;
         if (use_perspective)
         {
-            setPerspectiveMatrix(fovy, aspect_ratio, near_plane, far_plane);
+            changeFovy(fovy + inc);
         }
     }
 

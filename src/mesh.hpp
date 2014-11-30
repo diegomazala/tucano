@@ -287,7 +287,8 @@ public:
     }
 
     ///Default Destructor. Deletes the bufferIDs. vertices. normals. colors. indices and texCoords arrays.
-    virtual ~Mesh() {
+    virtual ~Mesh (void)
+    {
         reset();
     }
 
@@ -531,18 +532,18 @@ public:
     }
 
     /**
-     * @brief Resets all mesh locations and automatically sets the attribute locations for a given Shader.
+     * @brief Automatically sets the attribute locations for a given Shader.
      *
      * For every mesh attribute, the Shader will be queried for an attribute with the same name,
      * if one is found they will linked.
      * @param shader A pointer to the given shader.
      */
     void setAttributeLocation (Shader *shader)
-    {
+    {       
         for (unsigned int i = 0; i < vertex_attributes.size(); ++i)
         {
             GLint loc = shader->getAttributeLocation(vertex_attributes[i].getName().c_str());
-            if (loc != -1)
+            //if (loc != -1)
             {
                 vertex_attributes[i].setLocation(loc);
             }

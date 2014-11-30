@@ -61,6 +61,10 @@ protected:
 
 public:
 
+    /**
+     * @brief Default constructor.
+     * @param parent Parent widget.
+     */
     explicit QtTrackballWidget(QWidget *parent) : QGLWidget(parent)
     {
         mesh = 0;
@@ -68,6 +72,9 @@ public:
         light_trackball = 0;
     }
 
+    /**
+     * @brief Default destructor.
+     */
     ~QtTrackballWidget()
     {
 
@@ -100,7 +107,7 @@ public:
     virtual void resizeGL (void)
     {
         camera_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
-        camera_trackball->setPerspectiveMatrix(60.0, this->width()/this->height(), 1.0f, 100.0f);
+        camera_trackball->setPerspectiveMatrix(camera_trackball->getFovy(), this->width()/this->height(), 0.1f, 100.0f);
         light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
         updateGL();
     }
@@ -114,7 +121,7 @@ public:
         size << this->width(), this->height();
 
         camera_trackball = new Trackball();
-        camera_trackball->setPerspectiveMatrix(60.0, this->width()/this->height(), 1.0f, 100.0f);
+        camera_trackball->setPerspectiveMatrix(60.0, this->width()/this->height(), 0.1f, 100.0f);
         camera_trackball->setRenderFlag(true);
 
         camera_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
@@ -142,27 +149,6 @@ public:
     }
 
 protected:
-
-//    /**
-//     * @brief Callback for mouse double click.
-//     * @param event The mouse event that triggered the callback.
-//     */
-//    void mouseDoubleClickEvent (QMouseEvent * event)
-//    {
-//        event->ignore();
-//        updateGL();
-//    }
-
-//    /**
-//     * @brief Callback for key release event.
-//     * @param event The key event that triggered the callback.
-//     */
-//    void keyReleaseEvent (QKeyEvent * event)
-//    {
-//        event->ignore();
-//        updateGL ();
-//    }
-
 
     /**
      * @brief Callback for key press event.
