@@ -11,7 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = rendering
 TEMPLATE = app
 
-TUCANO_PATH = ../../
+# path relative from build directory
+TUCANO_PATH = ../../../../
 
 INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects
 

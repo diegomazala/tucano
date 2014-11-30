@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = phongViewer
 TEMPLATE = app
 
-TUCANO_PATH = ../../
+TUCANO_PATH = ../../../../
 
 INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects
 
