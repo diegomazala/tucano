@@ -8,9 +8,10 @@ QT       += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = phongViewer
+TARGET = rendering
 TEMPLATE = app
 
+# path relative from build directory
 TUCANO_PATH = ../../../../
 
 INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects
@@ -35,11 +36,22 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \        
         glwidget.hpp \
+        $$TUCANO_PATH/effects/ssao.hpp \
         $$TUCANO_PATH/effects/phongshader.hpp \
+        $$TUCANO_PATH/effects/toon.hpp \
         $$TUCANO_PATH/src/utils/qttrackballwidget.hpp
 
 FORMS    += mainwindow.ui
 
 OTHER_FILES += \
+        $$TUCANO_PATH/effects/shaders/toonshader.frag \
+        $$TUCANO_PATH/effects/shaders/toonshader.vert \
+        $$TUCANO_PATH/effects/shaders/ssao.frag \
+        $$TUCANO_PATH/effects/shaders/ssao.vert \
+        $$TUCANO_PATH/effects/shaders/ssaofinal.frag \
+        $$TUCANO_PATH/effects/shaders/ssaofinal.vert \
+        $$TUCANO_PATH/effects/shaders/viewspacebuffer.frag \
+        $$TUCANO_PATH/effects/shaders/viewspacebuffer.vert \
         $$TUCANO_PATH/effects/shaders/phongshader.frag \
         $$TUCANO_PATH/effects/shaders/phongshader.vert
+

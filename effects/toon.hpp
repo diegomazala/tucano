@@ -23,59 +23,89 @@
 #ifndef __TOON__
 #define __TOON__
 
-#include "effect.hpp"
+#include <tucano.hpp>
 
-using namespace std;
+using namespace Tucano;
+
+namespace Effects
+{
 
 /**
- * Toon effect class. It is used to store the quantization level for the effect and to handle the mesh rendering.
-**/
-class Toon : public Effect {
+ * @brief Renders a mesh using a Toon shader.
+ */
+class Toon : public Effect
+{
 
-	public:
+private:
 
-	/**
-	 * Constructor. Just initializes the quantization level and effect name.
-	 * @param name The effect's name.
-	**/
-	Toon(const char* name): quantizationLevel(8) {
-		effectName = name;
-	}
+    /// Toon shader
+    Shader* toon_shader;
 
-	///Initializes the effect, creating and loading the shader.
-	virtual void initialize();
+    /// Number of colors that will be used in color quantization to create the toonish effect.
+    float quantization_level;
+
+public:
 
 	/**
-	 * Renders the mesh with the Toon effect.
-	 * @param mesh A pointer to the mesh object.
-	 * @param cameraTrackball A pointer to the camera trackball object.
-	 * @param lightTrackball A pointer to the light trackball object.
-	 **/
-	virtual void render(Mesh* mesh = NULL, Trackball* cameraTrackball = NULL, Trackball* lightTrackball = NULL);
-
-	///Reloads the shader, reading the files again.
-	virtual void reloadShaders();
-
-	/**
-	 * Returns a pointer to the quantization level attribute. Used to create a button to adjust this attribute within the GUI.
-	 * @return Returns a pointer to the quantization level.
-	**/
-	float* getQuantizationLevelPointer() {
-		return &quantizationLevel;
+     * @brief Default constructor.
+     */
+    Toon (void)
+    {
+        toon_shader = 0;
+        quantization_level = 8;
 	}
 
-	Shader* getShader() {
-		return shader;
+    /**
+     * @brief Default destructor
+     */
+    virtual ~Toon (void) {}
+
+    /**
+     * @brief Set the quantization level.
+     * @param level Number of quantization levels.
+     */
+    void setQuantizationLevel(int level)
+    {
+        quantization_level = level;
+    }
+
+    /**
+     * @brief Load and initialize shaders
+     */
+    virtual void initialize (void)
+	{
+        toon_shader = loadShader ("toonshader");
 	}
 
-	private:
+    /**
+     * @brief Render the mesh given a camera and light trackball, using a Toon shader
+     * @param mesh Given mesh
+     * @param cameraTrackball Given camera trackball
+     * @param lightTrackball Given light trackball
+     */
+    virtual void render (Tucano::Mesh* mesh = NULL, Tucano::Trackball* cameraTrackball = NULL, Tucano::Trackball* lightTrackball = NULL)
+	{       
 
-	///
-	Shader* shader;
+        Eigen::Vector4f viewport = cameraTrackball->getViewport();
+        glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-	///Represents the number of colors that will be used in color quantization to create the toonish effect.
-	float quantizationLevel;
+        toon_shader->bind();
+
+        toon_shader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
+        toon_shader->setUniform("modelMatrix", mesh->getModelMatrix());
+        toon_shader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
+        toon_shader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
+        toon_shader->setUniform("has_color", mesh->hasAttribute("in_Color"));
+        toon_shader->setUniform("quantizationLevel", quantization_level);
+
+        mesh->setAttributeLocation(toon_shader);
+		mesh->render();
+
+        toon_shader->unbind();
+	}
 
 };
+
+}
 
 #endif

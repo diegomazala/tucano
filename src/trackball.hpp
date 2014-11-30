@@ -84,9 +84,6 @@ private:
     /// The current scale being applied to the View Matrix.
     float zoom;
 
-    /// Flag that indicates wether using perspective or orthographics projection.
-    bool use_perspective;
-
     /// Flag that indicates wether the trackball is being rotated.
     bool rotating;
 
@@ -297,8 +294,6 @@ public:
         translate(defaultTranslation);
 
         trackballProjectionMatrix = Eigen::Matrix4f::Identity();
-
-        use_perspective = false;
     }
 
     /**
@@ -487,18 +482,6 @@ public:
     {
         zoom /= scale;
         updateViewMatrix();
-    }
-
-    /**
-     * @brief Increases the fov of the perspective matrix by a given increment;
-     * @param inc Given increment to increase fov.
-     */
-    void incrementFov (float inc)
-    {
-        if (use_perspective)
-        {
-            changeFovy(fovy + inc);
-        }
     }
 
     /**

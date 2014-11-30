@@ -11,7 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = imgproc
 TEMPLATE = app
 
-TUCANO_PATH = ../../
+# path relative from build directory
+TUCANO_PATH = ../../../../
 
 INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects
 
