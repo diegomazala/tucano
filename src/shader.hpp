@@ -268,6 +268,32 @@ public:
         computeShaders = vector<GLuint>();
     }
 
+    /**
+     * @brief Link shader program and check for link errors.
+     */
+    void linkProgram (void)
+    {
+
+        glLinkProgram(shaderProgram);
+
+        GLint result = GL_FALSE;
+        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &result);
+        if (result != GL_TRUE)
+        {
+            cerr << "Error linking program : " << shaderName << endl;
+            GLchar errorLog[1024] = {0};
+            glGetProgramInfoLog(shaderProgram, 1024, NULL, errorLog);
+            fprintf(stdout, "%s", &errorLog[0]);
+            cerr << endl;
+        }
+        #ifdef TUCANODEBUG
+        else
+        {
+            cout << " Linked program with no errors : " << shaderName << endl << endl;
+        }
+        #endif
+    }
+
 
     /**
      * @brief Initializes shader and prepares it to use Transform Feedback.
@@ -302,7 +328,7 @@ public:
 
         glTransformFeedbackVaryings(shaderProgram, size, varlist, buffer_mode);
 
-        glLinkProgram(shaderProgram);
+        linkProgram();
 
         #ifdef TUCANODEBUG
         Misc::errorCheckFunc(__FILE__, __LINE__);
@@ -345,7 +371,7 @@ public:
             setFragmentShader(fragment_code);
         }
 
-        glLinkProgram(shaderProgram);
+        linkProgram();
 
         #ifdef TUCANODEBUG
         Misc::errorCheckFunc(__FILE__, __LINE__);
@@ -374,9 +400,9 @@ public:
         if(computeShaderPaths.size() > 0)
         {
             setComputeShaders();
-        }
+        }        
 
-        glLinkProgram(shaderProgram);
+        linkProgram();
 
         #ifdef TUCANODEBUG
         Misc::errorCheckFunc(__FILE__, __LINE__);
@@ -749,7 +775,11 @@ public:
             setComputeShaders();
         }
 
-        glLinkProgram(shaderProgram);
+        linkProgram();
+
+        #ifdef TUCANODEBUG
+        Misc::errorCheckFunc(__FILE__, __LINE__);
+        #endif
     }
 
     /**
