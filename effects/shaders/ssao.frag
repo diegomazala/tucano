@@ -4,15 +4,11 @@
 out vec4 out_Color;
 
 uniform mat4 lightViewMatrix;
-uniform mat4 projectionMatrix;
 
 uniform vec2 noiseScale;
 uniform vec2 kernel[numberOfSamples];
 uniform sampler2D coordsTexture;
 uniform sampler2D normalTexture;
-uniform sampler2D colorTexture;
-
-uniform bool displayAmbientPass;
 
 uniform float radius;
 uniform float intensity;
@@ -38,8 +34,8 @@ float ambientOcclusion (vec3 vert, vec3 normal)
     for (int i = 0; i <= numberOfSamples; ++i)
     {
         vec2 rotated = rotation * kernel[i].xy;
+        // rotate by random vector to avoid unwanted patterns
         ivec2 randCoord = texCoord + ivec2(rotated * rad);
-        //ivec2 randCoord = texCoord + ivec2(i,j);
 
         vec4 point = texelFetch(coordsTexture, randCoord, 0);
 
@@ -74,26 +70,6 @@ void main (void)
     // compute ambient occlusion
     float occlusion = ambientOcclusion(vert.xyz, normal);
 
-    // from now on, compute Phong Shader
-    vec3 lightDirection = (lightViewMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz;
-    lightDirection = normalize(lightDirection);
+    out_Color = vec4(1.0) * occlusion;
 
-    vec3 lightReflection = reflect(-lightDirection, normal);
-    vec3 eyeDirection = -normalize(vert.xyz);
-    float shininess = 100.0;
-
-    if(displayAmbientPass)
-    {
-        out_Color = vec4(1.0) * occlusion;
-    }
-    else
-    {
-        vec4 color = texelFetch(colorTexture, ivec2(gl_FragCoord.xy), 0);
-        vec4 ambientLight = vec4(0.5) * color;
-
-        vec4 diffuseLight = color * 0.4 * max(dot(lightDirection, normal),0.0);
-        vec4 specularLight = vec4(1.0) *  max(pow(dot(lightReflection, eyeDirection), shininess),0.0);
-
-        out_Color = occlusion*vec4(ambientLight.xyz + diffuseLight.xyz + specularLight.xyz, 1.0);
-    }
 }

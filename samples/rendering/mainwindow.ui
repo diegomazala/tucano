@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Phong hader</string>
+     <string>Phong Shader</string>
     </property>
     <property name="checked">
      <bool>true</bool>
@@ -166,6 +166,9 @@
     </property>
     <property name="text">
      <string>Draw trackball</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QSlider" name="slider_ssao_blur">

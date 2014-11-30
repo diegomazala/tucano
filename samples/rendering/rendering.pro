@@ -47,10 +47,10 @@ OTHER_FILES += \
         $$TUCANO_PATH/effects/shaders/toonshader.vert \
         $$TUCANO_PATH/effects/shaders/ssao.frag \
         $$TUCANO_PATH/effects/shaders/ssao.vert \
+        $$TUCANO_PATH/effects/shaders/ssaofinal.frag \
+        $$TUCANO_PATH/effects/shaders/ssaofinal.vert \
         $$TUCANO_PATH/effects/shaders/viewspacebuffer.frag \
         $$TUCANO_PATH/effects/shaders/viewspacebuffer.vert \
-        $$TUCANO_PATH/effects/shaders/gaussianblurfilter.frag \
-        $$TUCANO_PATH/effects/shaders/gaussianblurfilter.vert \
         $$TUCANO_PATH/effects/shaders/phongshader.frag \
         $$TUCANO_PATH/effects/shaders/phongshader.vert
 
