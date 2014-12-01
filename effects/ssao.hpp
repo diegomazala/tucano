@@ -24,6 +24,7 @@
 #define __SSAO__
 
 #include "tucano.hpp"
+#include <math.h>
 
 using namespace std;
 
@@ -38,35 +39,118 @@ namespace Effects
  * Three rendering passes are needed in order to use this effect: in the first pass, the eye-space depth information of the mesh is stored in one channel of a 2D texture. In the second pass, using this
  * depth information, the occlusion factor is computed and used to scale the ambient light. A small noise texture is tiled through thw whole mesh to remove banding due to low number of samples needed to 
  * keep computational cost low. In the third pass, a gaussian blur is applied in order to remove the high frequency noise.
+ *
+ * Based on http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/a-simple-and-practical-approach-to-ssao-r2753
 **/
 class SSAO: public Effect {
 
-	public:
+protected:
+    ///Noise texture dimension. It will be a noiseSize x noiseSize texture.
+    int noise_size;
+
+    ///Noise texture
+    Texture noiseTexture;
+
+    ///Array of sample points generated inside a unit hemisphere around z axis.
+    float *kernel;
+
+    ///Number of sample points that will be used per fragment for occlusion computation.
+    int numberOfSamples;
+
+    ///Kernel radius. If the distance between a sample point and the point for which the occlusion is being computed is larger than radius, the occlusion for this sample will be neglected.
+    float radius;
+
+    /// Framebuffer to store coord/normal buffer
+    Framebuffer* fbo;
+
+    /// The per pixel AO computation shader
+    Shader* ssaoShader;
+
+    /// Save coord, normal and color to FBO
+    Shader* deferredShader;
+
+    /// Join original render with SSAO (blur it first)
+    Shader* ssaoFinalShader;
+
+    /// A quad mesh for framebuffer rendering
+    Mesh* quad;
+
+    /// Flag indicating wether blur shall be applied or not.
+    bool apply_blur;
+
+    /// Flag indicating if the mesh should be rendered only with ambient occlusion pass or with full illumination. If True, mesh will be rendered only with the ambient occlusion pass.
+    bool displayAmbientPass;
+
+    /// Number of neighbour pixels used in blurring. The blur will be applied to a blurRange x blurRange square around the current pixel. It's important to notice that blurRange must be an odd number.
+    int blurRange;
+
+    /// The ID defining the color attachment to which the depth texture is bound in the framebuffer.
+    int depthTextureID;
+
+    /// The ID defining the color attachment to which the normal texture is bound in the framebuffer.
+    int normalTextureID;
+
+    /// The ID defining the color attachment to which the color texture is bound in the framebuffer.
+    int colorTextureID;
+
+    /// The ID of the color attachment holding the SSAO result.
+    int ssaoTextureID;
+
+    /// Global intensity value.
+    int intensity;
+
+    /// Global maximum distance value, distance in view space to consider a neighbor or not
+    float max_dist;
+
+    /// The ID defining the color attachment to which the blur texture is bound in the framebuffer.
+    GLuint blurTextureID;
+
+
+public:
 
     /**
      * @brief Default constructor.
      *
-     * User must pass the viewport width and height used for framebuffer initialization and noise scale factor computation and can optionally pass the number of samples used for
-	 * occlusion computation, dimension of the noise texture and kernel radius. It's important to notice that if the number of samples is changed here, it also needs to be changed in the shader code. It 
+     * It's important to notice that if the number of samples is modified here, it also needs to be changed in the shader code. It
 	 * can't be passed as a uniform to the shader because it represents the size of the sample points' array.
-	 * @param currentWidth the current Viewport Width.
-	 * @param currentHeight the current Viewport Height.
 	 * @param noiseTextureDimension The dimension of the noise texture to be generated.
 	 * @param sampleKernelSize The size of the kernel array that will store the sample points. This means that a number of points equal to
 	 * sampleKernelSize will be sampled in order to compute occlusion.
 	 * @param rad The kernel radius. This is used to define the max distance between the current point and the samples that will be considered for occlusion computation.
 	**/
-    SSAO (int currentWidth, int currentHeight, int noiseTextureDimension = 4, int sampleKernelSize = 16, float rad = 0.0001):
-         noiseSize(noiseTextureDimension), numberOfSamples(sampleKernelSize), radius(rad), applyBlur(true), displayAmbientPass(true), blurRange(3), depthTextureID(0), blurTextureID(1){
+    SSAO (int noiseTextureDimension = 64, int sampleKernelSize = 64, float rad = 35.0)
+    {
+        depthTextureID = 0;
+        normalTextureID = 1;
+        colorTextureID = 2;
+        ssaoTextureID = 3;
+        blurTextureID = 4;
 
-        computeNoiseScale();
-        viewportSize << currentWidth, currentHeight;
+        noise_size = noiseTextureDimension;
+        numberOfSamples = sampleKernelSize;
+        radius = rad;
+
+        blurRange = 3;
+        intensity = 20;
+        max_dist = 0.15;
+
+        apply_blur = true;
+        displayAmbientPass = false;
 
         ssaoShader = 0;
-        blurShader = 0;
+        ssaoFinalShader = 0;
         deferredShader = 0;
-
+        fbo = 0;
+        quad = 0;
 	}
+
+    ///Default destructor. Destroy the FBO, deletes the shaders and the sampling kernel.
+    ~SSAO()
+    {
+        delete fbo;
+        delete kernel;
+        delete quad;
+    }
 
     /**
      * @brief Initializes the SSAO effects,
@@ -78,331 +162,231 @@ class SSAO: public Effect {
         initializeShaders();
         generateKernel();
         generateNoiseTexture();
+        Misc::errorCheckFunc(__FILE__, __LINE__);
 
-        fbo = new Framebuffer(viewportSize[0], viewportSize[1], 2);
+        fbo = new Framebuffer();
 
         quad = new Mesh();
         quad->createQuad();
-
     }
 
-	/**
-     * @brief Renders the mesh with the desired effect.
-	 * @param mesh A pointer to the mesh that will be rendered.
-	 * @param cameraTrackball A pointer to the camera trackball object.
-	 * @param lightTrackball A pointer to the light trackball object.
+    /**
+     * @brief First pass of the SSAO, writes coords, normals and colors to a buffer.
+     * @param mesh A pointer to the mesh that will be rendered.
+     * @param cameraTrackball A pointer to the camera trackball object.
+     * @param lightTrackball A pointer to the light trackball object.
      */
-    virtual void render(Mesh* mesh, Trackball* cameraTrackball, Trackball* lightTrackball)
+    void createViewSpaceBuffer (Mesh* mesh, Trackball* camera_trackball, Trackball* light_trackball)
     {
-        glViewport(0, 0, viewportSize[0], viewportSize[1]);
 
-        glEnable(GL_DEPTH_TEST);
-        glClearColor(0.7, 0.7, 0.7, 0.0);
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-        //First pass - Depth Storage:
-
-        //Bind buffer to store depth information in framebuffer:
+        // Bind buffer to store coord, normal and color information
         fbo->clearAttachments();
-        fbo->bindRenderBuffer(depthTextureID);
+        fbo->bindRenderBuffers(depthTextureID, normalTextureID, colorTextureID);
 
         deferredShader->bind();
-        deferredShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
+        deferredShader->setUniform("projectionMatrix", camera_trackball->getProjectionMatrix());
         deferredShader->setUniform("modelMatrix",mesh->getModelMatrix());
-        deferredShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-        deferredShader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
+        deferredShader->setUniform("viewMatrix", camera_trackball->getViewMatrix());
+        deferredShader->setUniform("lightViewMatrix", light_trackball->getViewMatrix());
+        deferredShader->setUniform("has_color", mesh->hasAttribute("in_Color"));
 
         mesh->setAttributeLocation(deferredShader);
         mesh->render();
 
         deferredShader->unbind();
         fbo->unbind();
+        fbo->clearDepth();
 
-        Shader::errorCheckFunc(__FILE__, __LINE__);
+    }
 
-        // ******************** Second pass - SSAO Computation:
+    /**
+     * @brief Compute the Ambient Occlusion factor for each pixel.
+     */
+    void computeSSAO (void)
+    {
 
-        //Define standard color for mesh rendering:
-        Eigen::Vector4f colorVector;
-        colorVector << 0.686, 0.933, 0.933, 1.0;
-
-        if(applyBlur)
-        {
-            //Set draw buffer to blur texture:
-            fbo->bindRenderBuffer(blurTextureID);
-        }
+        fbo->bindRenderBuffer(ssaoTextureID);
 
         ssaoShader->bind();
 
-        //Setting Uniforms:
-        ssaoShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-        ssaoShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-        ssaoShader->setUniform("modelMatrix",mesh->getModelMatrix());
+        ssaoShader->setUniform("kernel", kernel, 2, numberOfSamples);
 
-        ssaoShader->setUniform("in_Color", colorVector);
-        ssaoShader->setUniform("noiseScale", noiseScale);
+        ssaoShader->setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
+        ssaoShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
+
         ssaoShader->setUniform("radius", radius);
-        ssaoShader->setUniform("kernel", kernel, 3, numberOfSamples);
+        ssaoShader->setUniform("intensity", (float)intensity);
+        ssaoShader->setUniform("max_dist", max_dist);
         ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
-        ssaoShader->setUniform("depthTexture", fbo->bindAttachment( depthTextureID ));
-        ssaoShader->setUniform("displayAmbientPass", displayAmbientPass);
-        ssaoShader->setUniform("viewportSize", viewportSize);
 
-        mesh->setAttributeLocation(ssaoShader);
-
-        //Second pass mesh rendering:
-        mesh->render();
+        quad->setAttributeLocation(ssaoShader);
+        quad->render();
 
         ssaoShader->unbind();
         noiseTexture.unbind();
         fbo->unbind();
+        fbo->clearDepth();
+    }
 
-        if(applyBlur)
+
+    /**
+     * @brief Blur SSAO result and mix with original render
+     * @param light_trackball A pointer to the light trackball object.
+     */
+    void applySSAO (Trackball* light_trackball)
+    {
+        ssaoFinalShader->bind();
+
+        ssaoFinalShader->setUniform("lightViewMatrix", light_trackball->getViewMatrix());
+
+        ssaoFinalShader->setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
+        ssaoFinalShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
+        ssaoFinalShader->setUniform("colorTexture", fbo->bindAttachment(colorTextureID));
+        ssaoFinalShader->setUniform("ssaoTexture", fbo->bindAttachment(ssaoTextureID));
+        ssaoFinalShader->setUniform("blurRange", blurRange);
+
+        quad->setAttributeLocation(ssaoFinalShader);
+        quad->render();
+
+        ssaoFinalShader->unbind();
+        fbo->unbind();
+    }
+
+	/**
+     * @brief Renders the mesh with the desired effect.
+     *
+     * The algorithm has three passes:
+     * 1. compute buffer with coords, normals and color per pixel
+     * 2. compute AO per pixel
+     * 3. blur the final result
+     * An option to pass an output buffer is available in case of offline rendering.
+     * For example, when taking snapshots of the current result.
+	 * @param mesh A pointer to the mesh that will be rendered.
+	 * @param cameraTrackball A pointer to the camera trackball object.
+	 * @param lightTrackball A pointer to the light trackball object.
+     * @param output_fbo Output buffer, alternative to GL back buffer for offline rendering
+     * @param output_attach In case of offline rendering, the output attachment of the fbo
+     */
+    virtual void render(Mesh* mesh, Trackball* camera_trackball, Trackball* light_trackball)
+    {
+        Eigen::Vector4f viewport = camera_trackball->getViewport();
+        Eigen::Vector2i viewport_size = camera_trackball->getViewportSize();
+
+        glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
+        // check if viewport was modified, if so, regenerate fbo
+        if (fbo->getWidth() != viewport_size[0] || fbo->getHeight() != viewport_size[1])
         {
-            //Third Pass - Blurring the scene:
-
-            blurShader->bind();
-
-            Eigen::Vector2f texelSize (1.0/(float)viewportSize[0], 1.0/(float)viewportSize[1]);
-
-            //Setting Uniforms:
-            blurShader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-            blurShader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-            blurShader->setUniform("modelMatrix", mesh->getModelMatrix());
-
-            blurShader->setUniform("texelSize", texelSize);
-            blurShader->setUniform("blurTexture", fbo->bindAttachment(blurTextureID));
-            //blurShader->setUniform("blurTexture", fbo->bindAttachment( depthTextureID ));
-            blurShader->setUniform("viewportSize", viewportSize);
-            blurShader->setUniform("blurRange", blurRange);
-
-            mesh->setAttributeLocation(blurShader);
-            mesh->render();
-
-            blurShader->unbind();
-            fbo->unbind();
+            fbo->create(viewport_size[0], viewport_size[1], 5);
         }
+
+        glEnable(GL_DEPTH_TEST);
+        glClearColor(1.0, 1.0, 1.0, 0.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // first pass
+        createViewSpaceBuffer (mesh, camera_trackball, light_trackball);
+
+        // second pass
+        computeSSAO();
+
+        // final pass, blur SSAO and join with original render
+        applySSAO(light_trackball);
     }
 
     /**
-     * @brief Toggles the current state of applyBlur flag.
+     * @brief Set intensity values.
+     * @param value New intensity value.
      */
-    void changeBlurFlag (void)
+    void setIntensity (int value)
     {
-        applyBlur = !applyBlur;
+        intensity = value;
     }
 
     /**
      * Increases blur range.
      */
-    void incrementBlurRange (void)
+    void setBlurRange (int value)
     {
-		blurRange += 2;
+        blurRange = value;
 	}
 
     /**
-     * Decreases blur range.
+     * @brief Toggles the displayAmbientPass flag.
      */
-    void decrementBlurRange (void)
-    {
-		if(blurRange >=5) {
-			blurRange -= 2;
-		}
-		else {
-			blurRange = 3;
-		}
-	}
-
-	///Change the current state of displayAmbientPass flag.
-    void changeAmbientPassFlag()
+    void changeAmbientPassFlag (void)
     {
         displayAmbientPass = !displayAmbientPass;
     }
 
-	///Reload all shaders needed for SSAO effect.
-    virtual void reloadShaders (void)
-    {
-        deferredShader->reloadShaders();
-        ssaoShader->reloadShaders();
-        blurShader->reloadShaders();
-    }
-
-	///Default destructor. Destroy the FBO, deletes the shaders and the sampling kernel.
-    ~SSAO()
-    {
-        if (fbo)
-        {
-            delete fbo;
-        }
-
-        if(ssaoShader)
-        {
-            delete ssaoShader;
-		}
-
-		if(deferredShader) {
-			delete deferredShader;
-		}
-
-		if(blurShader) {
-			delete blurShader;
-		}
-
-		if(kernel) {
-			delete kernel;
-		}
-
-	}
 
 private:
 
-	///Computes the noise scale factor, that will be used for tiling the noise texture through the screen.
-    void computeNoiseScale (void)
+    /**
+     * @brief Creates and loads all shaders.
+     */
+    void initializeShaders (void)
     {
-        noiseScale = Eigen::Vector2f((float)viewportSize[0]/(float)noiseSize, (float)viewportSize[1]/(float)noiseSize);
+        ssaoShader = loadShader("ssao");
+        deferredShader = loadShader("viewspacebuffer");
+        ssaoFinalShader = loadShader("ssaofinal");
     }
 
-	///Creates and loads all shaders.
-    void initializeShaders()
-    {
-        //SSAO Computation Shader:
-        ssaoShader = loadShader("ssaoShader");
-        ssaoShader->initialize();
-
-        //Deferred Shader, used to store depth information:
-        deferredShader = loadShader("deferredShader");
-        deferredShader->initialize();
-
-        //Blur Shader:
-        blurShader = loadShader("blurShader");
-        blurShader->initialize();
-
-    }
-
-	///Generates a sampling kernel.
+    /**
+     * @brief Generates a sampling kernel with random 2D unormalized vectors in range [-1,1].
+     */
     void generateKernel (void)
     {
-        float scale;
-        Eigen::Vector3f sample;
-        kernel = new float[numberOfSamples*3];
+        Eigen::Vector2f sample;
+        kernel = new float[numberOfSamples * 2];
 
-        int temp = 0;
-        for (int i = 0; i<numberOfSamples; i++)
-        {
-            sample = Eigen::Vector3f( random(-1.0f,1.0f) , random(-1.0f,1.0f) , random(0.0f,1.0f) );
-            sample.normalize();
-            //cout << "Kernel: " << sample.transpose() << endl;
-            sample *= random(0.0f,1.0f); //Distribute sample points randomly around the kernel.
-            scale = float(i)/float(numberOfSamples);
-            scale = lerp(0.1f, 1.0f, scale * scale);//Cluster sample points towards origin.
-            sample *= scale;
-            kernel[temp] = sample[0];
-            kernel[temp+1] = sample[1];
-            kernel[temp+2] = sample[2];
-            temp += 3;
+        float step = 2.0*M_PI/(float)numberOfSamples;
+
+        // divide in numberOfSamples directions in the unit circle, and multiply each vector by a random radius
+        for (int i = 1; i <= numberOfSamples; i++)
+        {          
+            float r = pow(random(0.01, 1.0f),1.0);
+
+            sample[0] = cos(step*i);
+            sample[1] = sin(step*i);
+
+            kernel[i*2+0] = r*sample[0];
+            kernel[i*2+1] = r*sample[1];
         }
-    }
-
-	///Generates a random noise texture.
-    void generateNoiseTexture()
-    {
-
-        float noise[noiseSize*noiseSize*4];//Noise is a texture with dimensions noiseSize x noiseSize.
-        Eigen::Vector3f randomVector;
-
-        for(int i = 0; i<numberOfSamples; i++) {
-
-            randomVector = Eigen::Vector3f ( random(-1.0f,1.0f), random(-1.0f,1.0f), 0.0f);
-            randomVector.normalize();
-            (randomVector + Eigen::Vector3f(1.0,1.0,1.0)) * 0.5;
-            noise[(i*4)] = randomVector[0];
-            noise[(i*4)+1] = randomVector[1];
-            noise[(i*4)+2] = 0.0;
-            noise[(i*4)+3] = 1.0f;
-        }
-
-        //Generate Texture:
-        noiseTexture.create( GL_TEXTURE_2D, GL_RGBA32F, 4, 4, GL_RGBA, GL_FLOAT, &noise[0]);
-        noiseTexture.setTexParameters( GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
     }
 
     /**
-     * Linear interpolation function. Interpolates between a and b with a scale factor s.
-	 * @param a The minimum point for interpolation.
-	 * @param b The maximum point for interpolation. 
-	 * @param s The scale factor used for interpolation.
+     * @brief Generates a random noise texture.
      */
-    float lerp(const float a, const float b, const float s)
+    void generateNoiseTexture (void)
     {
-        return a + s * (b - a);
+        GLfloat *noise = new GLfloat[noise_size*noise_size];
+
+        for(int i = 0; i < noise_size*noise_size; i++)
+        {
+            noise[i] = random(0.0f,1.0f);
+        }
+
+        noiseTexture.create(GL_TEXTURE_2D, GL_RGBA32F, noise_size, noise_size, GL_RGBA, GL_FLOAT, noise);
+        noiseTexture.setTexParameters( GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST );
+        delete [] noise;
     }
 
     /**
-     * Generate random number in range [min,max].
+     * @brief Generates a random number in range [min,max].
 	 * @param min The minimum value for random number generation.
 	 * @param max The maximum value for random number generation.
      */
-    float random(int min, int max)
+    float random(float min, float max)
     {
         //srand ( time(NULL) );
         int random = rand();
-        float ret = random/float(RAND_MAX);
+        float ret = random / float(RAND_MAX);
         ret *= (max - min);
         ret += min;
         assert(ret >= min && ret <= max);
         return ret;
     }
-
-	///Noise texture dimension. It will be a noiseSize x noiseSize texture.
-	int noiseSize;
-
-	///Scale used to tile the noise texture through screen.
-	Eigen::Vector2f noiseScale;
-
-	///Noise texture
-	Texture noiseTexture;
-
-	///Array of sample points generated inside a unit hemisphere around z axis.
-	float *kernel;
-
-	///Kernel radius. If the distance between a sample point and the point for which the occlusion is being computed is larger than radius, the occlusion for this sample will be neglected.
-	float radius;
-
-	///Number of sample points that will be used per fragment for occlusion computation.
-	int numberOfSamples;
-
-	///
-	Framebuffer* fbo;
-
-	///
-    Shader* ssaoShader;
-
-	///The shader used to store the depth information in the framebuffer.
-	Shader* deferredShader;
-
-	///The shader used to blur the result from the second pass, removing the noise pattern.
-	Shader* blurShader;
-
-    /// A quad mesh for framebuffer rendering
-    Mesh* quad;
-
-	///Flag indicating wether blur shall be applied or not.
-	bool applyBlur;
-
-	///Flag indicating if the mesh should be rendered only with ambient occlusion pass or with full illumination. If True, mesh will be rendered only with the ambient occlusion pass.
-	bool displayAmbientPass;
-
-	///Number of neighbour pixels used in blurring. The blur will be applied to a blurRange x blurRange square around the current pixel. It's important to notice that blurRange must be an odd number.
-	int blurRange;
-
-	///The ID defining the color attachment to which the depth texture is bound in the framebuffer.
-	int depthTextureID;
-
-	///The ID defining the color attachment to which the blur texture is bound in the framebuffer.
-	GLuint blurTextureID;
-
-    Eigen::Vector2i viewportSize;
-
 };
 }
 

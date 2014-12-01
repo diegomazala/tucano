@@ -115,12 +115,12 @@ public:
         if (tex_id != 0)
             glDeleteTextures(1, &tex_id);
 
-        glGenTextures(1, &tex_id);
+        glGenTextures(1, &tex_id);        
 
         glBindTexture(tex_type, tex_id);
         if(tex_type == GL_TEXTURE_2D || tex_type == GL_TEXTURE_RECTANGLE)
-        {
-            glTexImage2D(tex_type, lod, internal_format, width, height, 0, format, pixel_type, data);
+        {            
+            glTexImage2D(tex_type, lod, internal_format, width, height, 0, format, pixel_type, data);           
         }
         else if (tex_type == GL_TEXTURE_3D)
         {

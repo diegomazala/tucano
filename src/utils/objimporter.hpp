@@ -88,7 +88,7 @@ static void loadObjFile (Mesh* mesh, string filename)
         {
             istringstream s(line.substr(3));
             Eigen::Vector3f vn;
-            s >> vn[0]; s >> vn[1]; s >> vn[2];
+            s >> vn[0]; s >> vn[1]; s >> vn[2];            
             norm.push_back(vn);
         }
 
