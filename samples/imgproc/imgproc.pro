@@ -11,13 +11,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = imgproc
 TEMPLATE = app
 
-# path relative from build directory
-TUCANO_PATH = ../../../../
-
-INCLUDEPATH += $$TUCANO_PATH/src $$TUCANO_PATH/effects
-
 EIGEN_PATH  =  /usr/include/eigen3
-INCLUDEPATH += $$EIGEN_PATH
+
+TUCANO_PATH = ../../
+
+BUILDDIR = $$TUCANO_PATH/build/samples/imgproc/
 
 #GLEW_PATH = ../../../glew
 #INCLUDEPATH += $$GLEW_PATH/include
@@ -25,12 +23,13 @@ INCLUDEPATH += $$EIGEN_PATH
 
 LIBS += -lGLEW -lGLU
 
-OBJECTS_DIR = ./obj
-DESTDIR = $$TUCANO_PATH/bin
+INCLUDEPATH +=  $$TUCANO_PATH/src $$TUCANO_PATH/effects $$EIGEN_PATH
 
-OBJECTS_DIR = ./obj
-DESTDIR = $$TUCANO_PATH/bin
-
+OBJECTS_DIR =   $$BUILDDIR/obj
+MOC_DIR =       $$BUILDDIR/moc
+RCC_DIR =       $$BUILDDIR/rcc
+UI_DIR =        $$BUILDDIR/ui
+DESTDIR =       $$TUCANO_PATH/bin
 QMAKE_CXXFLAGS += -DTUCANODEBUG
 
 SOURCES += main.cpp\
