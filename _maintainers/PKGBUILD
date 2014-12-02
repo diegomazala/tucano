@@ -9,14 +9,13 @@ license=('GPL')
 depends=('eigen' 'glew')
 makedepends=('cmake')
 optdepends=()
-source=("$pkgname.tar.gz")
-        #"git+https://github.com/LCG-UFRJ/$pkgname.git")
+source=("git+https://github.com/LCG-UFRJ/$pkgname.git")
 md5sums=('SKIP')
 
 build() {
   cd "$srcdir/$pkgname"
   mkdir build/ && cd $_
-  cmake ..
+  cmake -DSAMPLES=OFF ..
 }
 
 package() {

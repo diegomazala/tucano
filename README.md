@@ -54,7 +54,7 @@ Tucano comes with several examples and an Effects Collection.
 ## Development Notice
 
 Even though **Tucano 0.1** is out, there are still some features that are not implemented, such as encapsulation of 
-*Tesselation Shaders*, and some *Buffers Objects* types. Some examples are still missing, but will soon be included in Tucano. Documentation is nearly up-to-date, but not 100%, completion is underway.
+*Tesselation Shaders*, and some *Buffer Objects* types. Some examples are still missing, but will soon be included in Tucano. Documentation is nearly up-to-date, but not 100%, completion is underway.
 
 Please help us improve Tucano using GitHub's [Issue Tracker](https://github.com/LCG-UFRJ/tucano/issues).
 

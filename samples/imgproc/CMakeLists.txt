@@ -34,8 +34,3 @@ target_link_libraries(
   Qt5::OpenGL
   Qt5::Widgets
   )
-
-install(
-  TARGETS imgproc
-  RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin
-  )

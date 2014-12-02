@@ -36,7 +36,6 @@ mkdir build/
 cd build/
 cmake ..
 make
-make install
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This will compile all tucano examples at once. They will be located under the `build/samples/` directory. However, `make install` conveniently puts them all under an easier location: the `bin/` folder, inside the tucano top-level directory.
+This will compile all tucano examples at once. They will be located under the `bin/` folder, inside the tucano top-level directory.

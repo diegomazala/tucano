@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 2.8.12)
-set(PROJECT_NAME "Tucano")
+set(PROJECT_NAME "tucano")
 project(${PROJECT_NAME} C CXX)
 
-add_definitions(-DTUCANODEBUG)
-
-set(DOCUMENTATION_DIR "${PROJECT_SOURCE_DIR}/doc")
-set(SAMPLES_DIR "${PROJECT_SOURCE_DIR}/samples")
+set(TUCANO_BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
+set(TUCANO_DOCUMENTATION_DIR "${PROJECT_SOURCE_DIR}/doc")
+set(TUCANO_SAMPLES_DIR "${PROJECT_SOURCE_DIR}/samples")
 set(TUCANO_EFFECTS_DIR "${PROJECT_SOURCE_DIR}/effects")
 set(TUCANO_SRC_DIR "${PROJECT_SOURCE_DIR}/src")
+
+option(DOC "documentation support" ON)
+option(SAMPLES "build samples?" ON)
 
 find_package(GLEW REQUIRED)
 if(NOT GLEW_FOUND)
@@ -43,53 +45,6 @@ include_directories(
   ${TUCANO_SRC_DIR}
   )
 
-###########################################
-# DOCUMENTATION BEGIN
-###########################################
-
-find_package(Doxygen QUIET)
-if (DOXYGEN_FOUND)
-  add_custom_target(
-    doc
-    ${DOXYGEN_EXECUTABLE}
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    COMMENT "Generating ${PROJECT_NAME} local documentation with Doxygen"
-  )    
-  if(EXISTS /usr/bin/git)
-  add_custom_target(
-    webdoc
-    COMMAND git add -A .
-    COMMAND git add -u .
-    COMMAND git status --short
-    COMMAND git commit -m "update web documentation"
-    COMMAND git push --force origin gh-pages:gh-pages
-    DEPENDS doc
-    WORKING_DIRECTORY "${DOCUMENTATION_DIR}/html"
-    COMMENT "Generating and updating ${PROJECT_NAME} documentation for the web with Doxygen"
-    )
-  else()
-    message(WARNING "git not found on your system")
-  endif()
-endif()
-
-file(GLOB
-  TUCANO_DOCS
-  ${DOCUMENTATION_DIR}/*.md
-  )
-
-install(
-  FILES ${TUCANO_DOCS}
-  DESTINATION "share/doc/tucano"
-  )
-
-###########################################
-# DOCUMENTATION END
-###########################################
-
-###########################################
-# TUCANO BEGIN
-###########################################
-
 set(
   TUCANO_SOURCES
   ${TUCANO_SRC_DIR}/bufferobject.hpp
@@ -111,43 +66,22 @@ set(
   ${TUCANO_SRC_DIR}/utils/rply/rply.h
   )
 
-install(
-  FILES ${TUCANO_SOURCES}
-  DESTINATION include/tucano/
-  )
-
 add_library(
   TUCANO_LIBRARY
   OBJECT
   ${TUCANO_SOURCES}
   )
 
-###########################################
-# TUCANO END
-###########################################
-
-###########################################
-# TUCANO_EFFECTS BEGIN
-###########################################
-
-set(
-  TUCANO_EFFECTS_SOURCES
-  ${TUCANO_EFFECTS_DIR}/gradientfilter.hpp
-  ${TUCANO_EFFECTS_DIR}/meanfilter.hpp
-  ${TUCANO_EFFECTS_DIR}/rendertexture.hpp
+install(
+  FILES ${TUCANO_SOURCES}
+  DESTINATION "include/tucano/"
   )
 
-add_library(
-  TUCANO_EFFECTS_LIBRARY
-  OBJECT
-  ${TUCANO_EFFECTS_SOURCES}
-  )
+if(DOC)
+  add_subdirectory(${TUCANO_DOCUMENTATION_DIR})
+endif()
 
-###########################################
-# TUCANO_EFFECTS END
-###########################################
-
-# You can comment out the examples you don't want to compile.
-add_subdirectory(${SAMPLES_DIR}/imgproc)
-add_subdirectory(${SAMPLES_DIR}/phongViewer)
-add_subdirectory(${SAMPLES_DIR}/simpleTexture)
+if(SAMPLES)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TUCANO_BINARY_DIR})
+  add_subdirectory(${TUCANO_SAMPLES_DIR})
+endif()
