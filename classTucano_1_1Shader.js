@@ -19,6 +19,7 @@ var classTucano_1_1Shader =
     [ "initialize", "classTucano_1_1Shader.html#af63031707bcd49d689a1c75c1a18a6f2", null ],
     [ "initializeFromStrings", "classTucano_1_1Shader.html#adb3ea42fab7ad64576e5562828e0e353", null ],
     [ "initializeTF", "classTucano_1_1Shader.html#aa71b0efd7bd99dd2d62b395619b17104", null ],
+    [ "linkProgram", "classTucano_1_1Shader.html#a5691bc6a17d0771514374b216398b0db", null ],
     [ "readFragmentCode", "classTucano_1_1Shader.html#a1143fb5fe59c5ee5a8268bcb8db3a116", null ],
     [ "readGeometryCode", "classTucano_1_1Shader.html#a9ed25bde1497202cb6c8d1166727eb17", null ],
     [ "readVertexCode", "classTucano_1_1Shader.html#ae6e28507b375c7f41b98997a2f7cd574", null ],

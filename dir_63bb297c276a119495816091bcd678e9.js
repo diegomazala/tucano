@@ -25,6 +25,6 @@ var dir_63bb297c276a119495816091bcd678e9 =
       [ "SSAO", "classEffects_1_1SSAO.html", "classEffects_1_1SSAO" ]
     ] ],
     [ "toon.hpp", "toon_8hpp.html", [
-      [ "Toon", "classToon.html", "classToon" ]
+      [ "Toon", "classEffects_1_1Toon.html", "classEffects_1_1Toon" ]
     ] ]
 ];

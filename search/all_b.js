@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['max_5fdist',['max_dist',['../classEffects_1_1SSAO.html#a86129637b7e425b6c30076884b8dbcaa',1,'Effects::SSAO']]],
   ['max_5ftexture_5funits',['max_texture_units',['../classTucano_1_1TextureManager.html#ac7d85567025a68a840780701ac3e1644',1,'Tucano::TextureManager']]],
   ['meanfilter',['MeanFilter',['../classEffects_1_1MeanFilter.html',1,'Effects']]],
   ['meanfilter',['MeanFilter',['../classEffects_1_1MeanFilter.html#a78f83aa5d18a5248f890467449a3eef4',1,'Effects::MeanFilter']]],
@@ -9,8 +10,8 @@ var searchData=
   ['mesh_2ehpp',['mesh.hpp',['../mesh_8hpp.html',1,'']]],
   ['meshtutorial_2emd',['meshTutorial.md',['../meshTutorial_8md.html',1,'']]],
   ['misc_2ehpp',['misc.hpp',['../misc_8hpp.html',1,'']]],
-  ['model',['Model',['../classTucano_1_1Model.html#a06ff734a796007dddf1f6b938d269e51',1,'Tucano::Model']]],
   ['model',['Model',['../classTucano_1_1Model.html',1,'Tucano']]],
+  ['model',['Model',['../classTucano_1_1Model.html#a06ff734a796007dddf1f6b938d269e51',1,'Tucano::Model']]],
   ['model_2ehpp',['model.hpp',['../model_8hpp.html',1,'']]],
   ['modelmatrix',['modelMatrix',['../classTucano_1_1Model.html#a011334c2000f15c637d13383067da183',1,'Tucano::Model']]],
   ['modelmatrixuniformlocation',['modelMatrixUniformLocation',['../classTucano_1_1Shader.html#a3e4366c9f62a3d8db27b7031f846dcb8',1,'Tucano::Shader']]],

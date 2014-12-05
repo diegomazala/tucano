@@ -3,7 +3,6 @@ var searchData=
   ['binding_5fpoint',['binding_point',['../classTucano_1_1BufferObject.html#aea230e9b962b4dbdd0893efe388ac6a5',1,'Tucano::BufferObject']]],
   ['blur_5fshader',['blur_shader',['../classEffects_1_1BlurredNormalMap.html#ada28914ce166a19b692e1da149341546',1,'Effects::BlurredNormalMap']]],
   ['blurrange',['blurRange',['../classEffects_1_1SSAO.html#a831c8973c5cdbe26429db89fbff92ea2',1,'Effects::SSAO']]],
-  ['blurshader',['blurShader',['../classEffects_1_1SSAO.html#af4269f549455a725d25c2034e5c50c9e',1,'Effects::SSAO']]],
   ['blurtextureid',['blurTextureID',['../classEffects_1_1SSAO.html#a383a060ff1560ece7570fc3b422a9a03',1,'Effects::SSAO']]],
   ['buffer_5fid',['buffer_id',['../classTucano_1_1BufferObject.html#a3c4db4ead61a11576bfec0905a218220',1,'Tucano::BufferObject']]],
   ['buffer_5ftype',['buffer_type',['../classTucano_1_1BufferObject.html#a2ec0d432f2985288a606febe7346090c',1,'Tucano::BufferObject']]],

@@ -16,7 +16,6 @@ var classTucano_1_1Trackball =
     [ "getDefaultTranslation", "classTucano_1_1Trackball.html#a4738af872f71f9ee4b30bba510e5784e", null ],
     [ "getZoom", "classTucano_1_1Trackball.html#a1762fe7b4cf462edf651f07cc48cd43a", null ],
     [ "increaseZoom", "classTucano_1_1Trackball.html#a440f3564e3f78ab9efd04b10091ce99e", null ],
-    [ "incrementFov", "classTucano_1_1Trackball.html#a896d3d0c17c3305120dfb1a3d195686f", null ],
     [ "initializeBuffers", "classTucano_1_1Trackball.html#af3052a3c128d35a3a750cf49f00b1047", null ],
     [ "initOpenGLMatrices", "classTucano_1_1Trackball.html#aa7c07ab83386e347e3361d9ffdce912b", null ],
     [ "isRotating", "classTucano_1_1Trackball.html#a113b38c9a96ea75c75cb1c0662687c1c", null ],
@@ -49,7 +48,6 @@ var classTucano_1_1Trackball =
     [ "translating", "classTucano_1_1Trackball.html#a1f4d0166448bd61ace9721f2ac2531cf", null ],
     [ "translationVector", "classTucano_1_1Trackball.html#aeced2fd047608bbe0e8a37f8cb84612b", null ],
     [ "use_default_shaders", "classTucano_1_1Trackball.html#a3a8ed6f62803792c138e067b80525761", null ],
-    [ "use_perspective", "classTucano_1_1Trackball.html#a28bbe2c14c5e6c03a4f193404dd416a8", null ],
     [ "vertices", "classTucano_1_1Trackball.html#a8ca2050ff3ec02be6bad50e1c7007dfc", null ],
     [ "zoom", "classTucano_1_1Trackball.html#af1c0d4d6c85f2223120f4cd9abcc930a", null ]
 ];

@@ -15,7 +15,6 @@ var searchData=
   ['blurrednormalmap',['BlurredNormalMap',['../classEffects_1_1BlurredNormalMap.html',1,'Effects']]],
   ['blurrednormalmap',['BlurredNormalMap',['../classEffects_1_1BlurredNormalMap.html#a43232e422270cc9b66788b2b0118b650',1,'Effects::BlurredNormalMap']]],
   ['blurrednormalmap_2ehpp',['blurrednormalmap.hpp',['../blurrednormalmap_8hpp.html',1,'']]],
-  ['blurshader',['blurShader',['../classEffects_1_1SSAO.html#af4269f549455a725d25c2034e5c50c9e',1,'Effects::SSAO']]],
   ['blurtextureid',['blurTextureID',['../classEffects_1_1SSAO.html#a383a060ff1560ece7570fc3b422a9a03',1,'Effects::SSAO']]],
   ['buffer_5fid',['buffer_id',['../classTucano_1_1BufferObject.html#a3c4db4ead61a11576bfec0905a218220',1,'Tucano::BufferObject']]],
   ['buffer_5ftype',['buffer_type',['../classTucano_1_1BufferObject.html#a2ec0d432f2985288a606febe7346090c',1,'Tucano::BufferObject']]],

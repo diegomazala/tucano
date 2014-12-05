@@ -8,6 +8,5 @@ var searchData=
   ['vertices',['vertices',['../classTucano_1_1Camera.html#a5cfa056d742a2c24449de623cd3abe86',1,'Tucano::Camera::vertices()'],['../classTucano_1_1Trackball.html#a8ca2050ff3ec02be6bad50e1c7007dfc',1,'Tucano::Trackball::vertices()']]],
   ['viewmatrix',['viewMatrix',['../classTucano_1_1Camera.html#a02876712b84e855d4a6ecc5855e69660',1,'Tucano::Camera']]],
   ['viewmatrixuniformlocation',['viewMatrixUniformLocation',['../classTucano_1_1Shader.html#af0963269c11cde3ecf47176c604c68e6',1,'Tucano::Shader']]],
-  ['viewport',['viewport',['../classTucano_1_1Camera.html#a254de6a51ae23c7ddd4edeb964058aa8',1,'Tucano::Camera']]],
-  ['viewportsize',['viewportSize',['../classEffects_1_1SSAO.html#adf278865fb93aa062d518c028d3a3ed3',1,'Effects::SSAO']]]
+  ['viewport',['viewport',['../classTucano_1_1Camera.html#a254de6a51ae23c7ddd4edeb964058aa8',1,'Tucano::Camera']]]
 ];

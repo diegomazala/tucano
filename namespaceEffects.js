@@ -6,5 +6,6 @@ var namespaceEffects =
     [ "NormalMap", "classEffects_1_1NormalMap.html", "classEffects_1_1NormalMap" ],
     [ "Phong", "classEffects_1_1Phong.html", "classEffects_1_1Phong" ],
     [ "RenderTexture", "classEffects_1_1RenderTexture.html", "classEffects_1_1RenderTexture" ],
-    [ "SSAO", "classEffects_1_1SSAO.html", "classEffects_1_1SSAO" ]
+    [ "SSAO", "classEffects_1_1SSAO.html", "classEffects_1_1SSAO" ],
+    [ "Toon", "classEffects_1_1Toon.html", "classEffects_1_1Toon" ]
 ];

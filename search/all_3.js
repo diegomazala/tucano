@@ -2,7 +2,6 @@ var searchData=
 [
   ['debug_5flevel',['debug_level',['../classTucano_1_1Shader.html#affd87b8e584c6c65d631aff7e34fc3ac',1,'Tucano::Shader']]],
   ['decreasezoom',['decreaseZoom',['../classTucano_1_1Trackball.html#aca294080fd8e39f8456e6dc602fb41d4',1,'Tucano::Trackball']]],
-  ['decrementblurrange',['decrementBlurRange',['../classEffects_1_1SSAO.html#a7767a376ae7f6978e941b123c0e6233c',1,'Effects::SSAO']]],
   ['defaulttranslation',['defaultTranslation',['../classTucano_1_1Trackball.html#ac5815f72c19dcf86d500e4a805e7bb12',1,'Tucano::Trackball']]],
   ['deferredshader',['deferredShader',['../classEffects_1_1SSAO.html#a45c0518fe20a68c70896c17522b76816',1,'Effects::SSAO']]],
   ['deletebuffers',['deleteBuffers',['../classTucano_1_1Mesh.html#ac1355001799107e9f5ce6e881be29fe1',1,'Tucano::Mesh']]],

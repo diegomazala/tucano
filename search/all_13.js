@@ -15,6 +15,6 @@ var searchData=
   ['update',['update',['../classTucano_1_1Texture.html#a381ca54d9eb3fc758d93080a847410f3',1,'Tucano::Texture']]],
   ['updateviewmatrix',['updateViewMatrix',['../classTucano_1_1Trackball.html#aa6e1e01f8c432291aaf12d39d47c54b0',1,'Tucano::Trackball']]],
   ['use_5fdefault_5fshaders',['use_default_shaders',['../classTucano_1_1Camera.html#a099bc8053ce908d67036cdfc25c84e05',1,'Tucano::Camera::use_default_shaders()'],['../classTucano_1_1Trackball.html#a3a8ed6f62803792c138e067b80525761',1,'Tucano::Trackball::use_default_shaders()']]],
-  ['use_5fperspective',['use_perspective',['../classTucano_1_1Camera.html#ad51a7593f80b3e9b5361eb6341bf2976',1,'Tucano::Camera::use_perspective()'],['../classTucano_1_1Trackball.html#a28bbe2c14c5e6c03a4f193404dd416a8',1,'Tucano::Trackball::use_perspective()']]],
+  ['use_5fperspective',['use_perspective',['../classTucano_1_1Camera.html#ad51a7593f80b3e9b5361eb6341bf2976',1,'Tucano::Camera']]],
   ['used_5funits',['used_units',['../classTucano_1_1TextureManager.html#a8b62ee7120dff0436902ca8b8c265357',1,'Tucano::TextureManager']]]
 ];

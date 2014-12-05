@@ -3,6 +3,7 @@ var searchData=
   ['scale',['scale',['../classTucano_1_1Camera.html#a3bdddf94defb27a99b6b94f056b5b260',1,'Tucano::Camera::scale(const Eigen::Vector3f &amp;scale_factors)'],['../classTucano_1_1Camera.html#a84ed16a0ce7ffc585ddcf66cc9bcb91a',1,'Tucano::Camera::scale(float scale_factor)']]],
   ['setarraytype',['setArrayType',['../classTucano_1_1VertexAttribute.html#a7d313d650d379ace65ebd715cfa7336f',1,'Tucano::VertexAttribute']]],
   ['setattributelocation',['setAttributeLocation',['../classTucano_1_1Mesh.html#aed68ff605af17e9bc9ee01d2148fa776',1,'Tucano::Mesh::setAttributeLocation(Shader *shader)'],['../classTucano_1_1Mesh.html#ad0540055b6db7962a23139e81a95405a',1,'Tucano::Mesh::setAttributeLocation(string name, GLint loc)']]],
+  ['setblurrange',['setBlurRange',['../classEffects_1_1SSAO.html#a3578bd12cb06a2327f23be736feafbe0',1,'Effects::SSAO']]],
   ['setcomputeshaders',['setComputeShaders',['../classTucano_1_1Shader.html#a94ecae15ab33d9974f4d641c0caa2705',1,'Tucano::Shader']]],
   ['setdefaultattriblocations',['setDefaultAttribLocations',['../classTucano_1_1Mesh.html#a681e980fae8d6845a1a5dd2d3a127283',1,'Tucano::Mesh']]],
   ['setdirections',['setDirections',['../classEffects_1_1GradientFilter.html#a704b12534e71489599b7d61043fab870',1,'Effects::GradientFilter']]],
@@ -10,6 +11,7 @@ var searchData=
   ['setgeometryshader',['setGeometryShader',['../classTucano_1_1Shader.html#a38c07d4f3f1c34d82399c22c91e942b4',1,'Tucano::Shader']]],
   ['setinputformat',['setInputFormat',['../classTucano_1_1Framebuffer.html#a8e1c737c1cc915fcf7e9207e76a3c7fa',1,'Tucano::Framebuffer']]],
   ['setinputtype',['setInputType',['../classTucano_1_1Framebuffer.html#a4fba99648a822c5662a755526cd61b17',1,'Tucano::Framebuffer']]],
+  ['setintensity',['setIntensity',['../classEffects_1_1SSAO.html#a15fbe8c3cc66f75ce1d92c57c3277d90',1,'Effects::SSAO']]],
   ['setinternalformat',['setInternalFormat',['../classTucano_1_1Framebuffer.html#a4c1e0c75f289087397fc5042f6aaedc0',1,'Tucano::Framebuffer']]],
   ['setkernel',['setKernel',['../classEffects_1_1MeanFilter.html#abdcad785e0082c3ad74558bbdc854516',1,'Effects::MeanFilter']]],
   ['setlocation',['setLocation',['../classTucano_1_1VertexAttribute.html#aee9399e465566083b7f7228bcba0394e',1,'Tucano::VertexAttribute']]],
@@ -17,6 +19,7 @@ var searchData=
   ['setorthographicmatrix',['setOrthographicMatrix',['../classTucano_1_1Camera.html#a15ea6163b3f23181dec5e9dd27d9477c',1,'Tucano::Camera']]],
   ['setperspectivematrix',['setPerspectiveMatrix',['../classTucano_1_1Camera.html#a9b19ce76a8c1f0be1f698d5ae6fe20ac',1,'Tucano::Camera']]],
   ['setprojectionmatrix',['setProjectionMatrix',['../classTucano_1_1Camera.html#a615bdbea16806a712b49992e3121f4aa',1,'Tucano::Camera']]],
+  ['setquantizationlevel',['setQuantizationLevel',['../classEffects_1_1Toon.html#a3adb038dea08f9b18909a86fb00191ac',1,'Effects::Toon']]],
   ['setrenderflag',['setRenderFlag',['../classTucano_1_1Trackball.html#a23e954dd20ffe7bd3b7d17f660703aa4',1,'Tucano::Trackball']]],
   ['setshadersdir',['setShadersDir',['../classTucano_1_1Effect.html#a50a2dd644fcf3cb626ac8dab8a9f4103',1,'Tucano::Effect']]],
   ['settexparameters',['setTexParameters',['../classTucano_1_1Texture.html#a473033802a63fd999c70308daf457d99',1,'Tucano::Texture']]],
@@ -32,5 +35,5 @@ var searchData=
   ['shader',['Shader',['../classTucano_1_1Shader.html#a328a27c795abf9f079b6ef2e5d8a09fc',1,'Tucano::Shader::Shader(string name)'],['../classTucano_1_1Shader.html#a2f128bf9dfbe6eebbd7a030830fa9d97',1,'Tucano::Shader::Shader(string name, vector&lt; string &gt; compute_shader_paths)'],['../classTucano_1_1Shader.html#a2dc4654dcac637b9f0f74de79bcb4093',1,'Tucano::Shader::Shader(string name, string vertex_shader_path, string fragment_shader_path, string geometry_shader_path=&quot;&quot;)'],['../classTucano_1_1Shader.html#a1c7cfa8c09a8d668911183ddbd130f41',1,'Tucano::Shader::Shader(string shader_dir, string name)']]],
   ['shaderstoragebufferfloat',['ShaderStorageBufferFloat',['../classTucano_1_1ShaderStorageBufferFloat.html#aed15d1cbf7144bb2232134e5f7f016bd',1,'Tucano::ShaderStorageBufferFloat']]],
   ['shaderstoragebufferint',['ShaderStorageBufferInt',['../classTucano_1_1ShaderStorageBufferInt.html#ab8011db34fbc79d47b89cb1edb00924f',1,'Tucano::ShaderStorageBufferInt']]],
-  ['ssao',['SSAO',['../classEffects_1_1SSAO.html#a5c4e058208f3c8a969a6162d41fc35a3',1,'Effects::SSAO']]]
+  ['ssao',['SSAO',['../classEffects_1_1SSAO.html#a898d6e7aad1fba22ad4832e9e336a716',1,'Effects::SSAO']]]
 ];

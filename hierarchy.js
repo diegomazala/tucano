@@ -20,11 +20,11 @@ var hierarchy =
       [ "Effects::NormalMap", "classEffects_1_1NormalMap.html", null ],
       [ "Effects::Phong", "classEffects_1_1Phong.html", null ],
       [ "Effects::RenderTexture", "classEffects_1_1RenderTexture.html", null ],
-      [ "Effects::SSAO", "classEffects_1_1SSAO.html", null ]
+      [ "Effects::SSAO", "classEffects_1_1SSAO.html", null ],
+      [ "Effects::Toon", "classEffects_1_1Toon.html", null ]
     ] ],
     [ "Effect", null, [
-      [ "ComputeShaderTest", "classComputeShaderTest.html", null ],
-      [ "Toon", "classToon.html", null ]
+      [ "ComputeShaderTest", "classComputeShaderTest.html", null ]
     ] ],
     [ "Tucano::Framebuffer", "classTucano_1_1Framebuffer.html", null ],
     [ "Tucano::Model", "classTucano_1_1Model.html", [

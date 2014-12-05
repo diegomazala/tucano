@@ -8,7 +8,7 @@ var searchData=
   ['_7eframebuffer',['~Framebuffer',['../classTucano_1_1Framebuffer.html#a97476b8a9c597f6ab20de0b96141a798',1,'Tucano::Framebuffer']]],
   ['_7egradientfilter',['~GradientFilter',['../classEffects_1_1GradientFilter.html#a82a79f8adf8e4131e18e302ebeca1dd3',1,'Effects::GradientFilter']]],
   ['_7emeanfilter',['~MeanFilter',['../classEffects_1_1MeanFilter.html#a6f6665bf38b6cf37c2a85627f2c11e0b',1,'Effects::MeanFilter']]],
-  ['_7emesh',['~Mesh',['../classTucano_1_1Mesh.html#ad1d6897b11e80398579d2e569d1f024a',1,'Tucano::Mesh']]],
+  ['_7emesh',['~Mesh',['../classTucano_1_1Mesh.html#a3fff91b907388b41d64fcab2e10cbe12',1,'Tucano::Mesh']]],
   ['_7emodel',['~Model',['../classTucano_1_1Model.html#aca0f4ffdc2d4fec89cb80e5fb33ec137',1,'Tucano::Model']]],
   ['_7enormalmap',['~NormalMap',['../classEffects_1_1NormalMap.html#ac205b93afdae0a4416caf38dfe061175',1,'Effects::NormalMap']]],
   ['_7ephong',['~Phong',['../classEffects_1_1Phong.html#a62956d8f4da074d432f80f76b371a7bc',1,'Effects::Phong']]],
@@ -19,6 +19,7 @@ var searchData=
   ['_7essao',['~SSAO',['../classEffects_1_1SSAO.html#a8ad0d346771eb7558a245dc1568996b0',1,'Effects::SSAO']]],
   ['_7etexture',['~Texture',['../classTucano_1_1Texture.html#a6e836cad0e56178876c39ade4954ebea',1,'Tucano::Texture']]],
   ['_7etexturemanager',['~TextureManager',['../classTucano_1_1TextureManager.html#acf6fdc1fa71dde851398e57b3939f3d0',1,'Tucano::TextureManager']]],
+  ['_7etoon',['~Toon',['../classEffects_1_1Toon.html#a04de89d21c4bf79995637d53abb08cec',1,'Effects::Toon']]],
   ['_7etrackball',['~Trackball',['../classTucano_1_1Trackball.html#a2af8008490babad0b798f1873a4f722a',1,'Tucano::Trackball']]],
   ['_7evertexattribute',['~VertexAttribute',['../classTucano_1_1VertexAttribute.html#afea5e2d11a9783085e363fbe572a57c0',1,'Tucano::VertexAttribute']]]
 ];

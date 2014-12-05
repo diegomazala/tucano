@@ -19,6 +19,7 @@ var classTucano_1_1Camera =
     [ "getViewMatrix", "classTucano_1_1Camera.html#ade67dadeb0a9c37f9b02c863ded3ab0d", null ],
     [ "getViewMatrix", "classTucano_1_1Camera.html#a48ea53bb505c3312d6e2dc49637f7fb0", null ],
     [ "getViewport", "classTucano_1_1Camera.html#a9a058fc79beb6dee1937099af281b38c", null ],
+    [ "getViewportSize", "classTucano_1_1Camera.html#ad4f1c93faa1757905e09e4983622319a", null ],
     [ "incrementFov", "classTucano_1_1Camera.html#a2be204a013396a3cfcf62e3fa2a7aba9", null ],
     [ "loadShader", "classTucano_1_1Camera.html#a934d790da8c078b465a99c0dc61e2a7e", null ],
     [ "projectPoint", "classTucano_1_1Camera.html#af3e2bdc316e2d56f65e69f146b598469", null ],
