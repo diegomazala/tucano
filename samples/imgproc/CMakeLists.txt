@@ -17,13 +17,11 @@ add_executable(
   imgproc
   ${IMGPROC_SOURCES}
   ${IMGPROC_UIS}
-  $<TARGET_OBJECTS:TUCANO_EFFECTS_LIBRARY>
   $<TARGET_OBJECTS:TUCANO_LIBRARY>
   )
 
 add_dependencies(
   imgproc
-  TUCANO_EFFECTS_LIBRARY
   TUCANO_LIBRARY
   )
 

@@ -17,13 +17,11 @@ add_executable(
   simpleTexture
   ${SIMPLETEXTURE_SOURCES}
   ${SIMPLETEXTURE_UIS}
-  $<TARGET_OBJECTS:TUCANO_EFFECTS_LIBRARY>
   $<TARGET_OBJECTS:TUCANO_LIBRARY>
   )
 
 add_dependencies(
   simpleTexture
-  TUCANO_EFFECTS_LIBRARY
   TUCANO_LIBRARY
   )
 

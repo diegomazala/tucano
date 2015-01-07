@@ -9,7 +9,7 @@ set(TUCANO_EFFECTS_DIR "${PROJECT_SOURCE_DIR}/effects")
 set(TUCANO_SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
 option(DOC "documentation support" ON)
-option(SAMPLES "build samples?" ON)
+option(SAMPLES "build samples" ON)
 
 find_package(GLEW REQUIRED)
 if(NOT GLEW_FOUND)
@@ -58,6 +58,11 @@ set(
   ${TUCANO_SRC_DIR}/texturemanager.hpp
   ${TUCANO_SRC_DIR}/trackball.hpp
   ${TUCANO_SRC_DIR}/tucano.hpp
+  )
+
+set(
+  TUCANO_SOURCES_UTILS
+  ${TUCANO_SRC_DIR}/utils/misc.hpp
   ${TUCANO_SRC_DIR}/utils/objimporter.hpp
   ${TUCANO_SRC_DIR}/utils/plyimporter.hpp
   ${TUCANO_SRC_DIR}/utils/qtplainwidget.hpp
@@ -70,11 +75,17 @@ add_library(
   TUCANO_LIBRARY
   OBJECT
   ${TUCANO_SOURCES}
+  ${TUCANO_SOURCES_UTILS}
   )
 
 install(
   FILES ${TUCANO_SOURCES}
   DESTINATION "include/tucano/"
+  )
+
+install(
+  FILES ${TUCANO_SOURCES_UTILS}
+  DESTINATION "include/tucano/utils"
   )
 
 if(DOC)

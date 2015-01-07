@@ -23,14 +23,3 @@ if (DOXYGEN_FOUND)
     message(WARNING "git not found on your system")
   endif()
 endif()
-
-file(GLOB
-  TUCANO_DOCS
-  ${TUCANO_DOCUMENTATION_DIR}/*.md
-  )
-
-install(
-  FILES ${TUCANO_DOCS}
-  DESTINATION "share/doc/tucano"
-  )
-

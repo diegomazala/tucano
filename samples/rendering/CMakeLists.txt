@@ -17,13 +17,11 @@ add_executable(
   rendering
   ${RENDERING_SOURCES}
   ${RENDERING_UIS}
-  $<TARGET_OBJECTS:TUCANO_EFFECTS_LIBRARY>
   $<TARGET_OBJECTS:TUCANO_LIBRARY>
   )
 
 add_dependencies(
   rendering
-  TUCANO_EFFECTS_LIBRARY
   TUCANO_LIBRARY
   )
 
