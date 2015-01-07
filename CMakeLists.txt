@@ -80,7 +80,7 @@ add_library(
 
 install(
   FILES ${TUCANO_SOURCES}
-  DESTINATION "include/tucano/"
+  DESTINATION "include/tucano"
   )
 
 install(

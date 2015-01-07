@@ -4,21 +4,21 @@ pkgver=0.1
 pkgrel=1
 pkgdesc="A library for rapid prototyping with modern OpenGL and GLSL"
 arch=('i686' 'x86_64')
-url="https://github.com/LCG-UFRJ/tucano"
+url="https://github.com/LCG-UFRJ/${pkgname}"
 license=('GPL')
 depends=('eigen' 'glew')
 makedepends=('cmake')
 optdepends=()
-source=("git+https://github.com/LCG-UFRJ/$pkgname.git")
+source=("git+https://github.com/LCG-UFRJ/${pkgname}.git")
 md5sums=('SKIP')
 
 build() {
   cd "$srcdir/$pkgname"
   mkdir build/ && cd $_
-  cmake -DSAMPLES=OFF ..
+  cmake -DSAMPLES=OFF -DDOC=OFF ..
 }
 
 package() {
   cd "$srcdir/$pkgname"
-  make -C build/ DESTDIR="$pkgdir/" install
+  make -C build/ DESTDIR="${pkgdir}/" install
 }
