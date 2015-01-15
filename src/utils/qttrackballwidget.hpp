@@ -158,7 +158,7 @@ protected:
     {
         if (event->key() == Qt::Key_O)
         {
-            QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("OBJ Files (*.obj)"));
+            QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Mesh Files (*.obj *.ply)"));
             if (!filename.isEmpty())
             {
                 openMesh (filename.toStdString());
