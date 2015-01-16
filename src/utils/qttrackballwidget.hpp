@@ -25,7 +25,7 @@
 
 #include <GL/glew.h>
 
-//#include "objimporter.hpp"
+#include "objimporter.hpp"
 #include "plyimporter.hpp"
 
 #include <tucano.hpp>
@@ -140,11 +140,29 @@ public:
      */
     void openMesh (string filename)
     {
+        QString str (filename.c_str());
+        QStringList strlist = str.split(".");
+        QString extension = strlist[strlist.size()-1];
+
+        if (extension.compare("ply") != 0 && extension.compare("obj") != 0)
+        {
+            cerr << "file format [" << extension.toStdString() << "] not supported" << endl;
+            return;
+        }
+
         if (mesh)
             delete mesh;
         mesh = new Mesh();
-        MeshImporter::loadPlyFile(mesh, filename);
-        //ShaderLib::MeshImporter::loadPlyFile(mesh, filename);
+
+        if (extension.compare("ply") == 0)
+        {
+            MeshImporter::loadPlyFile(mesh, filename);
+        }
+        if (extension.compare("obj") == 0)
+        {
+            MeshImporter::loadObjFile(mesh, filename);
+        }
+
         mesh->normalizeModelMatrix();
     }
 
