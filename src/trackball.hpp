@@ -23,8 +23,6 @@
 #ifndef __TRACKBALL__
 #define __TRACKBALL__
 
-#define PI 3.14159265358979323846
-
 #include "camera.hpp"
 #include <Eigen/Dense>
 #include <cmath>
@@ -524,7 +522,7 @@ public:
     void createTrackballRepresentation (void)
     {
         int index = 0;
-        for (float theta = 0; theta<2*PI; theta += (2*PI)/200.0) {
+        for (float theta = 0; theta<2*M_PI; theta += (2*M_PI)/200.0) {
 
             vertices[index] = 0.8*cos(theta);
             vertices[index+1] = 0.8*sin(theta);
@@ -615,13 +613,13 @@ public:
 
             //X:
             Eigen::Vector4f colorVector(1.0, 0.0, 0.0, 1.0);
-            trackballShader->setUniform("modelMatrix", Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(PI/2.0,Eigen::Vector3f(0.0,1.0,0.0)));
+            trackballShader->setUniform("modelMatrix", Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(M_PI/2.0,Eigen::Vector3f(0.0,1.0,0.0)));
             trackballShader->setUniform("in_Color", colorVector);
             glDrawArrays(GL_LINE_LOOP, 0, 200);
 
             //Y:
             colorVector << 0.0, 1.0, 0.0, 1.0;
-            trackballShader->setUniform("modelMatrix", Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(PI/2.0,Eigen::Vector3f(1.0,0.0,0.0)));
+            trackballShader->setUniform("modelMatrix", Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(M_PI/2.0,Eigen::Vector3f(1.0,0.0,0.0)));
             trackballShader->setUniform("in_Color", colorVector);
             glDrawArrays(GL_LINE_LOOP, 0, 200);
 
