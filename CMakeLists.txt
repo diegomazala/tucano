@@ -5,6 +5,7 @@ project(${PROJECT_NAME} C CXX)
 # Tucano directories.
 set(TUCANO_BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
 set(TUCANO_DOCUMENTATION_DIR "${PROJECT_SOURCE_DIR}/doc")
+set(TUCANO_EFFECTS_DIR "${PROJECT_SOURCE_DIR}/effects")
 set(TUCANO_SAMPLES_DIR "${PROJECT_SOURCE_DIR}/samples")
 set(TUCANO_SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
@@ -44,6 +45,7 @@ include_directories(
   ${OPENGL_INCLUDE_DIR}
   ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5OpenGL_INCLUDE_DIRS}
+  ${TUCANO_EFFECTS_DIR}
   ${TUCANO_SRC_DIR}
   )
 
