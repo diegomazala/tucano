@@ -6,9 +6,8 @@ var NAVTREEINDEX0 =
 "bufferobject_8hpp.html":[9,0,1,1],
 "bufferobject_8hpp_source.html":[9,0,1,1],
 "camera_8hpp.html":[9,0,1,2],
-"camera_8hpp.html#a4076bf3445a4f340a1ffca3b145825f7":[9,0,1,2,2],
-"camera_8hpp.html#a598a3330b3c21701223ee0ca14316eca":[9,0,1,2,1],
-"camera_8hpp.html#afdc37fd92c8014ead286059b832185e2":[9,0,1,2,3],
+"camera_8hpp.html#a4076bf3445a4f340a1ffca3b145825f7":[9,0,1,2,1],
+"camera_8hpp.html#afdc37fd92c8014ead286059b832185e2":[9,0,1,2,2],
 "camera_8hpp_source.html":[9,0,1,2],
 "classComputeShaderTest.html":[8,0,2],
 "classComputeShaderTest.html#a1c3c362bfa08de469dc1b881fa561821":[8,0,2,3],
@@ -249,5 +248,6 @@ var NAVTREEINDEX0 =
 "classTucano_1_1Framebuffer.html#ad25bd54e3b323bd80c405ccbc4a5416d":[8,0,1,8,30],
 "classTucano_1_1Framebuffer.html#adbe9592a1238b1df96652be88b4e8291":[8,0,1,8,33],
 "classTucano_1_1Framebuffer.html#adf078b592d78f0742bc04ef152290da2":[8,0,1,8,14],
-"classTucano_1_1Framebuffer.html#adf2b82c4d1df5640a8687a3eeaadc78c":[8,0,1,8,22]
+"classTucano_1_1Framebuffer.html#adf2b82c4d1df5640a8687a3eeaadc78c":[8,0,1,8,22],
+"classTucano_1_1Framebuffer.html#ae0e3a63dc04d7c976a8f94b346b81e00":[8,0,1,8,21]
 };

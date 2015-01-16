@@ -1,6 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"classTucano_1_1Framebuffer.html#ae0e3a63dc04d7c976a8f94b346b81e00":[8,0,1,8,21],
 "classTucano_1_1Framebuffer.html#ae48c5780618d1d3dd31ecb82a55f239f":[8,0,1,8,48],
 "classTucano_1_1Framebuffer.html#ae540708a905ca8bd1a9cf795c7a3a49e":[8,0,1,8,6],
 "classTucano_1_1Framebuffer.html#ae763375c73e3d64ec4be293c71be6590":[8,0,1,8,50],
@@ -249,5 +248,6 @@ var NAVTREEINDEX1 =
 "classTucano_1_1Trackball.html#a440f3564e3f78ab9efd04b10091ce99e":[8,0,1,15,15],
 "classTucano_1_1Trackball.html#a4738af872f71f9ee4b30bba510e5784e":[8,0,1,15,13],
 "classTucano_1_1Trackball.html#a5e453871c03c7861b5d5b19605ae1858":[8,0,1,15,20],
-"classTucano_1_1Trackball.html#a6a09b8c52799b0863a6fc4bfa4dbe9ca":[8,0,1,15,27]
+"classTucano_1_1Trackball.html#a6a09b8c52799b0863a6fc4bfa4dbe9ca":[8,0,1,15,27],
+"classTucano_1_1Trackball.html#a74cb9ab64a6fac69df505f309103e547":[8,0,1,15,24]
 };

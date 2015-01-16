@@ -7,6 +7,7 @@ var searchData=
   ['centroid',['centroid',['../classTucano_1_1Model.html#a3724545a59c89f0ce097759fd6094482',1,'Tucano::Model']]],
   ['colortextureid',['colorTextureID',['../classEffects_1_1SSAO.html#aae1380f653800443880f1d65199ad40d',1,'Effects::SSAO']]],
   ['coloruniformlocation',['colorUniformLocation',['../classTucano_1_1Shader.html#acc0d013dd765374402f477544955c758',1,'Tucano::Shader']]],
+  ['comment',['comment',['../structt__ply__.html#a3e3fe7d31c905da0fb259cdc9a99f47f',1,'t_ply_']]],
   ['computeshaderpaths',['computeShaderPaths',['../classTucano_1_1Shader.html#a5fbafcbd3635dafbe64fba33292115e1',1,'Tucano::Shader']]],
   ['computeshaders',['computeShaders',['../classTucano_1_1Shader.html#a9fc5146c1814820bf2f14d34f516f890',1,'Tucano::Shader']]]
 ];

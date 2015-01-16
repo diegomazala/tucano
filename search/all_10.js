@@ -2,6 +2,7 @@ var searchData=
 [
   ['radius',['radius',['../classTucano_1_1Model.html#a723bdbec761afe88053dd2fa53cf1954',1,'Tucano::Model::radius()'],['../classTucano_1_1Trackball.html#a00235c0d75c6a2b7c5be0eedcbc614e5',1,'Tucano::Trackball::radius()'],['../classEffects_1_1SSAO.html#a5d519b8f431776e2111ceb37bc9a76ef',1,'Effects::SSAO::radius()']]],
   ['random',['random',['../classEffects_1_1SSAO.html#a181bcb50512e344e8b078880fdc392c7',1,'Effects::SSAO']]],
+  ['read_5fcb',['read_cb',['../structt__ply__property__.html#af139cc44e475f4754daf7501e1288716',1,'t_ply_property_']]],
   ['readbuffer',['readBuffer',['../classTucano_1_1BufferObject.html#ac6391cea1dab9b3662d94e8d1ec4fb02',1,'Tucano::BufferObject::readBuffer()'],['../classTucano_1_1Framebuffer.html#aca2606fa3ff96b2eda5cbac255a6ea62',1,'Tucano::Framebuffer::readBuffer(int attach_id, GLfloat *pixels)'],['../classTucano_1_1Framebuffer.html#adbe9592a1238b1df96652be88b4e8291',1,'Tucano::Framebuffer::readBuffer(int attach_id, GLbyte *pixels)'],['../classTucano_1_1Framebuffer.html#a18dad2108558815dbb58e2665262a4c9',1,'Tucano::Framebuffer::readBuffer(int attach_id, unsigned char *pixels)'],['../classTucano_1_1Framebuffer.html#aad2a316be6006be940d6425a83b515b0',1,'Tucano::Framebuffer::readBuffer(int attach_id, vector&lt; unsigned char &gt; &amp;pixels)'],['../classTucano_1_1Framebuffer.html#acf1d75c184941fa43822325a435487cf',1,'Tucano::Framebuffer::readBuffer(int attach_id, vector&lt; float &gt; &amp;pixels)']]],
   ['readdepthbuffer',['readDepthBuffer',['../classTucano_1_1Framebuffer.html#a0fd1af3ce83a6c623a57a3b42172ebad',1,'Tucano::Framebuffer']]],
   ['readfragmentcode',['readFragmentCode',['../classTucano_1_1Shader.html#a1143fb5fe59c5ee5a8268bcb8db3a116',1,'Tucano::Shader']]],
@@ -11,15 +12,20 @@ var searchData=
   ['reloadshaders',['reloadShaders',['../classTucano_1_1Effect.html#a9e09f5ba0dac75f90949dbc6cd83fb2a',1,'Tucano::Effect::reloadShaders()'],['../classTucano_1_1Shader.html#ab0320cf52ee3a5c3e27b9ace161141ef',1,'Tucano::Shader::reloadShaders()'],['../classComputeShaderTest.html#a7234c34268be29b29525967593c9207b',1,'ComputeShaderTest::reloadShaders()']]],
   ['render',['render',['../classTucano_1_1Camera.html#ac511f635e35371968d1284e4e268b813',1,'Tucano::Camera::render()'],['../classTucano_1_1Mesh.html#a155f4437f2628952e11f4adee4644ee3',1,'Tucano::Mesh::render()'],['../classTucano_1_1Trackball.html#a0d90541fce3c35fe86f383c29b8ba068',1,'Tucano::Trackball::render()'],['../classEffects_1_1BlurredNormalMap.html#a05a99bd413d6b879eacf11cc8dd0430f',1,'Effects::BlurredNormalMap::render()'],['../classComputeShaderTest.html#add28bb713c3c593009fad1a6aa2e87fd',1,'ComputeShaderTest::render()'],['../classEffects_1_1NormalMap.html#a49be288aabe77755078907fd3e99df0c',1,'Effects::NormalMap::render()'],['../classEffects_1_1Phong.html#a6a9b0b5be69d6cfb141fbfc1948a0e44',1,'Effects::Phong::render()'],['../classEffects_1_1SSAO.html#a739746eb21e44e3435f44c3c33c8b4cd',1,'Effects::SSAO::render()'],['../classEffects_1_1Toon.html#a7063fff34f1ac47610aa591189ab622a',1,'Effects::Toon::render()']]],
   ['renderelements',['renderElements',['../classTucano_1_1Mesh.html#aeb1bfe692bfc157a0dc24f57e5dc5237',1,'Tucano::Mesh']]],
-  ['rendertexture',['RenderTexture',['../classEffects_1_1RenderTexture.html',1,'Effects']]],
   ['rendertexture',['renderTexture',['../classEffects_1_1GradientFilter.html#a39fb53cdd89ffee503fa1c11c64f1df6',1,'Effects::GradientFilter::renderTexture()'],['../classEffects_1_1MeanFilter.html#a64959fd5ab93f7c8abc2bd485b66f78a',1,'Effects::MeanFilter::renderTexture()'],['../classEffects_1_1RenderTexture.html#a73c9a065fc070b445db23bae0add60b2',1,'Effects::RenderTexture::renderTexture(Texture *tex, Eigen::Vector2i viewport)'],['../classEffects_1_1RenderTexture.html#a74e583e67d423d00219ba37860f67e3b',1,'Effects::RenderTexture::RenderTexture(void)']]],
+  ['rendertexture',['RenderTexture',['../classEffects_1_1RenderTexture.html',1,'Effects']]],
   ['rendertexture_2ehpp',['rendertexture.hpp',['../rendertexture_8hpp.html',1,'']]],
   ['reset',['reset',['../classTucano_1_1Camera.html#a96c45150074ef982dfa07e338d43c1b3',1,'Tucano::Camera::reset()'],['../classTucano_1_1Mesh.html#ab3571d0fdcfafa34cd7160fe983aa20c',1,'Tucano::Mesh::reset()'],['../classTucano_1_1Model.html#a979b9fe72b942f789754df2bc9c6a294',1,'Tucano::Model::reset()'],['../classTucano_1_1Trackball.html#a936d586a4b3124e7ab04acb524f8e2ad',1,'Tucano::Trackball::reset()']]],
   ['resetlocations',['resetLocations',['../classTucano_1_1Mesh.html#a08c4fd840c181e6e81cb66176a0a883e',1,'Tucano::Mesh']]],
   ['resetprojectionmatrix',['resetProjectionMatrix',['../classTucano_1_1Camera.html#aa91b7c675c5d7547991b7bafb50fffca',1,'Tucano::Camera']]],
   ['resetviewmatrix',['resetViewMatrix',['../classTucano_1_1Camera.html#a789a4057690d77788ff6e0b4ba37f488',1,'Tucano::Camera']]],
   ['resizegl',['resizeGL',['../classTucano_1_1QtPlainWidget.html#ad64d8e36a4ef1daa6f7e6c922e2e83d9',1,'Tucano::QtPlainWidget::resizeGL()'],['../classTucano_1_1QtTrackballWidget.html#a8ad4d92400f05b7d828f417a24b6fead',1,'Tucano::QtTrackballWidget::resizeGL()']]],
+  ['rn',['rn',['../structt__ply__.html#a440d79013c5a0616b9a95125613cd6c8',1,'t_ply_']]],
   ['rotate',['rotate',['../classTucano_1_1Camera.html#a657019fa598e2557875533d14b50be17',1,'Tucano::Camera']]],
   ['rotatecamera',['rotateCamera',['../classTucano_1_1Trackball.html#a74cb9ab64a6fac69df505f309103e547',1,'Tucano::Trackball']]],
-  ['rotating',['rotating',['../classTucano_1_1Trackball.html#ae231134bb0dd7299048620cac68ce07f',1,'Tucano::Trackball']]]
+  ['rotating',['rotating',['../classTucano_1_1Trackball.html#ae231134bb0dd7299048620cac68ce07f',1,'Tucano::Trackball']]],
+  ['rply_2ehpp',['rply.hpp',['../rply_8hpp.html',1,'']]],
+  ['rply_5fauthors',['RPLY_AUTHORS',['../rply_8hpp.html#af94ce096b1ffdc3355d241149acac1a3',1,'rply.hpp']]],
+  ['rply_5fcopyright',['RPLY_COPYRIGHT',['../rply_8hpp.html#a9008a3ea3182772ebfcb62ee823a12ef',1,'rply.hpp']]],
+  ['rply_5fversion',['RPLY_VERSION',['../rply_8hpp.html#a1bb762acc4ade9216d1294ee6345c790',1,'rply.hpp']]]
 ];

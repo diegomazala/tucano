@@ -11,5 +11,5 @@ var searchData=
   ['trackballshader',['trackballShader',['../classTucano_1_1Trackball.html#a01f19c38430254179d87ad837f3e71a1',1,'Tucano::Trackball']]],
   ['translating',['translating',['../classTucano_1_1Trackball.html#a1f4d0166448bd61ace9721f2ac2531cf',1,'Tucano::Trackball']]],
   ['translationvector',['translationVector',['../classTucano_1_1Trackball.html#aeced2fd047608bbe0e8a37f8cb84612b',1,'Tucano::Trackball']]],
-  ['type',['type',['../classTucano_1_1VertexAttribute.html#a61b6c9ce6f50c56aed3efd705d1b93af',1,'Tucano::VertexAttribute']]]
+  ['type',['type',['../classTucano_1_1VertexAttribute.html#a61b6c9ce6f50c56aed3efd705d1b93af',1,'Tucano::VertexAttribute::type()'],['../structt__ply__property__.html#a7021be56bf6726be847887cfbba0d24e',1,'t_ply_property_::type()']]]
 ];

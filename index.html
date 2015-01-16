@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>Tucano: Tucano</title>
+<title>Tucano: Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('index.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -100,53 +100,51 @@ $(document).ready(function(){initNavTree('index.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title"><a class="el" href="namespaceTucano.html">Tucano</a> </div>  </div>
+<div class="title">Tucano Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h3>Welcome to <a class="el" href="namespaceTucano.html">Tucano</a>, a Library for rapid prototyping with modern OpenGL and GLSL.</h3>
+<div class="textblock"><div class="image">
+<img src="tucano.png"  alt="tucano"/>
+</div>
+<h3>Welcome to <a class="el" href="namespaceTucano.html">Tucano</a>, a Library for rapid prototyping with modern OpenGL and GLSL.</h3>
 <p><a class="el" href="namespaceTucano.html">Tucano</a> encapsulates many common OpenGL/GLSL features in C++ classes, saving a lot of coding and allowing the developer to concentrate on the core of the application and the Shader codes.</p>
 <p>By keeping the code <b>clean</b> and <b>compact</b>, <a class="el" href="namespaceTucano.html">Tucano</a> also renders the code <b>less bug prone</b>.</p>
 <h2>Features</h2>
 <ul>
-<li>easily create and use Textures, FBOs, Shader Programs, Textures, modern OpenGL buffers ...</li>
+<li>easily create and use Textures, FBOs, Shader Programs, Textures, modern OpenGL buffers...</li>
 <li>common classes used in most applications, such as Mesh, Camera, Trackball, and much more</li>
 <li>automatic texture unit assignment when binding textures, no need to worry about keeping track of ids</li>
 <li>uniforms, textures, and attributes are linked with the shaders in a simple and transparent way (no need to manually set locations)</li>
-<li>wrapper for Eigen Geometry, ex: directly pass an <em>Eigen Matrix4f</em> to a GLSL Shader <em>mat4</em></li>
+<li>wrapper for Eigen Geometry, e.g. directly pass an <em>Eigen Matrix4f</em> to a GLSL Shader <em>mat4</em></li>
 <li>use it with Qt, Glut, Glfw, or any other window manager that supports OpenGL</li>
-<li>default widgets for Qt, ex. with a few lines of code open a 3D viewer with a trackball to visualize a Mesh</li>
-<li>examples and a collection of common effects (Phong, Image filters, SSAO ...)</li>
+<li>default widgets for Qt, e.g. with a few lines of code open a 3D viewer with a trackball to visualize a Mesh</li>
+<li>examples and a collection of common effects (Phong, Image filters, SSAO...)</li>
 </ul>
-<h2>Downloading</h2>
-<p><a class="el" href="namespaceTucano.html">Tucano</a> is distributed under GPL Version 3, and is available at <a href="https://github.com/LCG-UFRJ/tucano">github</a></p>
-<p>You can clone <a class="el" href="namespaceTucano.html">Tucano</a> directly from:</p>
-<blockquote class="doxtable">
-<p>git clone <a href="https://github.com/LCG-UFRJ/tucano.git">https://github.com/LCG-UFRJ/tucano.git</a></p>
-<p></p>
-</blockquote>
+<h2>Documentation</h2>
+<p>Documentation is available at <a href="http://lcg-ufrj.github.io/tucano">http://lcg-ufrj.github.io/tucano</a></p>
 <h2>Requirements</h2>
-<p><a class="el" href="namespaceTucano.html">Tucano</a> has only two library dependencies (make sure you have recent version):</p>
+<p><a class="el" href="namespaceTucano.html">Tucano</a> has only two library dependencies (make sure you have a recent version of them):</p>
 <ul>
 <li>Eigen : <a href="http://eigen.tuxfamily.org/">http://eigen.tuxfamily.org/</a></li>
 <li>GLEW : <a href="http://glew.sourceforge.net/">http://glew.sourceforge.net/</a></li>
 </ul>
 <blockquote class="doxtable">
-<p>Note that you need an OpenGL driver that supports at least version 4.3</p>
+<p>Note that you need an OpenGL driver that supports at least version 4.3.</p>
 <p></p>
 </blockquote>
 <h2>Using</h2>
-<p>No need to compile <a class="el" href="namespaceTucano.html">Tucano</a>, just include <em><a class="el" href="tucano_8hpp.html">tucano.hpp</a></em> and be happy!</p>
+<p>No need to compile <a class="el" href="namespaceTucano.html">Tucano</a>, just include <em><a class="el" href="tucano_8hpp.html">tucano.hpp</a></em> in your project and be happy!</p>
 <ul>
-<li>use the TUCANODEBUG flag for debugging</li>
+<li>use the <code>TUCANODEBUG</code> flag for debugging</li>
 </ul>
 <h2>Examples</h2>
-<p>Check out the <a class="el" href="examples.html">Samples</a> page for the examples</p>
-<p>Check out the <a class="el" href="effects.html">Effects</a> Collection</p>
+<p><a class="el" href="namespaceTucano.html">Tucano</a> comes with several examples and an <a class="el" href="namespaceEffects.html">Effects</a> Collection.</p>
+<p>Check out the <a class="el" href="examples.html">Samples</a> page for the examples and the <a class="el" href="effects.html">Effects</a> Collection.</p>
 <h2>Development Notice</h2>
-<p>Even though <b><a class="el" href="namespaceTucano.html">Tucano</a> 0.1</b> is out, there are still some features that are not implemented, such as encapsulation of <em>Tesselation Shaders</em>, and some <em>Buffers Objects</em> types. Some examples are still missing, but will soon be included in <a class="el" href="namespaceTucano.html">Tucano</a>. Documentation is almost up-to-date, but not 100%, completion is underway.</p>
-<p>Please help us improve <a class="el" href="namespaceTucano.html">Tucano</a> using github's <a href="https://github.com/LCG-UFRJ/tucano/issues">Issue Tracker</a>.</p>
+<p>Even though <b><a class="el" href="namespaceTucano.html">Tucano</a> 0.1</b> is out, there are still some features that are not implemented, such as encapsulation of <em>Tesselation Shaders</em>, and some <em>Buffer Objects</em> types. Some examples are still missing, but will soon be included in <a class="el" href="namespaceTucano.html">Tucano</a>. Documentation is nearly up-to-date, but not 100%, completion is underway.</p>
+<p>Please help us improve <a class="el" href="namespaceTucano.html">Tucano</a> using GitHub's <a href="https://github.com/LCG-UFRJ/tucano/issues/">Issue Tracker</a>.</p>
 <h2>Developers</h2>
-<p><a class="el" href="namespaceTucano.html">Tucano</a> is maintained by the <a href="http://www.lcg.ufrj.br">Computer Graphics Lab</a> at <a href="http://www.ufrj.br">UFRJ</a></p>
+<p><a class="el" href="namespaceTucano.html">Tucano</a> is maintained by the <a href="http://www.lcg.ufrj.br">Computer Graphics Lab</a> at <a href="http://www.ufrj.br">UFRJ</a>.</p>
 <p><a class="el" href="namespaceTucano.html">Tucano</a> was initially developed by:</p>
 <ul>
 <li><a href="http://www.lcg.ufrj.br/Members/ricardo">Ricardo Marroquim</a></li>
@@ -162,7 +160,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Dec 5 2014 13:42:15 for Tucano by
+    <li class="footer">Generated on Fri Jan 16 2015 12:12:02 for Tucano by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

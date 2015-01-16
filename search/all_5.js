@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['face_5fcb',['face_cb',['../namespaceTucano_1_1MeshImporter.html#a8c29681ba5011243670d2b60b38a0679',1,'Tucano::MeshImporter']]],
   ['far_5fplane',['far_plane',['../classTucano_1_1Camera.html#a9b8b56979ef89a5118479af0b1c5c18a',1,'Tucano::Camera']]],
   ['fbo',['fbo',['../classEffects_1_1BlurredNormalMap.html#a0a5a1a598821bec3780bdf1a0f62e685',1,'Effects::BlurredNormalMap::fbo()'],['../classComputeShaderTest.html#a3097b2889e54bb607da55e3e7b728028',1,'ComputeShaderTest::fbo()'],['../classEffects_1_1SSAO.html#a7a08cc01c547398c2f285626622ed438',1,'Effects::SSAO::fbo()']]],
   ['fbo_5fid',['fbo_id',['../classTucano_1_1Framebuffer.html#ae48c5780618d1d3dd31ecb82a55f239f',1,'Tucano::Framebuffer']]],
@@ -12,6 +13,7 @@ var searchData=
   ['focal_5flength',['focal_length',['../classTucano_1_1Camera.html#af88f9ee99c5c9e7293210157af0bf819',1,'Tucano::Camera']]],
   ['format',['format',['../classTucano_1_1Framebuffer.html#ae763375c73e3d64ec4be293c71be6590',1,'Tucano::Framebuffer::format()'],['../classTucano_1_1Texture.html#a1f9e6ddbe203a7924b3eacb94411ed6b',1,'Tucano::Texture::format()']]],
   ['fovy',['fovy',['../classTucano_1_1Camera.html#a2374468e6f6985a80bf3946900e655d9',1,'Tucano::Camera']]],
+  ['fp',['fp',['../structt__ply__.html#a0637e03cf8c826220eac2865e1c13cd4',1,'t_ply_']]],
   ['fragmentshader',['fragmentShader',['../classTucano_1_1Shader.html#a975fb1639bd33294c02a3dea8d2fa9f8',1,'Tucano::Shader']]],
   ['fragmentshaderpath',['fragmentShaderPath',['../classTucano_1_1Shader.html#a6532bfbdc86f24e1cda07a7d3d532768',1,'Tucano::Shader']]],
   ['framebuffer',['Framebuffer',['../classTucano_1_1Framebuffer.html#a236f5e505e4f348461706fe6a2caa197',1,'Tucano::Framebuffer::Framebuffer(int w, int h, int num_buffers=1, GLenum textype=GL_TEXTURE_2D, GLenum int_frm=GL_RGBA32F, GLenum frm=GL_RGBA, GLenum pix_type=GL_UNSIGNED_BYTE)'],['../classTucano_1_1Framebuffer.html#afa206205579195f2abbaaa4db701c41d',1,'Tucano::Framebuffer::Framebuffer(void)']]],

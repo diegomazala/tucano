@@ -8,5 +8,6 @@ var dir_313caf1132e152dd9b58bea13a4052ca =
     ] ],
     [ "qttrackballwidget.hpp", "qttrackballwidget_8hpp.html", [
       [ "QtTrackballWidget", "classTucano_1_1QtTrackballWidget.html", "classTucano_1_1QtTrackballWidget" ]
-    ] ]
+    ] ],
+    [ "rply.hpp", "rply_8hpp.html", "rply_8hpp" ]
 ];
