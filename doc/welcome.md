@@ -51,8 +51,7 @@ No need to compile Tucano, just include *tucano.hpp* in your project and be happ
 
 Tucano comes with several examples and an Effects Collection.
 
-Check out the [Samples](@ref examples) page for the examples.
-Check out the [Effects](@ref effects) Collection.
+Check out the [Samples](@ref examples) page for the examples and the [Effects](@ref effects) Collection.
 
 ## Development Notice
 

@@ -28,14 +28,14 @@ The binaries are placed in the **bin** folder in your base **tucano** directory.
 
 To compile the examples with cmake, first make sure you have a recent version of it (2.8.12+) installed on your system.
 
-Now, create a `build` directory inside the tucano directory, cd into it, then run cmake in the standard way:
+Then create a `build` directory inside the tucano directory, cd into it, then run cmake in the standard way:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd tucano/ # top-level directory of tucano
-mkdir build/
+cd tucano/    # top-level directory of tucano
+mkdir build/  # build directory
 cd build/
 cmake ..
 make
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This will compile all tucano examples at once. They will be located under the `bin/` folder, inside the tucano top-level directory.
+This will compile all tucano examples at once, placing them under the `bin/` folder, inside the tucano top-level directory.
