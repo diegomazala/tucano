@@ -8,13 +8,12 @@ url="https://github.com/LCG-UFRJ/${pkgname}"
 license=('GPL')
 depends=('eigen' 'glew')
 makedepends=('cmake')
-optdepends=()
 source=("git+https://github.com/LCG-UFRJ/${pkgname}.git")
 md5sums=('SKIP')
 
 build() {
   cd "$srcdir/$pkgname"
-  mkdir build/ && cd $_
+  mkdir build && cd build
   cmake -DSAMPLES=OFF -DDOC=OFF ..
 }
 
