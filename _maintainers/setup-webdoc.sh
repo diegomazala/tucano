@@ -1,5 +1,5 @@
 #!/bin/sh
-# Automatically setup the documentation folder, so you can run `make webdoc` later.
+# Automatically setup the documentation directory, so you can run `make webdoc` later on.
 
 msg() {
   echo "--> $*"
