@@ -71,8 +71,7 @@ set(
   ${TUCANO_SRC_DIR}/utils/plyimporter.hpp
   ${TUCANO_SRC_DIR}/utils/qtplainwidget.hpp
   ${TUCANO_SRC_DIR}/utils/qttrackballwidget.hpp
-  ${TUCANO_SRC_DIR}/utils/rply/rply.c
-  ${TUCANO_SRC_DIR}/utils/rply/rply.h
+  ${TUCANO_SRC_DIR}/utils/rply.hpp
   )
 
 add_library(

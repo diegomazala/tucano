@@ -24,7 +24,7 @@
 #define __PLYIMPORTER__
 
 #include <mesh.hpp>
-#include "rply/rply.h"
+#include <utils/rply.hpp>
 
 using namespace std;
 
@@ -90,6 +90,38 @@ static int vertex_cb( p_ply_argument argument )
 }
 
 
+static int face_cb( p_ply_argument argument )
+{
+    long length, value_index;
+    void* data;
+
+    ply_get_argument_property(argument, &data, &length, &value_index);
+    ply_get_argument_user_data( argument, &data, &value_index );
+
+    vector<uint>* vec = static_cast< vector<uint>*  >(data);
+
+    uint ind = ply_get_argument_value(argument);
+    vec->push_back(ind);
+
+    cout << ind << " " << value_index << endl;
+
+//    switch (value_index) {
+//        case 0:
+//        case 1:
+//            uint ind = ply_get_argument_value(argument);
+//            printf("%g ", ply_get_argument_value(argument));
+//            break;
+//        case 2:
+//            uint ind = ply_get_argument_value(argument);
+//            printf("%g\n", ply_get_argument_value(argument));
+//            vec->push_back(ind);
+//            break;
+//        default:
+//            break;
+//    }
+    return 1;
+}
+
 /**
  * @brief Loads a mesh from an PLY file.
  *
@@ -111,22 +143,26 @@ static bool loadPlyFile (Mesh *mesh, string filename)
     vector<Eigen::Vector4f> color;
     std::vector<uint> indices;
 
-//	long nvertices, ncolors, nnormals;
+    long nvertices, ncolors, nnormals, ntriangles;
 
-//	nvertices = ply_set_read_cb( ply, "vertex", "x", vertex_cb, ( void* )&vert, 0 );
-    ply_set_read_cb( ply, "vertex", "x", vertex_cb, ( void* )&vertices, 0 );
+    nvertices = ply_set_read_cb( ply, "vertex", "x", vertex_cb, ( void* )&vertices, 0 );
+//    ply_set_read_cb( ply, "vertex", "x", vertex_cb, ( void* )&vertices, 0 );
     ply_set_read_cb( ply, "vertex", "y", vertex_cb, ( void* )&vertices, 1 );
     ply_set_read_cb( ply, "vertex", "z", vertex_cb, ( void* )&vertices, 2 );
 
-//	ncolors = ply_set_read_cb( ply, "vertex", "red", vertex_cb, ( void* )&color, 0 );
-    ply_set_read_cb( ply, "vertex", "red", vertex_cb, ( void* )&color, 0 );
+    ncolors = ply_set_read_cb( ply, "vertex", "red", vertex_cb, ( void* )&color, 0 );
+//    ply_set_read_cb( ply, "vertex", "red", vertex_cb, ( void* )&color, 0 );
     ply_set_read_cb( ply, "vertex", "green", vertex_cb, ( void* )&color, 1 );
     ply_set_read_cb( ply, "vertex", "blue", vertex_cb, ( void* )&color, 2 );
 
-//	nnormals = ply_set_read_cb( ply, "vertex", "nx", normal_cb, ( void* )&norm, 0 );
+    nnormals = ply_set_read_cb( ply, "vertex", "nx", normal_cb, ( void* )&norm, 0 );
+//    ply_set_read_cb( ply, "vertex", "ny", normal_cb, ( void* )&norm, 1 );
     ply_set_read_cb( ply, "vertex", "nx", normal_cb, ( void* )&norm, 0 );
-    ply_set_read_cb( ply, "vertex", "ny", normal_cb, ( void* )&norm, 1 );
     ply_set_read_cb( ply, "vertex", "nz", normal_cb, ( void* )&norm, 2 );
+
+    ntriangles = ply_set_read_cb(ply, "face", "vertex_indices", face_cb, &indices, 0);
+
+    cout << nvertices << " " << ncolors << " " << nnormals << " " << ntriangles << endl;
 
     if( !ply_read( ply ) )
         return false;
@@ -174,7 +210,6 @@ static bool loadPlyFile (Mesh *mesh, string filename)
     {
         indices.push_back(i);
     }
-
 
     // load attributes found in file
     if (vertices.size() > 0)

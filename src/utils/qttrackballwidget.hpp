@@ -26,7 +26,7 @@
 #include <GL/glew.h>
 
 #include "objimporter.hpp"
-//#include "plyimporter.hpp"
+#include "plyimporter.hpp"
 
 #include <tucano.hpp>
 
@@ -143,7 +143,7 @@ public:
         if (mesh)
             delete mesh;
         mesh = new Mesh();
-        MeshImporter::loadObjFile(mesh, filename);
+        MeshImporter::loadPlyFile(mesh, filename);
         //ShaderLib::MeshImporter::loadPlyFile(mesh, filename);
         mesh->normalizeModelMatrix();
     }
@@ -158,7 +158,7 @@ protected:
     {
         if (event->key() == Qt::Key_O)
         {
-            QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("OBJ Files (*.obj)"));
+            QString filename = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Mesh Files (*.obj *.ply)"));
             if (!filename.isEmpty())
             {
                 openMesh (filename.toStdString());

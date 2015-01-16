@@ -23,7 +23,7 @@ void GLWidget::initialize (void)
 
     // initialize the widget, camera and light trackball, and opens default mesh
     Tucano::QtTrackballWidget::initialize();
-    Tucano::QtTrackballWidget::openMesh("../samples/models/toy.obj");
+    Tucano::QtTrackballWidget::openMesh("../samples/models/toy.ply");
 }
 
 void GLWidget::paintGL (void)

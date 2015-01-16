@@ -13,7 +13,7 @@ TEMPLATE = app
 
 EIGEN_PATH  =  /usr/include/eigen3
 
-TUCANO_PATH = ../../
+TUCANO_PATH = $$PWD/../../
 
 BUILDDIR = $$TUCANO_PATH/build/samples/phongViewer/
 
