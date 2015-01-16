@@ -27,7 +27,7 @@
 
 #include <QGLWidget>
 #include <QMouseEvent>
-#include<iostream>
+#include <iostream>
 
 #include <tucano.hpp>
 

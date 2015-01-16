@@ -23,7 +23,7 @@
 #ifndef __TEXTURE__
 #define __TEXTURE__
 
-#include <texturemanager.hpp>
+#include "texturemanager.hpp"
 #include <iostream>
 #include <GL/glew.h>
 

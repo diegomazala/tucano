@@ -1,7 +1,7 @@
 #ifndef __MODEL__
 #define __MODEL__
 
-#include <utils/misc.hpp>
+#include "utils/misc.hpp"
 
 #include <vector>
 #include <fstream>

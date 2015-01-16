@@ -23,8 +23,8 @@
 #ifndef __FRAMEBUFFER__
 #define __FRAMEBUFFER__
 
-#include <shader.hpp>
-#include <texture.hpp>
+#include "shader.hpp"
+#include "texture.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>

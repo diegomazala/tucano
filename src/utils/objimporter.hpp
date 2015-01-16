@@ -23,7 +23,7 @@
 #ifndef __OBJIMPORTER__
 #define __OBJIMPORTER__
 
-#include "mesh.hpp"
+#include <mesh.hpp>
 
 using namespace std;
 

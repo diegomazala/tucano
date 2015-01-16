@@ -25,7 +25,7 @@
 
 #include <Eigen/Dense>
 #include <vector>
-#include <shader.hpp>
+#include "shader.hpp"
 
 namespace Tucano
 {

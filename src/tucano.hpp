@@ -20,9 +20,9 @@
  * along with Tucano Library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <effect.hpp>
-#include <trackball.hpp>
-#include <bufferobject.hpp>
-#include <framebuffer.hpp>
-#include <mesh.hpp>
+#include "effect.hpp"
+#include "trackball.hpp"
+#include "bufferobject.hpp"
+#include "framebuffer.hpp"
+#include "mesh.hpp"
 

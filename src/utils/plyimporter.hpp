@@ -24,7 +24,7 @@
 #define __PLYIMPORTER__
 
 #include <mesh.hpp>
-#include <utils/rply/rply.h>
+#include "rply/rply.h"
 
 using namespace std;
 

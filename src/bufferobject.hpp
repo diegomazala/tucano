@@ -23,8 +23,8 @@
 #ifndef __BUFFEROBJECT__
 #define __BUFFEROBJECT__
 
-#include <shader.hpp>
-#include <texture.hpp>
+#include "shader.hpp"
+#include "texture.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>

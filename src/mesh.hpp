@@ -23,8 +23,8 @@
 #ifndef __MESH__
 #define __MESH__
 
-#include <model.hpp>
-#include <shader.hpp>
+#include "model.hpp"
+#include "shader.hpp"
 
 using namespace std;
 

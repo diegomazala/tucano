@@ -23,8 +23,8 @@
 #ifndef __SSAO__
 #define __SSAO__
 
-#include "tucano.hpp"
-#include <math.h>
+#include <tucano.hpp>
+#include <cmath>
 
 using namespace std;
 
