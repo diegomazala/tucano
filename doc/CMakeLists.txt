@@ -1,7 +1,7 @@
 find_package(Doxygen QUIET)
 if (DOXYGEN_FOUND)
   add_custom_target(
-    localdoc
+    doc
     ${DOXYGEN_EXECUTABLE}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Generating ${PROJECT_NAME} local documentation with Doxygen"
