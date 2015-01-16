@@ -61,16 +61,43 @@ static int normal_cb( p_ply_argument argument )
     return 1;
 }
 
-static int vertex_cb( p_ply_argument argument )
+static int color_cb( p_ply_argument argument )
 {
-    static Eigen::Vector4f v;
+    static Eigen::Vector4f c;
 
     void* data;
     long coord;
 
     ply_get_argument_user_data( argument, &data, &coord );
 
-    vector<Eigen::Vector4f>* vec = static_cast< vector<Eigen::Vector4f>* >( data );
+    float channel = ply_get_argument_value( argument );
+    if (channel > 1.0)
+        channel /= 255.0;
+
+    switch( coord )
+    {
+        case 0:
+        case 1:
+            c[coord] = channel;
+            break;
+
+        case 2:
+            c[2] = channel;
+            c[3] = 1.0;
+            (static_cast< vector<Eigen::Vector4f>* >( data ))->push_back( c );
+            break;
+    }
+
+    return 1;
+}
+
+static int vertex_cb( p_ply_argument argument )
+{
+    static Eigen::Vector4f v;
+    void* data;
+    long coord;
+
+    ply_get_argument_user_data( argument, &data, &coord );
 
     switch( coord )
     {
@@ -82,7 +109,7 @@ static int vertex_cb( p_ply_argument argument )
         case 2:
             v[2] = ply_get_argument_value( argument );
             v[3] = 1.0;
-            vec->push_back( v );
+            (static_cast< vector<Eigen::Vector4f>* >( data ))->push_back( v );
             break;
     }
 
@@ -92,33 +119,19 @@ static int vertex_cb( p_ply_argument argument )
 
 static int face_cb( p_ply_argument argument )
 {
-    long length, value_index;
+    long value_index;
     void* data;
 
-    ply_get_argument_property(argument, &data, &length, &value_index);
-    ply_get_argument_user_data( argument, &data, &value_index );
+    // 3rd parameter is the list length, which is always 3 for triangle meshes
+    // if necessary it can be retrieved passing a reference to a long var
+    ply_get_argument_property( argument, NULL, NULL, &value_index);
+    ply_get_argument_user_data( argument, &data, NULL );
 
-    vector<uint>* vec = static_cast< vector<uint>*  >(data);
+    if (value_index >= 0 && value_index < 3)
+    {
+        (static_cast< vector<uint>* >(data))->push_back(ply_get_argument_value(argument));
+    }
 
-    uint ind = ply_get_argument_value(argument);
-    vec->push_back(ind);
-
-    cout << ind << " " << value_index << endl;
-
-//    switch (value_index) {
-//        case 0:
-//        case 1:
-//            uint ind = ply_get_argument_value(argument);
-//            printf("%g ", ply_get_argument_value(argument));
-//            break;
-//        case 2:
-//            uint ind = ply_get_argument_value(argument);
-//            printf("%g\n", ply_get_argument_value(argument));
-//            vec->push_back(ind);
-//            break;
-//        default:
-//            break;
-//    }
     return 1;
 }
 
@@ -143,73 +156,40 @@ static bool loadPlyFile (Mesh *mesh, string filename)
     vector<Eigen::Vector4f> color;
     std::vector<uint> indices;
 
-    long nvertices, ncolors, nnormals, ntriangles;
+//    long nvertices, ncolors, nnormals, ntriangles;
 
-    nvertices = ply_set_read_cb( ply, "vertex", "x", vertex_cb, ( void* )&vertices, 0 );
-//    ply_set_read_cb( ply, "vertex", "x", vertex_cb, ( void* )&vertices, 0 );
+//    nvertices = ply_set_read_cb( ply, "vertex", "x", vertex_cb, ( void* )&vertices, 0 );
+    ply_set_read_cb( ply, "vertex", "x", vertex_cb, ( void* )&vertices, 0 );
     ply_set_read_cb( ply, "vertex", "y", vertex_cb, ( void* )&vertices, 1 );
     ply_set_read_cb( ply, "vertex", "z", vertex_cb, ( void* )&vertices, 2 );
 
-    ncolors = ply_set_read_cb( ply, "vertex", "red", vertex_cb, ( void* )&color, 0 );
-//    ply_set_read_cb( ply, "vertex", "red", vertex_cb, ( void* )&color, 0 );
-    ply_set_read_cb( ply, "vertex", "green", vertex_cb, ( void* )&color, 1 );
-    ply_set_read_cb( ply, "vertex", "blue", vertex_cb, ( void* )&color, 2 );
+//    ncolors = ply_set_read_cb( ply, "vertex", "red", vertex_cb, ( void* )&color, 0 );
+    ply_set_read_cb( ply, "vertex", "red", color_cb, ( void* )&color, 0 );
+    ply_set_read_cb( ply, "vertex", "green", color_cb, ( void* )&color, 1 );
+    ply_set_read_cb( ply, "vertex", "blue", color_cb, ( void* )&color, 2 );
 
-    nnormals = ply_set_read_cb( ply, "vertex", "nx", normal_cb, ( void* )&norm, 0 );
-//    ply_set_read_cb( ply, "vertex", "ny", normal_cb, ( void* )&norm, 1 );
+//    nnormals = ply_set_read_cb( ply, "vertex", "nx", normal_cb, ( void* )&norm, 0 );
+    ply_set_read_cb( ply, "vertex", "ny", normal_cb, ( void* )&norm, 1 );
     ply_set_read_cb( ply, "vertex", "nx", normal_cb, ( void* )&norm, 0 );
     ply_set_read_cb( ply, "vertex", "nz", normal_cb, ( void* )&norm, 2 );
 
-    ntriangles = ply_set_read_cb(ply, "face", "vertex_indices", face_cb, &indices, 0);
+//    ntriangles = ply_set_read_cb(ply, "face", "vertex_indices", face_cb, &indices, 0);
+    ply_set_read_cb(ply, "face", "vertex_indices", face_cb, &indices, 0);
 
-    cout << nvertices << " " << ncolors << " " << nnormals << " " << ntriangles << endl;
+//    cout << nvertices << " " << ncolors << " " << nnormals << " " << ntriangles << endl << endl;
 
     if( !ply_read( ply ) )
+    {
         return false;
+    }
 
     ply_close( ply );
 
-    if( color.size() > 0 )
-    {
-        float max = 1.0f;
-
-        for( unsigned int i = 0; i < color.size(); i++ )
-        {
-            if( color[i][0] > max )
-            {
-                max = color[i][0];
-                break;
-            }
-        }
-
-        if( max > 1.0f )
-        {
-            for( unsigned int i = 0; i < color.size(); i++ )
-            {
-                color[i][0] = color[i][0] / 256.0f;
-                color[i][1] = color[i][1] / 256.0f;
-                color[i][2] = color[i][2] / 256.0f;
-                color[i][3] = color[i][3];
-            }
-        }
-    }
-    else
-    {
-        color.resize( vertices.size() );
-
-        for( unsigned int i = 0; i < color.size(); i++ )
-        {
-            color[i][0] = 1.0f;
-            color[i][1] = 1.0f;
-            color[i][2] = 1.0f;
-            color[i][3] = 1.0f;
-        }
-    }
-
-    for( unsigned int i = 0; i < vertices.size(); ++i )
-    {
-        indices.push_back(i);
-    }
+    cout << "vertices : " << vertices.size() << endl;
+    cout << "normals : " << norm.size() << endl;
+    cout << "color : " << color.size() << endl;
+    cout << "texcoords : " << texCoord.size() << endl;
+    cout << "indices : " << indices.size() << endl;
 
     // load attributes found in file
     if (vertices.size() > 0)
