@@ -22,7 +22,6 @@
 
 #ifndef __CAMERA__
 #define __CAMERA__
-#define PI 3.14159265358979323846
 
 #include "shader.hpp"
 #include <Eigen/Dense>
@@ -256,7 +255,7 @@ public:
      */
     float getPerspectiveScale (void)
     {
-        return (float)1.0f/tan((fovy/2.0f)*(PI/180.0f));
+        return (float)1.0f/tan((fovy/2.0f)*(M_PI/180.0f));
     }
 
     /**
@@ -412,7 +411,7 @@ public:
         Eigen::Matrix4f out = Eigen::Matrix4f::Zero();
 
         const float
-                y_scale = (float)1.0/tan((fy/2.0)*(PI/180.0)),
+                y_scale = (float)1.0/tan((fy/2.0)*(M_PI/180.0)),
                 x_scale = y_scale / in_aspect_ratio,
                 frustum_length = in_far_plane - in_near_plane;
 
@@ -607,7 +606,7 @@ public:
 
         //X:
         Eigen::Vector4f colorVector(1.0, 0.0, 0.0, 1.0);
-        cameraShader->setUniform("modelMatrix",(Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(PI/2.0,Eigen::Vector3f(0.0,1.0,0.0))).data(), 4, GL_FALSE, 1);
+        cameraShader->setUniform("modelMatrix",(Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(M_PI/2.0,Eigen::Vector3f(0.0,1.0,0.0))).data(), 4, GL_FALSE, 1);
         cameraShader->setUniform("in_Color",colorVector.data(),4,1);
         glDrawArrays(GL_LINE_LOOP, 0, 200);
         Misc::errorCheckFunc(__FILE__, __LINE__);
