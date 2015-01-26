@@ -1,5 +1,13 @@
 #include "GLFW/glfw3.h"
 #include <iostream>
+#include <tucano.hpp>
+
+void initialize ( void )
+{
+	
+}
+
+
 
 int main(int argc, char *argv[])
 {
