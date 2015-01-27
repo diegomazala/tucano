@@ -32,7 +32,6 @@ add_executable(
 target_link_libraries(
   flyscene 
   ${GLEW_LIBRARIES}
-  glfw
   ${GLFW_LIBRARIES}
   ${OPENGL_LIBRARIES}
   )

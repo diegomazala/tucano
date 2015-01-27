@@ -1,33 +1,41 @@
-#include "GLFW/glfw3.h"
 #include <iostream>
 #include <tucano.hpp>
+#include <flyscene.hpp>
+#include "GLFW/glfw3.h"
 
-void initialize ( void )
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+
+Flyscene *flyscene;
+
+void initialize (void)
 {
-	
+	Misc::initGlew();
+	flyscene = new Flyscene();	
 }
-
 
 
 int main(int argc, char *argv[])
 {
-
 	GLFWwindow* window;
 
-	if (!glfwInit())
+	if (!glfwInit()) 
+	{
+    	std::cerr << "Failed to init glfw" << std::endl;
 		return 1;
+	}
 
-	window = glfwCreateWindow(640, 480, "TUCANO :: Flythrough Camera", NULL, NULL);
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "TUCANO :: Flythrough Camera", NULL, NULL);
 	if (!window)
 	{
-		std::cerr << "Failed to create GLFW window";
+		std::cerr << "Failed to create the GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
 
 	glfwMakeContextCurrent(window);
 
-	while (!glfwWindowShouldClose (window) )
+	while (!glfwWindowShouldClose(window))
 	{
 		// render here
 

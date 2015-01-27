@@ -73,7 +73,7 @@ public:
      * @param cameraTrackball Given camera trackball
      * @param lightTrackball Given light trackball
      */
-    virtual void render (Tucano::Mesh* mesh = NULL, Tucano::Trackball* cameraTrackball = NULL, Tucano::Trackball* lightTrackball = NULL)
+    virtual void render (Tucano::Mesh* mesh = NULL, Tucano::Camera* cameraTrackball = NULL, Tucano::Camera* lightTrackball = NULL)
     {
 
         Eigen::Vector4f viewport = cameraTrackball->getViewport();

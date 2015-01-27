@@ -53,7 +53,6 @@ public:
     void reset (void)
     {
         Camera::reset();
-        updateViewMatrix();
     }
 
     ///Default destructor.
