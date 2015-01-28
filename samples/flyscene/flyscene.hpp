@@ -6,7 +6,7 @@
 #include <phongshader.hpp>
 #include <utils/flycamera.hpp>
 #include <mesh.hpp>
-#include <utils/plyimporter.hpp>
+#include <utils/objimporter.hpp>
 
 using namespace std;
 
@@ -15,7 +15,7 @@ class Flyscene
 
 public:
 
-    explicit Flyscene(QWidget *parent);
+    explicit Flyscene(void);
     ~Flyscene();
     
     /**
@@ -30,6 +30,15 @@ public:
      **/
     virtual void paintGL();
 
+
+	/**
+	* Returns the pointer to the flycamera instance
+	* @return pointer to flycamera
+	**/
+	Flycamera* getCamera(void)
+	{
+		return flycamera;
+	}
 
 private:
 

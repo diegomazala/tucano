@@ -1,6 +1,6 @@
 #include "flyscene.hpp"
 
-Flyscene::Flyscene(QWidget *parent) : Tucano::QtTrackballWidget(parent)
+Flyscene::Flyscene(void)
 {
     phong = 0;
 	flycamera = 0;
@@ -10,23 +10,29 @@ Flyscene::Flyscene(QWidget *parent) : Tucano::QtTrackballWidget(parent)
 Flyscene::~Flyscene()
 {
     if (phong)
-    {
         delete phong;
-    }
+	if (flycamera)
+		delete flycamera;
+	if (light)
+		delete light;
 }
 
-void Flyscene::initialize (void)
+void Flyscene::initialize (int width, int height)
 {
     // initialize the shader effect
     phong = new Effects::Phong();
     phong->setShadersDir("../effects/shaders/");
     phong->initialize();
 
+	flycamera = new Flycamera();
+	flycamera->setPerspectiveMatrix(60.0, width/(float)height, 0.1f, 100.0f);
+	flycamera->setViewport(Eigen::Vector2f ((float)width, (float)height));
 
+	light = new Camera();
 
-    // initialize the widget, camera and light trackball, and opens default mesh
-    Tucano::QtTrackballWidget::initialize();
-    Tucano::QtTrackballWidget::openMesh("../samples/models/toy.ply");
+	mesh = new Mesh();
+	MeshImporter::loadObjFile(mesh, "../samples/models/toy.obj");
+	mesh->normalizeModelMatrix();
 }
 
 void Flyscene::paintGL (void)

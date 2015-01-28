@@ -74,21 +74,64 @@ public:
      */
     Flycamera ()
     {
-
-        speed = 1.0;
-
+        speed = 0.1;
         initOpenGLMatrices();
     }
 
     /**
-     * @brief Translates the view matrix by a given vector trans.
-     * @param translation Given translation vector.
+     * @brief Translates the view matrix to the left.
      */
     void strideLeft ( void )
     {
-		Eigen::Vector3f dir = viewMatrix * Eigen::Vector3f(-1.0, 0.0, 0.0);
+		Eigen::Vector3f dir = Eigen::Vector3f(speed, 0.0, 0.0);
         translate(dir);
     }
+
+    /**
+     * @brief Translates the view matrix to the right.
+     */
+    void strideRight ( void )
+    {
+		Eigen::Vector3f dir = Eigen::Vector3f(-speed, 0.0, 0.0);
+        translate(dir);
+    }
+
+    /**
+     * @brief Translates the view matrix back.
+     */
+    void moveBack ( void )
+    {
+		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, -speed);
+        translate(dir);
+    }
+
+    /**
+     * @brief Translates the view matrix forward.
+     */
+    void moveForward ( void )
+    {
+		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, speed);
+        translate(dir);
+    }
+
+    /**
+     * @brief Translates the view matrix down.
+     */
+    void moveDown ( void )
+    {
+		Eigen::Vector3f dir = Eigen::Vector3f(0.0, speed, 0.0);
+        translate(dir);
+    }
+
+    /**
+     * @brief Translates the view matrix up.
+     */
+    void moveUp ( void )
+    {
+		Eigen::Vector3f dir = Eigen::Vector3f(0.0, -speed, 0.0);
+        translate(dir);
+    }
+
 
 };
 
