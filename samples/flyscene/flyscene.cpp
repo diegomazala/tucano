@@ -40,6 +40,7 @@ void Flyscene::paintGL (void)
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+	flycamera->updateViewMatrix();
     if (phong && mesh)
     {
         phong->render(mesh, flycamera, light);

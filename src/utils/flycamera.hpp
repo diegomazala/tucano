@@ -45,6 +45,15 @@ private:
     /// Global movement speed
     float speed;
 
+	/// Current mouse position
+	Eigen::Vector2f start_mouse_pos;
+	
+	/// Camera rotation (view direction)
+	Eigen::Matrix3f rotationMatrix;
+
+	/// Camera position
+	Eigen::Vector3f translationVector;
+
 public:
 
     /**
@@ -53,6 +62,9 @@ public:
     void reset (void)
     {
         Camera::reset();
+		start_mouse_pos = Eigen::Vector2f::Zero();
+		translationVector = Eigen::Vector3f::Zero();
+		rotationMatrix = Eigen::Matrix3f::Identity();
     }
 
     ///Default destructor.
@@ -78,13 +90,23 @@ public:
         initOpenGLMatrices();
     }
 
+	/**
+	 * @brief Compose rotation and translation
+	 */
+	void updateViewMatrix()
+	{
+		resetViewMatrix();
+		viewMatrix.rotate(rotationMatrix);	
+		viewMatrix.translate(translationVector);
+	}	
+
     /**
      * @brief Translates the view matrix to the left.
      */
     void strideLeft ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(speed, 0.0, 0.0);
-        translate(dir);
+		translationVector += dir;
     }
 
     /**
@@ -93,7 +115,7 @@ public:
     void strideRight ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(-speed, 0.0, 0.0);
-        translate(dir);
+		translationVector += dir;
     }
 
     /**
@@ -102,7 +124,7 @@ public:
     void moveBack ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, -speed);
-        translate(dir);
+		translationVector += dir;
     }
 
     /**
@@ -111,7 +133,7 @@ public:
     void moveForward ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, speed);
-        translate(dir);
+		translationVector += dir;
     }
 
     /**
@@ -120,7 +142,8 @@ public:
     void moveDown ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, speed, 0.0);
-        translate(dir);
+		translationVector += dir;
+
     }
 
     /**
@@ -129,9 +152,44 @@ public:
     void moveUp ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, -speed, 0.0);
-        translate(dir);
+    	translationVector += dir;
+	}
+
+    /**
+    * @brief Nomalizes a screen position to range [-1,1].
+    * @param pos Screen position
+    * @return Returns position in normalized coordinates.
+    */
+    Eigen::Vector2f normalizePosition (const Eigen::Vector2f& pos)
+    {
+        return Eigen::Vector2f ((pos[0]/((viewport[2]-viewport[0])/2.0)) - 1.0,
+                                1.0 - (pos[1]/((viewport[3] - viewport[1])/2.0)));
     }
 
+
+	/**
+	 * @brief Begin view direction rotation
+	 * @param pos Mouse coordinates
+	 **/
+	void startRotation ( Eigen::Vector2f pos )
+	{
+//		start_mouse_pos = normalizePosition ( pos );
+	}	
+
+	/**
+	 * @brief Rotates the camera view direction
+	 * @param new_pos New mouse position
+	 */
+	void rotate ( Eigen::Vector2f new_mouse_pos )
+	{
+		Eigen::Vector2f new_position = normalizePosition(new_mouse_pos);
+		Eigen::Vector2f dir2d = new_position - start_mouse_pos;
+		Eigen::Vector3f dir3d (dir2d[0], dir2d[1], sqrt(1.0 - (dir2d[0]*dir2d[0] + dir2d[1]*dir2d[1])));
+		float anglex = dir2d[0]*M_PI;
+		float angley = dir2d[1]*M_PI;
+	
+		rotationMatrix = Eigen::AngleAxisf(angley, Eigen::Vector3f::UnitX()) * Eigen::AngleAxisf(anglex, Eigen::Vector3f::UnitY());
+	}
 
 };
 

@@ -412,7 +412,7 @@ public:
     * @param pos Screen position
     * @return Returns position in normalized coordinates.
     */
-    Eigen::Vector2f nomalizePosition (const Eigen::Vector2f& pos)
+    Eigen::Vector2f normalizePosition (const Eigen::Vector2f& pos)
     {
         return Eigen::Vector2f ((pos[0]/((viewport[2]-viewport[0])/2.0)) - 1.0,
                                 1.0 - (pos[1]/((viewport[3] - viewport[1])/2.0)));
@@ -424,7 +424,7 @@ public:
      */
     void rotateCamera (const Eigen::Vector2f& pos)
     {
-        Eigen::Vector3f normalized_pos = computeSpherePosition(nomalizePosition(pos));
+        Eigen::Vector3f normalized_pos = computeSpherePosition(normalizePosition(pos));
 
         if (!rotating)
         {
@@ -446,7 +446,7 @@ public:
      */
     void translateCamera (const Eigen::Vector2f& pos)
     {
-        Eigen::Vector2f normalized_pos = nomalizePosition(pos);
+        Eigen::Vector2f normalized_pos = normalizePosition(pos);
         if (!translating)
         {
             translating = true;
