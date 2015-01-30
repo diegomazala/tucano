@@ -5,7 +5,7 @@ project(${PROJECT_NAME} C CXX)
 set(FLYSCENE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(TUCANO_DIR "../../src/")
 set(TUCANO_EFFECTS_DIR "../../effects/")
-set(TUCANO_BINARY_DIR "../../bin/flyscene/bin")
+set(TUCANO_BINARY_DIR "../../../bin/")
 
 
 find_package(PkgConfig REQUIRED)
@@ -40,6 +40,8 @@ set(
   ${FLYSCENE_DIR}/flyscene.cpp
   )
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TUCANO_BINARY_DIR})
+
 add_executable(
   flyscene
   ${FLYSCENE_SOURCES}
@@ -52,5 +54,4 @@ target_link_libraries(
   ${OPENGL_LIBRARIES}
   )
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TUCANO_BINARY_DIR})
 

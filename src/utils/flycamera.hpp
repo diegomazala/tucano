@@ -23,7 +23,6 @@
 #ifndef __FLYCAMERA__
 #define __FLYCAMERA__
 
-#define PI 3.14159265358979323846
 
 #include "camera.hpp"
 #include <Eigen/Dense>
@@ -49,10 +48,13 @@ private:
 	Eigen::Vector2f start_mouse_pos;
 	
 	/// Camera rotation (view direction)
-	Eigen::Matrix3f rotationMatrix;
+	Eigen::Matrix3f rotation_matrix;
 
 	/// Camera position
-	Eigen::Vector3f translationVector;
+	Eigen::Vector3f translation_vector;
+
+	// Default start translation vector
+	Eigen::Vector3f default_translation;
 
 public:
 
@@ -61,10 +63,10 @@ public:
      */
     void reset (void)
     {
-        Camera::reset();
 		start_mouse_pos = Eigen::Vector2f::Zero();
-		translationVector = Eigen::Vector3f::Zero();
-		rotationMatrix = Eigen::Matrix3f::Identity();
+		translation_vector = Eigen::Vector3f::Zero();
+		rotation_matrix = Eigen::Matrix3f::Identity();
+		default_translation = Eigen::Vector3f (0.0, 0.0, -5.0);
     }
 
     ///Default destructor.
@@ -96,8 +98,9 @@ public:
 	void updateViewMatrix()
 	{
 		resetViewMatrix();
-		viewMatrix.rotate(rotationMatrix);	
-		viewMatrix.translate(translationVector);
+		viewMatrix.rotate(rotation_matrix);
+		viewMatrix.translate(default_translation);	
+		viewMatrix.translate(translation_vector);
 	}	
 
     /**
@@ -106,7 +109,7 @@ public:
     void strideLeft ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(speed, 0.0, 0.0);
-		translationVector += dir;
+		translation_vector += dir;
     }
 
     /**
@@ -115,7 +118,7 @@ public:
     void strideRight ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(-speed, 0.0, 0.0);
-		translationVector += dir;
+		translation_vector += dir;
     }
 
     /**
@@ -124,7 +127,7 @@ public:
     void moveBack ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, -speed);
-		translationVector += dir;
+		translation_vector += dir;
     }
 
     /**
@@ -133,7 +136,7 @@ public:
     void moveForward ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, speed);
-		translationVector += dir;
+		translation_vector += dir;
     }
 
     /**
@@ -142,7 +145,7 @@ public:
     void moveDown ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, speed, 0.0);
-		translationVector += dir;
+		translation_vector += dir;
 
     }
 
@@ -152,7 +155,7 @@ public:
     void moveUp ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, -speed, 0.0);
-    	translationVector += dir;
+    	translation_vector += dir;
 	}
 
     /**
@@ -173,7 +176,7 @@ public:
 	 **/
 	void startRotation ( Eigen::Vector2f pos )
 	{
-//		start_mouse_pos = normalizePosition ( pos );
+		start_mouse_pos = normalizePosition ( pos );
 	}	
 
 	/**
@@ -184,11 +187,15 @@ public:
 	{
 		Eigen::Vector2f new_position = normalizePosition(new_mouse_pos);
 		Eigen::Vector2f dir2d = new_position - start_mouse_pos;
-		Eigen::Vector3f dir3d (dir2d[0], dir2d[1], sqrt(1.0 - (dir2d[0]*dir2d[0] + dir2d[1]*dir2d[1])));
+		
+		start_mouse_pos = new_position;
+
 		float anglex = dir2d[0]*M_PI;
 		float angley = dir2d[1]*M_PI;
 	
-		rotationMatrix = Eigen::AngleAxisf(angley, Eigen::Vector3f::UnitX()) * Eigen::AngleAxisf(anglex, Eigen::Vector3f::UnitY());
+		Eigen::Matrix3f rot = Eigen::Matrix3f::Identity();
+		rot = Eigen::AngleAxisf(angley, Eigen::Vector3f::UnitX()) * Eigen::AngleAxisf(anglex, Eigen::Vector3f::UnitY());
+		rotation_matrix = rotation_matrix * rot;
 	}
 
 };

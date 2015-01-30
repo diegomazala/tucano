@@ -20,6 +20,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, 1);	
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+		flyscene->getCamera()->reset();
 	if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT))
 		flyscene->getCamera()->strideLeft();
 	if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT))
@@ -35,6 +37,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 }
 
+static void mouseButtonCallback (GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		flyscene->getCamera()->startRotation( Eigen::Vector2f (xpos, ypos) );
+	}
+}
 static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
@@ -64,7 +75,7 @@ int main(int argc, char *argv[])
 
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, keyCallback);
-//	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 	glfwSetCursorPosCallback(window, cursorPosCallback);
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, true);
