@@ -56,6 +56,11 @@ private:
 	// Default start translation vector
 	Eigen::Vector3f default_translation;
 
+	/// Rotation angles
+	float rotation_Y_axis;
+	float rotation_X_axis;
+
+
 public:
 
     /**
@@ -98,6 +103,11 @@ public:
 	void updateViewMatrix()
 	{
 		resetViewMatrix();
+
+		Eigen::Matrix3f rot = Eigen::Matrix3f::Identity();
+		rot = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY());
+		rotation_matrix = Eigen::AngleAxisf(rotation_X_axis, rot*Eigen::Vector3f::UnitX()) * rot;
+
 		viewMatrix.rotate(rotation_matrix);
 		viewMatrix.translate(default_translation);	
 		viewMatrix.translate(translation_vector);
@@ -190,12 +200,11 @@ public:
 		
 		start_mouse_pos = new_position;
 
-		float anglex = dir2d[0]*M_PI;
-		float angley = dir2d[1]*M_PI;
+		float anglex = dir2d[1]*M_PI;
+		float angley = dir2d[0]*M_PI;
 	
-		Eigen::Matrix3f rot = Eigen::Matrix3f::Identity();
-		rot = Eigen::AngleAxisf(angley, Eigen::Vector3f::UnitX()) * Eigen::AngleAxisf(anglex, Eigen::Vector3f::UnitY());
-		rotation_matrix = rotation_matrix * rot;
+		rotation_X_axis += anglex;
+		rotation_Y_axis += angley;
 	}
 
 };

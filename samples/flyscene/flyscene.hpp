@@ -50,7 +50,7 @@ private:
 
 	// Light represented as a camera
 	Tucano::Camera *light;
-
+	
 	// A mesh
 	Mesh *mesh;
 };
