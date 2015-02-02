@@ -93,7 +93,7 @@ public:
      */
     Flycamera ()
     {
-        speed = 0.1;
+        speed = 1.1;
         initOpenGLMatrices();
     }
 
@@ -102,7 +102,12 @@ public:
 	 */
 	void updateViewMatrix()
 	{
-//		resetViewMatrix();
+		resetViewMatrix();
+		Eigen::Matrix3f rot = Eigen::Matrix3f::Identity();
+		rotation_matrix = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX());
+
+		viewMatrix.rotate (rotation_matrix);
+		viewMatrix.translate (translation_vector);
 
 	}	
 
@@ -111,9 +116,9 @@ public:
      */
     void strideLeft ( void )
     {
-		Eigen::Vector3f dir = viewMatrix.rotation() * Eigen::Vector3f(1.0, 0.0, 0.0);
-		viewMatrix.translate (dir * speed);
-//		translation_vector -= dir * speed;
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(1.0, 0.0, 0.0);
+//		Eigen::Vector3f dir = viewMatrix.rotation().inverse() * Eigen::Vector3f(1.0, 0.0, 0.0);
+		translation_vector += dir * speed;
     }
 
     /**
@@ -121,9 +126,8 @@ public:
      */
     void strideRight ( void )
     {
-		Eigen::Vector3f dir = viewMatrix.rotation() * Eigen::Vector3f(1.0, 0.0, 0.0);
-		viewMatrix.translate (-dir * speed);
-//		translation_vector += dir * speed;
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(-1.0, 0.0, 0.0);
+		translation_vector += dir * speed;
     }
 
     /**
@@ -131,8 +135,8 @@ public:
      */
     void moveBack ( void )
     {
-		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, -speed);
-		viewMatrix.translate (dir * speed);
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(0.0, 0.0, -1.0);
+		translation_vector += dir * speed;
     }
 
     /**
@@ -140,8 +144,9 @@ public:
      */
     void moveForward ( void )
     {
-		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, speed);
-		translation_vector += dir;
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(0.0, 0.0, 1.0);
+		translation_vector += dir * speed;
+
     }
 
     /**
@@ -149,8 +154,8 @@ public:
      */
     void moveDown ( void )
     {
-		Eigen::Vector3f dir = Eigen::Vector3f(0.0, speed, 0.0);
-		translation_vector += dir;
+		Eigen::Vector3f dir = viewMatrix.rotation().inverse() * Eigen::Vector3f(0.0, speed, 0.0);
+		translation_vector += dir * speed;
 
     }
 
@@ -205,9 +210,9 @@ public:
 		rot = Eigen::AngleAxisf(angley, Eigen::Vector3f::UnitY());
 
 		Eigen::Vector3f t = viewMatrix.translation();
-		viewMatrix.translate (-t);
+		viewMatrix.translation() = Eigen::Vector3f(0,0,0);
 		viewMatrix.rotate (rot);
-		viewMatrix.translate (t);
+		viewMatrix.translation() = rot * t;
 		
 	}
 
