@@ -102,15 +102,8 @@ public:
 	 */
 	void updateViewMatrix()
 	{
-		resetViewMatrix();
+//		resetViewMatrix();
 
-		Eigen::Matrix3f rot = Eigen::Matrix3f::Identity();
-		rot = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY());
-		rotation_matrix = Eigen::AngleAxisf(rotation_X_axis, rot*Eigen::Vector3f::UnitX()) * rot;
-
-		viewMatrix.rotate(rotation_matrix);
-		viewMatrix.translate(default_translation);	
-		viewMatrix.translate(translation_vector);
 	}	
 
     /**
@@ -118,8 +111,9 @@ public:
      */
     void strideLeft ( void )
     {
-		Eigen::Vector3f dir = Eigen::Vector3f(speed, 0.0, 0.0);
-		translation_vector += dir;
+		Eigen::Vector3f dir = viewMatrix.rotation() * Eigen::Vector3f(1.0, 0.0, 0.0);
+		viewMatrix.translate (dir * speed);
+//		translation_vector -= dir * speed;
     }
 
     /**
@@ -127,8 +121,9 @@ public:
      */
     void strideRight ( void )
     {
-		Eigen::Vector3f dir = Eigen::Vector3f(-speed, 0.0, 0.0);
-		translation_vector += dir;
+		Eigen::Vector3f dir = viewMatrix.rotation() * Eigen::Vector3f(1.0, 0.0, 0.0);
+		viewMatrix.translate (-dir * speed);
+//		translation_vector += dir * speed;
     }
 
     /**
@@ -137,7 +132,7 @@ public:
     void moveBack ( void )
     {
 		Eigen::Vector3f dir = Eigen::Vector3f(0.0, 0.0, -speed);
-		translation_vector += dir;
+		viewMatrix.translate (dir * speed);
     }
 
     /**
@@ -205,6 +200,15 @@ public:
 	
 		rotation_X_axis += anglex;
 		rotation_Y_axis += angley;
+
+		Eigen::Matrix3f rot = Eigen::Matrix3f::Identity();
+		rot = Eigen::AngleAxisf(angley, Eigen::Vector3f::UnitY());
+
+		Eigen::Vector3f t = viewMatrix.translation();
+		viewMatrix.translate (-t);
+		viewMatrix.rotate (rot);
+		viewMatrix.translate (t);
+		
 	}
 
 };
