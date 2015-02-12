@@ -31,6 +31,41 @@
 namespace Tucano
 {
 
+
+/// Default fragment shader for rendering trackball representation.
+const string flycamera_fragment_code = "\n"
+        "#version 430\n"
+        "in vec4 ex_Color;\n"
+        "out vec4 out_Color;\n"
+        "in float depth;\n"
+        "void main(void)\n"
+        "{\n"
+        "    out_Color = ex_Color;\n"
+        "    gl_FragDepth = depth;\n"
+        "}\n";
+
+/// Default vertex shader for rendering trackball representation.
+const string flycamera_vertex_code = "\n"
+        "#version 430\n"
+        "layout(location=0) in vec4 in_Position;\n"
+        "out vec4 ex_Color;\n"
+        "out float depth;\n"
+        "uniform mat4 modelMatrix;\n"
+        "uniform mat4 viewMatrix;\n"
+        "uniform mat4 projectionMatrix;\n"
+        "uniform vec4 in_Color;\n"
+        "uniform float nearPlane;\n"
+        "uniform float farPlane;\n"
+        "void main(void)\n"
+        "{\n"
+        "   gl_Position = (viewMatrix * modelMatrix) * in_Position;\n"
+        "   depth = (farPlane+nearPlane)/(farPlane-nearPlane) + ( (2*nearPlane*farPlane)/(farPlane-nearPlane) ) * (1/gl_Position[2]);\n"
+        "   depth = (depth+1.0)/2.0;\n"
+        "   gl_Position = projectionMatrix * gl_Position;\n"
+        "   ex_Color = in_Color;\n"
+        "}\n";
+
+
 /**
  * @brief Flythrough camera class for manipulating a camera.
  *
@@ -56,10 +91,19 @@ private:
 	// Default start translation vector
 	Eigen::Vector3f default_translation;
 
+
 	/// Rotation angles
 	float rotation_Y_axis;
 	float rotation_X_axis;
 
+    /// The vertices for drawing the axis on screen
+    float vertices[8];
+    
+    /// Flycamera shader, used for render the axis
+    Shader* flycamera_shader;
+
+    /// Buffer Objects for drawing axis on screen
+    GLuint * bufferIDs;
 
 public:
 
@@ -72,6 +116,8 @@ public:
 		translation_vector = Eigen::Vector3f::Zero();
 		rotation_matrix = Eigen::Matrix3f::Identity();
 		default_translation = Eigen::Vector3f (0.0, 0.0, -5.0);
+        rotation_X_axis = 0.0;
+        rotation_Y_axis = 0.0;
     }
 
     ///Default destructor.
@@ -93,9 +139,89 @@ public:
      */
     Flycamera ()
     {
-        speed = 0.5;
+        speed = 0.1;
         initOpenGLMatrices();
+
+        vertices[0] = 0.0;
+        vertices[1] = 0.0;
+        vertices[2] = 0.0;
+        vertices[3] = 1.0;
+        vertices[4] = 1.0;
+        vertices[5] = 0.0;
+        vertices[6] = 0.0;
+        vertices[7] = 1.0;
+
+        flycamera_shader = new Shader("flycameraShader");
+
+        bufferIDs = new GLuint[3];
+        glGenVertexArrays(1, &bufferIDs[0]);
+        glGenBuffers(2, &bufferIDs[1]);
+
+        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        flycamera_shader->initializeFromStrings(flycamera_vertex_code, flycamera_fragment_code);
     }
+
+    void bindBuffers (void)
+    {
+        // VAO
+        glBindVertexArray(bufferIDs[0]);
+
+        // VBO
+        glBindBuffer (GL_ARRAY_BUFFER, bufferIDs[1]);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+        glEnableVertexAttribArray(0);
+    }
+
+    void unBindBuffers (void)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER,0);
+        glDisableVertexAttribArray(0);
+    }
+
+    void render (void)
+    {
+        float ratio = (viewport[2] - viewport[0]) / (viewport[3] - viewport[1]);
+        Eigen::Matrix4f repProjectionMatrix = createOrthographicMatrix(-ratio, ratio, -1.0, 1.0, 0.1, 100.0);
+
+        flycamera_shader->bind();
+        Misc::errorCheckFunc(__FILE__, __LINE__);
+    
+        Eigen::Affine3f repViewMatrix = Eigen::Affine3f::Identity();
+
+        repViewMatrix.translate( Eigen::Vector3f(1.0, -0.75, -2.0));
+        repViewMatrix.rotate(rotation_matrix.inverse());
+        repViewMatrix.scale(0.2);
+        
+        flycamera_shader->setUniform("viewMatrix", repViewMatrix);
+        flycamera_shader->setUniform("projectionMatrix", repProjectionMatrix);
+        flycamera_shader->setUniform("nearPlane", near_plane);
+        flycamera_shader->setUniform("farPlane", far_plane);
+
+        bindBuffers();
+        Eigen::Vector4f color (1.0, 0.0, 0.0, 1.0);
+        flycamera_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
+        flycamera_shader->setUniform("in_Color", color);
+        glDrawArrays(GL_LINES, 0, 2);
+
+        color << 0.0, 1.0, 0.0, 1.0;
+        flycamera_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity() * Eigen::AngleAxisf(M_PI*0.5, Eigen::Vector3f::UnitZ()));
+        flycamera_shader->setUniform("in_Color", color);
+        glDrawArrays(GL_LINES, 0, 2);
+
+        color << 0.0, 0.0, 1.0, 1.0;
+        flycamera_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity() * Eigen::AngleAxisf(M_PI*0.5, Eigen::Vector3f::UnitY()));
+        flycamera_shader->setUniform("in_Color", color);
+        glDrawArrays(GL_LINES, 0, 2);
+
+        unbindBuffers();
+        
+        flycamera_shader->unbind();
+        Misc::errorCheckFunc(__FILE__, __LINE__);
+    }
+
 
 	/**
 	 * @brief Compose rotation and translation
@@ -103,12 +229,24 @@ public:
 	void updateViewMatrix()
 	{
 		resetViewMatrix();
-		Eigen::Matrix3f rot = Eigen::Matrix3f::Identity() * Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY());
-        rotation_matrix = rot * Eigen::AngleAxisf(rotation_X_axis, rot.inverse()*Eigen::Vector3f::UnitX());
+
+        Eigen::Vector3f rotX = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitX();
+        rotX.normalize();
+
+        Eigen::Vector3f rotZ = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitZ();
+        rotZ = Eigen::AngleAxisf(rotation_X_axis, rotX) * rotZ;
+        rotZ.normalize();
+
+        rotation_matrix.col(2) = rotZ;
+        rotation_matrix.col(1) = rotZ.cross(rotX);
+        rotation_matrix.col(0) = rotX;
+
+        //rotation_matrix = Eigen::Matrix3f::Identity() * Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY());
+        cout << endl << rotation_matrix << endl;
 
 		viewMatrix.rotate (rotation_matrix);
+        viewMatrix.translate (Eigen::Vector3f(0.0, 0.0, -5.0));
 		viewMatrix.translate (translation_vector);
-
 	}	
 
     /**
@@ -145,7 +283,6 @@ public:
     {
 		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(0.0, 0.0, 1.0);
 		translation_vector += dir * speed;
-
     }
 
     /**
@@ -155,7 +292,6 @@ public:
     {
 		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())).inverse() * Eigen::Vector3f(0.0, 1.0, 0.0);
 		translation_vector += dir * speed;
-
     }
 
     /**
@@ -177,7 +313,6 @@ public:
         return Eigen::Vector2f ((pos[0]/((viewport[2]-viewport[0])/2.0)) - 1.0,
                                 1.0 - (pos[1]/((viewport[3] - viewport[1])/2.0)));
     }
-
 
 	/**
 	 * @brief Begin view direction rotation
@@ -214,6 +349,8 @@ public:
 		viewMatrix.translation() = rot * t;
 */		
 	}
+
+    
 
 };
 

@@ -44,5 +44,6 @@ void Flyscene::paintGL (void)
     if (phong && mesh)
     {
         phong->render(mesh, flycamera, light);
+        flycamera->render();
     }
 }
