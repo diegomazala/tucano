@@ -212,7 +212,7 @@ public:
         glDrawArrays(GL_LINES, 0, 2);
 
         color << 0.0, 0.0, 1.0, 1.0;
-        flycamera_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity() * Eigen::AngleAxisf(M_PI*0.5, Eigen::Vector3f::UnitY()));
+        flycamera_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity() * Eigen::AngleAxisf(-M_PI*0.5, Eigen::Vector3f::UnitY()));
         flycamera_shader->setUniform("in_Color", color);
         glDrawArrays(GL_LINES, 0, 2);
 
@@ -237,13 +237,13 @@ public:
         rotZ = Eigen::AngleAxisf(rotation_X_axis, rotX) * rotZ;
         rotZ.normalize();
 
-        rotation_matrix.col(2) = rotZ;
-        rotation_matrix.col(1) = rotZ.cross(rotX);
-        rotation_matrix.col(0) = rotX;
+		Eigen::Vector3f rotY = Eigen::AngleAxisf(rotation_X_axis, rotX) * Eigen::Vector3f::UnitY();
+
+        rotation_matrix.row(2) = rotZ;
+        rotation_matrix.row(1) = rotY;
+        rotation_matrix.row(0) = rotX;
 
         //rotation_matrix = Eigen::Matrix3f::Identity() * Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY());
-        cout << endl << rotation_matrix << endl;
-
 		viewMatrix.rotate (rotation_matrix);
         viewMatrix.translate (Eigen::Vector3f(0.0, 0.0, -5.0));
 		viewMatrix.translate (translation_vector);
@@ -254,7 +254,7 @@ public:
      */
     void strideLeft ( void )
     {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(1.0, 0.0, 0.0);
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())) * Eigen::Vector3f(1.0, 0.0, 0.0);
 		translation_vector += dir * speed;
     }
 
@@ -263,7 +263,7 @@ public:
      */
     void strideRight ( void )
     {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(-1.0, 0.0, 0.0);
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())) * Eigen::Vector3f(-1.0, 0.0, 0.0);
 		translation_vector += dir * speed;
     }
 
@@ -272,7 +272,7 @@ public:
      */
     void moveBack ( void )
     {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(0.0, 0.0, -1.0);
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())) * Eigen::Vector3f(0.0, 0.0, -1.0);
 		translation_vector += dir * speed;
     }
 
@@ -281,7 +281,7 @@ public:
      */
     void moveForward ( void )
     {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())).inverse() * Eigen::Vector3f(0.0, 0.0, 1.0);
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())) * Eigen::Vector3f(0.0, 0.0, 1.0);
 		translation_vector += dir * speed;
     }
 
@@ -290,7 +290,7 @@ public:
      */
     void moveDown ( void )
     {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())).inverse() * Eigen::Vector3f(0.0, 1.0, 0.0);
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())) * Eigen::Vector3f(0.0, 1.0, 0.0);
 		translation_vector += dir * speed;
     }
 
@@ -299,8 +299,8 @@ public:
      */
     void moveUp ( void )
     {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())).inverse() * Eigen::Vector3f(0.0, -1.0, 0.0);
-    	translation_vector += dir;
+		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())) * Eigen::Vector3f(0.0, -1.0, 0.0);
+    	translation_vector += dir * speed;
 	}
 
     /**
@@ -334,20 +334,11 @@ public:
 		
 		start_mouse_pos = new_position;
 
-		float anglex = dir2d[1]*M_PI;
-		float angley = dir2d[0]*M_PI;
+		float anglex = -dir2d[1]*M_PI;
+		float angley = -dir2d[0]*M_PI;
 	
 		rotation_X_axis += anglex;
 		rotation_Y_axis += angley;
-/*
-		Eigen::Matrix3f rot = Eigen::Matrix3f::Identity();
-		rot = Eigen::AngleAxisf(angley, Eigen::Vector3f::UnitY());
-
-		Eigen::Vector3f t = viewMatrix.translation();
-		viewMatrix.translation() = Eigen::Vector3f(0,0,0);
-		viewMatrix.rotate (rot);
-		viewMatrix.translation() = rot * t;
-*/		
 	}
 
     
