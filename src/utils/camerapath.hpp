@@ -20,9 +20,8 @@
  * along with Tucano Library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __FLYCAMERA__
-#define __FLYCAMERA__
-
+#ifndef __CAMERAPATH__
+#define __CAMERAPATH__
 
 #include "camera.hpp"
 #include <Eigen/Dense>
@@ -32,7 +31,7 @@ namespace Tucano
 {
 
 
-/// Default fragment shader for rendering camera coordinate system representation.
+/// Default fragment shader for rendering trackball representation.
 const string flycamera_fragment_code = "\n"
         "#version 430\n"
         "in vec4 ex_Color;\n"
@@ -44,7 +43,7 @@ const string flycamera_fragment_code = "\n"
         "    gl_FragDepth = depth;\n"
         "}\n";
 
-/// Default vertex shader for rendering camera coordinate system representation.
+/// Default vertex shader for rendering trackball representation.
 const string flycamera_vertex_code = "\n"
         "#version 430\n"
         "layout(location=0) in vec4 in_Position;\n"
@@ -67,60 +66,45 @@ const string flycamera_vertex_code = "\n"
 
 
 /**
- * @brief Flythrough camera class for manipulating a camera.
- *
- * This class simulates a flythrough camera with 6 DOF.
+ * @brief Camera path class, defines control points and a cubic Bezier approximation
+ * for defining a smooth camera path from key frames.
  **/
-class Flycamera : public Tucano::Camera {
+class CameraPath: public Tucano::Camera {
 
 
 private:
 
-    /// Global movement speed
+    /// Movement speed
     float speed;
 
-	/// Current mouse position
-	Eigen::Vector2f start_mouse_pos;
+	/// Camera position at each Key frames
+	vector< Eigen::Vector3f > key_position;
+
+	/// View matrix at each key frame
+	vector< Eigen::Affine3f > key_matrix;
 	
-	/// Camera rotation (view direction)
-	Eigen::Matrix3f rotation_matrix;
-
-	/// Camera position
-	Eigen::Vector3f translation_vector;
-
-	// Default start translation vector
-	Eigen::Vector3f default_translation;
-
-	/// Rotation angles
-	float rotation_Y_axis;
-	float rotation_X_axis;
-
     /// The vertices for drawing the axis on screen
     float vertices[8];
     
-    /// Flycamera shader, used for render the axis
+    /// Path shader, used for rendering the curve
     Shader* flycamera_shader;
 
-    /// Buffer Objects for drawing axis on screen
+    /// Buffer Objects for drawing path curve 
     GLuint * bufferIDs;
 
 public:
 
     /**
-     * @brief Resets camera to initial position and orientation
+     * @brief Resets the path 
      */
     void reset (void)
     {
-		start_mouse_pos = Eigen::Vector2f::Zero();
-		translation_vector = Eigen::Vector3f::Zero();
-		rotation_matrix = Eigen::Matrix3f::Identity();
-		default_translation = Eigen::Vector3f (0.0, 0.0, -5.0);
-        rotation_X_axis = 0.0;
-        rotation_Y_axis = 0.0;
+		key_position.clear();
+		key_matrix.clear();
     }
 
     ///Default destructor.
-    ~Flycamera() 
+    ~CameraPath() 
 	{}
 
     /**
@@ -136,7 +120,7 @@ public:
     /**
      * @brief Default constructor.
      */
-    Flycamera ()
+    CameraPath ()
     {
         speed = 0.05;
         initOpenGLMatrices();
@@ -181,9 +165,6 @@ public:
         glDisableVertexAttribArray(0);
     }
 
-	/**
-	* @brief Renders the camera's coordinate axis at the lower right corner of the screen.
-	*/
     void render (void)
     {
         float ratio = (viewport[2] - viewport[0]) / (viewport[3] - viewport[1]);
