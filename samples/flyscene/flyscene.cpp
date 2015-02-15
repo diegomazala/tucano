@@ -5,17 +5,24 @@ Flyscene::Flyscene(void)
     phong = 0;
 	flycamera = 0;
 	light = 0;
+	camerapath = 0;
 }
 
 Flyscene::~Flyscene()
 {
-    if (phong)
-        delete phong;
-	if (flycamera)
-		delete flycamera;
-	if (light)
-		delete light;
+	delete phong;
+	delete flycamera;
+	delete light;
+	delete camerapath;
 }
+
+void Flyscene::addKeyPoint (void)
+{
+	Eigen::Vector3f pt = flycamera->getCenter();
+	camerapath->addKeyPosition(pt);
+	
+}
+
 
 void Flyscene::initialize (int width, int height)
 {
@@ -27,6 +34,8 @@ void Flyscene::initialize (int width, int height)
 	flycamera = new Flycamera();
 	flycamera->setPerspectiveMatrix(60.0, width/(float)height, 0.1f, 100.0f);
 	flycamera->setViewport(Eigen::Vector2f ((float)width, (float)height));
+
+	camerapath = new CameraPath();
 
 	light = new Camera();
 
@@ -45,5 +54,6 @@ void Flyscene::paintGL (void)
     {
         phong->render(mesh, flycamera, light);
         flycamera->render();
+		camerapath->render(flycamera);
     }
 }

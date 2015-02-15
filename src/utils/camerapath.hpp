@@ -32,7 +32,7 @@ namespace Tucano
 
 
 /// Default fragment shader for rendering trackball representation.
-const string flycamera_fragment_code = "\n"
+const string camerapath_fragment_code = "\n"
         "#version 430\n"
         "in vec4 ex_Color;\n"
         "out vec4 out_Color;\n"
@@ -44,7 +44,7 @@ const string flycamera_fragment_code = "\n"
         "}\n";
 
 /// Default vertex shader for rendering trackball representation.
-const string flycamera_vertex_code = "\n"
+const string camerapath_vertex_code = "\n"
         "#version 430\n"
         "layout(location=0) in vec4 in_Position;\n"
         "out vec4 ex_Color;\n"
@@ -68,6 +68,7 @@ const string flycamera_vertex_code = "\n"
 /**
  * @brief Camera path class, defines control points and a cubic Bezier approximation
  * for defining a smooth camera path from key frames.
+ * Reference: https://www.particleincell.com/2012/bezier-splines/
  **/
 class CameraPath: public Tucano::Camera {
 
@@ -87,7 +88,7 @@ private:
     float vertices[8];
     
     /// Path shader, used for rendering the curve
-    Shader* flycamera_shader;
+    Shader* camerapath_shader;
 
     /// Buffer Objects for drawing path curve 
     GLuint * bufferIDs;
@@ -125,28 +126,36 @@ public:
         speed = 0.05;
         initOpenGLMatrices();
 
-		// vertices for on screen representation of camera coordinate system
-        vertices[0] = 0.0;
-        vertices[1] = 0.0;
-        vertices[2] = 0.0;
-        vertices[3] = 1.0;
-        vertices[4] = 1.0;
-        vertices[5] = 0.0;
-        vertices[6] = 0.0;
-        vertices[7] = 1.0;
+        camerapath_shader = new Shader("camerapathShader");
 
-        flycamera_shader = new Shader("flycameraShader");
-
+		// generate buffers for rendering path
         bufferIDs = new GLuint[3];
         glGenVertexArrays(1, &bufferIDs[0]);
         glGenBuffers(2, &bufferIDs[1]);
 
-        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        flycamera_shader->initializeFromStrings(flycamera_vertex_code, flycamera_fragment_code);
+        camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
+
+	/**
+	* @brief Fill the vertices array
+	*/
+	void fillVertexData (void)
+	{
+        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
+        glBufferData(GL_ARRAY_BUFFER, key_position.size(), &key_position[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	/**
+	* @brief Add key position
+	* @param pt New key point
+	*/
+	void addKeyPosition (Eigen::Vector3f & pt)
+	{
+		key_position.push_back ( pt );
+		fillVertexData();
+		cout << "included key point : " << pt.transpose() << endl;
+	}
 
     void bindBuffers (void)
     {
@@ -165,171 +174,82 @@ public:
         glDisableVertexAttribArray(0);
     }
 
-    void render (void)
+    void render (Tucano::Camera *camera)
     {
-        float ratio = (viewport[2] - viewport[0]) / (viewport[3] - viewport[1]);
-        Eigen::Matrix4f repProjectionMatrix = createOrthographicMatrix(-ratio, ratio, -1.0, 1.0, 0.1, 100.0);
+		if (key_position.size() < 2)
+			return;
 
-        flycamera_shader->bind();
+        camerapath_shader->bind();
         Misc::errorCheckFunc(__FILE__, __LINE__);
-    
-        Eigen::Affine3f repViewMatrix = Eigen::Affine3f::Identity();
-
-        repViewMatrix.translate( Eigen::Vector3f(1.0, -0.75, -2.0));
-        repViewMatrix.rotate(rotation_matrix.inverse());
-        repViewMatrix.scale(0.2);
         
-        flycamera_shader->setUniform("viewMatrix", repViewMatrix);
-        flycamera_shader->setUniform("projectionMatrix", repProjectionMatrix);
-        flycamera_shader->setUniform("nearPlane", near_plane);
-        flycamera_shader->setUniform("farPlane", far_plane);
+        camerapath_shader->setUniform("viewMatrix", camera->getViewMatrix());
+        camerapath_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
+        camerapath_shader->setUniform("nearPlane", camera->getNearPlane());
+        camerapath_shader->setUniform("farPlane", camera->getFarPlane());
 
         bindBuffers();
         Eigen::Vector4f color (1.0, 0.0, 0.0, 1.0);
-        flycamera_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
-        flycamera_shader->setUniform("in_Color", color);
-        glDrawArrays(GL_LINES, 0, 2);
-
-        color << 0.0, 1.0, 0.0, 1.0;
-        flycamera_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity() * Eigen::AngleAxisf(M_PI*0.5, Eigen::Vector3f::UnitZ()));
-        flycamera_shader->setUniform("in_Color", color);
-        glDrawArrays(GL_LINES, 0, 2);
-
-        color << 0.0, 0.0, 1.0, 1.0;
-        flycamera_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity() * Eigen::AngleAxisf(-M_PI*0.5, Eigen::Vector3f::UnitY()));
-        flycamera_shader->setUniform("in_Color", color);
-        glDrawArrays(GL_LINES, 0, 2);
+        camerapath_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
+        camerapath_shader->setUniform("in_Color", color);
+        glDrawArrays(GL_LINE_STRIP, 0, key_position.size()-1);
 
         unbindBuffers();
         
-        flycamera_shader->unbind();
+        camerapath_shader->unbind();
         Misc::errorCheckFunc(__FILE__, __LINE__);
     }
 
 
 	/**
-	 * @brief Compose rotation and translation
-	 */
-	void updateViewMatrix()
+	* @brief Compute inner control points from key positions
+	* For each pair of subsequent key positions, compute two control points
+	* to define a Beziér Spline.
+	* Since we are restricting the splines to join with same position, and first
+	* two derivatives, the result is a smooth curve passing through all control points
+	* See reference at class info for more details.
+	*/
+	void computeInnerControlPoints (void)
 	{
-		resetViewMatrix();
+		const int n = key_position.size()-1;
+		Eigen::MatrixXf A = Eigen::MatrixXf::Zero(n,n);
+		Eigen::MatrixXf x = Eigen::MatrixXf::Zero(n,3);
+		Eigen::MatrixXf b = Eigen::MatrixXf::Zero(n,3);
 
-        Eigen::Vector3f rotX = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitX();
-        rotX.normalize();
+		// build the weight matrix, it is the same for all coordinates
+		A(0, 0) = -2.0;
+		A(0, 1) = 1.0;
 
-        Eigen::Vector3f rotZ = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitZ();
-        rotZ = Eigen::AngleAxisf(rotation_X_axis, rotX) * rotZ;
-        rotZ.normalize();
+		for (int i = 1; i < n-2; i++)
+		{
+			A(i, i-1) = 1.0;
+			A(i, i) = 4.0;
+			A(i, i+1) = 1.0;
+		}
 
-		Eigen::Vector3f rotY = Eigen::AngleAxisf(rotation_X_axis, rotX) * Eigen::Vector3f::UnitY();
-		rotY.normalize();
+		A(n-1, n-2) = 2.0;
+		A(n-1, n-1) = 7.0;
 
+		// solve the system three times, one for each coordinate (x, y, and z)
+		b(0, 0) = key_position[0][0] + 2.0 * key_position[1][0];	
+		b(0, 1) = key_position[0][1] + 2.0 * key_position[1][1];
+		b(0, 2) = key_position[0][2] + 2.0 * key_position[1][2];
 
-		/**@TODO must check if matrix is still orthonormal, it might deviate
-		* due to numerical errors. Should force it sometimes, or recompute
-		* it using cross products
-		**/
+		for (int i = 1; i < n-2; i++)
+		{
+			b(i, 0) = 4.0*key_position[i][0] + 2.0*key_position[i+1][0];
+			b(i, 1) = 4.0*key_position[i][1] + 2.0*key_position[i+1][1];
+			b(i, 2) = 4.0*key_position[i][2] + 2.0*key_position[i+1][2];
 
-        rotation_matrix.row(2) = rotZ;
-        rotation_matrix.row(1) = rotY;
-        rotation_matrix.row(0) = rotX;
-
-		viewMatrix.rotate (rotation_matrix);
-        viewMatrix.translate (Eigen::Vector3f(0.0, 0.0, -5.0));
-		viewMatrix.translate (translation_vector);
-	}	
-
-    /**
-     * @brief Translates the view matrix to the left.
-     */
-    void strideLeft ( void )
-    {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())) * Eigen::Vector3f(1.0, 0.0, 0.0);
-		translation_vector += dir * speed;
-    }
-
-    /**
-     * @brief Translates the view matrix to the right.
-     */
-    void strideRight ( void )
-    {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())) * Eigen::Vector3f(-1.0, 0.0, 0.0);
-		translation_vector += dir * speed;
-    }
-
-    /**
-     * @brief Translates the view matrix back.
-     */
-    void moveBack ( void )
-    {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())) * Eigen::Vector3f(0.0, 0.0, -1.0);
-		translation_vector += dir * speed;
-    }
-
-    /**
-     * @brief Translates the view matrix forward.
-     */
-    void moveForward ( void )
-    {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY())) * Eigen::Vector3f(0.0, 0.0, 1.0);
-		translation_vector += dir * speed;
-    }
-
-    /**
-     * @brief Translates the view matrix down.
-     */
-    void moveDown ( void )
-    {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())) * Eigen::Vector3f(0.0, 1.0, 0.0);
-		translation_vector += dir * speed;
-    }
-
-    /**
-     * @brief Translates the view matrix up.
-     */
-    void moveUp ( void )
-    {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())) * Eigen::Vector3f(0.0, -1.0, 0.0);
-    	translation_vector += dir * speed;
-	}
-
-    /**
-    * @brief Nomalizes a screen position to range [-1,1].
-    * @param pos Screen position
-    * @return Returns position in normalized coordinates.
-    */
-    Eigen::Vector2f normalizePosition (const Eigen::Vector2f& pos)
-    {
-        return Eigen::Vector2f ((pos[0]/((viewport[2]-viewport[0])/2.0)) - 1.0,
-                                1.0 - (pos[1]/((viewport[3] - viewport[1])/2.0)));
-    }
-
-	/**
-	 * @brief Begin view direction rotation
-	 * @param pos Mouse coordinates
-	 **/
-	void startRotation ( Eigen::Vector2f pos )
-	{
-		start_mouse_pos = normalizePosition ( pos );
-	}	
-
-	/**
-	 * @brief Rotates the camera view direction
-	 * @param new_pos New mouse position
-	 */
-	void rotate ( Eigen::Vector2f new_mouse_pos )
-	{
-		Eigen::Vector2f new_position = normalizePosition(new_mouse_pos);
-		Eigen::Vector2f dir2d = new_position - start_mouse_pos;
-		
-		start_mouse_pos = new_position;
-
-		float anglex = -dir2d[1]*M_PI;
-		float angley = -dir2d[0]*M_PI;
+		}
+		b(n-1, 0) = 8.0*key_position[n-1][0] + key_position[n][0];
+		b(n-1, 1) = 8.0*key_position[n-1][1] + key_position[n][1];
+		b(n-1, 2) = 8.0*key_position[n-1][2] + key_position[n][2];
 	
-		rotation_X_axis += anglex;
-		rotation_Y_axis += angley;
+		x.col(0) = A.colPivHouseholderQr().solve(b.col(0));
+		x.col(1) = A.colPivHouseholderQr().solve(b.col(1));
+		x.col(2) = A.colPivHouseholderQr().solve(b.col(2));
 	}
+
 
 };
 

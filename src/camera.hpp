@@ -281,6 +281,15 @@ public:
         return Eigen::Vector2i(viewport[2]-viewport[0], viewport[3]-viewport[1]);
     }
 
+	/**
+	* @brief Returns the viewport aspect ratio
+	* @return Viewport aspect ratio x/y
+	*/
+	float getViewportAspectRatio (void)
+	{
+		return (viewport[2] - viewport[0]) / (viewport[3] - viewport[1]);
+	}
+
     /**
      * @brief Sets the viewport coordinates.
      * @param vp Viewport coordinates.

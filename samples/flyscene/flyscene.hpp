@@ -5,6 +5,7 @@
 
 #include <phongshader.hpp>
 #include <utils/flycamera.hpp>
+#include <utils/camerapath.hpp>
 #include <mesh.hpp>
 #include <utils/objimporter.hpp>
 
@@ -30,7 +31,6 @@ public:
      **/
     virtual void paintGL();
 
-
 	/**
 	* Returns the pointer to the flycamera instance
 	* @return pointer to flycamera
@@ -40,6 +40,8 @@ public:
 		return flycamera;
 	}
 
+	void addKeyPoint (void);
+
 private:
 
 	// A simple phong shader for rendering meshes
@@ -47,6 +49,9 @@ private:
 
 	// A fly through camera
 	Tucano::Flycamera *flycamera;
+
+	// A camera path for smooth camera animation
+	Tucano::CameraPath *camerapath;
 
 	// Light represented as a camera
 	Tucano::Camera *light;
