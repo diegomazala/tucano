@@ -41,6 +41,9 @@ private:
     /// Phong Shader
     Shader *phong_shader;
 
+	/// Default color
+	Eigen::Vector4f default_color;
+
 public:
 
     /**
@@ -49,6 +52,7 @@ public:
     Phong (void)
     {
         phong_shader = 0;
+		default_color << 0.7, 0.7, 0.7, 1.0;
     }
 
     /**
@@ -66,6 +70,14 @@ public:
         // searches in default shader directory (/shaders) for shader files phongShader.(vert,frag,geom,comp)
         phong_shader = loadShader("phongshader");
     }
+
+	/**
+	* @brief Sets the default color, usually used for meshes without color attribute
+	*/
+	void setDefaultColor ( Eigen::Vector4f& color )
+	{
+		default_color = color;
+	}
 
     /** * @brief Render the mesh given a camera and light trackball, using a Phong shader * @param mesh Given mesh
      * @param cameraTrackball Given camera trackball
@@ -85,6 +97,7 @@ public:
         phong_shader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
         phong_shader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
         phong_shader->setUniform("has_color", mesh->hasAttribute("in_Color"));
+		phong_shader->setUniform("default_color", default_color);
 
         mesh->setAttributeLocation(phong_shader);
 

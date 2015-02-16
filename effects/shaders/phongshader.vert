@@ -16,17 +16,17 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
+uniform vec4 default_color;
 
 // if attribute in_Color exists or not
 uniform bool has_color;
-const vec4 default_color = vec4(0.7, 0.7, 0.7, 1.0);
 
 void main(void)
 {
 	mat4 modelViewMatrix = viewMatrix * modelMatrix;
 
 	mat4 normalMatrix = transpose(inverse(modelViewMatrix));
-        normal = normalize(vec3(normalMatrix * vec4(in_Normal,0.0)).xyz);
+    normal = normalize(vec3(normalMatrix * vec4(in_Normal,0.0)).xyz);
 
 	vert = modelViewMatrix * in_Position;
 
@@ -36,9 +36,9 @@ void main(void)
 
 	gl_Position = (projectionMatrix * modelViewMatrix) * in_Position;
 
-        if (has_color)
-            color = in_Color;
-        else
-            color = default_color;
+    if (has_color)
+        color = in_Color;
+    else
+        color = default_color;
 
 }

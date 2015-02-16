@@ -238,6 +238,8 @@ public:
 		}
 
 		// render key positions
+		Eigen::Vector4f color (0.95, 0.38, 0.38, 1.0);
+		phong->setDefaultColor( color );
 		for (int i = 0; i < key_positions.size(); i++)
 		{
 			sphere.resetModelMatrix();
@@ -267,6 +269,8 @@ public:
 			Eigen::Vector3f translation = pt.head(3);
 			sphere.modelMatrixPtr()->translate( translation );
 			sphere.modelMatrixPtr()->scale( 0.07 );
+			color << 0.45, 1.0, 0.5, 1.0;
+			phong->setDefaultColor (color);
 			phong->render(&sphere, camera, light);
 		}
 		if (animating)
