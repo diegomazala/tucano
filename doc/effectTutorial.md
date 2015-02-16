@@ -66,7 +66,7 @@ virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
 
     mesh->render();
 
-    phong_shader->unbind();
+    normalmap_shader->unbind();
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     

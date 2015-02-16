@@ -24,6 +24,7 @@
 #define __CAMERAPATH__
 
 #include "camera.hpp"
+#include "mesh.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 
@@ -46,7 +47,7 @@ const string camerapath_fragment_code = "\n"
 /// Default vertex shader for rendering trackball representation.
 const string camerapath_vertex_code = "\n"
         "#version 430\n"
-        "layout(location=0) in vec4 in_Position;\n"
+        "in vec4 in_Position;\n"
         "out vec4 ex_Color;\n"
         "out float depth;\n"
         "uniform mat4 modelMatrix;\n"
@@ -79,16 +80,17 @@ private:
     float speed;
 
 	/// Camera position at each Key frames
-	vector< Eigen::Vector3f > key_position;
+	vector< Eigen::Vector4f > key_position;
 
 	/// View matrix at each key frame
 	vector< Eigen::Affine3f > key_matrix;
+
+	/// Mesh with key positions and computed control points for drawing
+	/// smooth curve between key positions
+	Mesh curve;
     
     /// Path shader, used for rendering the curve
     Shader* camerapath_shader;
-
-    /// Buffer Objects for drawing path curve 
-    GLuint * bufferIDs;
 
 public:
 
@@ -121,15 +123,10 @@ public:
     CameraPath ()
     {
         speed = 0.05;
+
         initOpenGLMatrices();
 
         camerapath_shader = new Shader("camerapathShader");
-
-		// generate buffers for rendering path
-        bufferIDs = new GLuint[3];
-        glGenVertexArrays(1, &bufferIDs[0]);
-        glGenBuffers(2, &bufferIDs[1]);
-
         camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
 
@@ -139,21 +136,13 @@ public:
 	void fillVertexData (void)
 	{
 
-		float * attrib_data = new float[key_position.size()*4];
+		curve.reset();
+		curve.loadVertices(key_position);
+		curve.setDefaultAttribLocations();
+		
+        Misc::errorCheckFunc(__FILE__, __LINE__);
+//		curve.createAttribute("p0", key_positions);
 
-		for (int i = 0; i < key_position.size(); ++i)
-		{
-			attrib_data[i*4+0] = key_position[i][0];
-			attrib_data[i*4+1] = key_position[i][1];
-			attrib_data[i*4+2] = key_position[i][2];
-			attrib_data[i*4+3] = 1.0;
-		}
-
-        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
-        glBufferData(GL_ARRAY_BUFFER, key_position.size()*4*sizeof(GL_FLOAT), attrib_data, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		delete [] attrib_data;
 	}
 
 	/**
@@ -162,28 +151,17 @@ public:
 	*/
 	void addKeyPosition (Eigen::Vector3f & pt)
 	{
-		key_position.push_back ( pt );
+		key_position.push_back ( Eigen::Vector4f(pt[0], pt[1], pt[2], 1.0) );
 		fillVertexData();
 		cout << "included key point : " << pt.transpose() << endl;
 	}
 
-    void bindBuffers (void)
-    {
-        // VAO
-        glBindVertexArray(bufferIDs[0]);
-
-        // VBO
-        glBindBuffer (GL_ARRAY_BUFFER, bufferIDs[1]);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(0);
-    }
-
-    void unBindBuffers (void)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-        glDisableVertexAttribArray(0);
-    }
-
+	/**
+	* @brief Renders smooth path
+	* End points for each Beziér is passed as line_strip
+	* and control points as vertex attributes
+	* @param camera Current camera for viewing scene
+	*/
     void render (Tucano::Camera *camera)
     {
 		if (key_position.size() < 2)
@@ -197,14 +175,15 @@ public:
         camerapath_shader->setUniform("nearPlane", camera->getNearPlane());
         camerapath_shader->setUniform("farPlane", camera->getFarPlane());
 
-        bindBuffers();
         Eigen::Vector4f color (1.0, 0.0, 0.0, 1.0);
         camerapath_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
         camerapath_shader->setUniform("in_Color", color);
-        glDrawArrays(GL_LINE_STRIP, 0, key_position.size());
 
-        unbindBuffers();
-        
+		curve.setAttributeLocation(camerapath_shader);
+		curve.bindBuffers();
+        glDrawArrays(GL_LINE_STRIP, 0, key_position.size());
+		curve.unbindBuffers();
+
         camerapath_shader->unbind();
         Misc::errorCheckFunc(__FILE__, __LINE__);
     }

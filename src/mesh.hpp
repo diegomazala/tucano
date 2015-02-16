@@ -263,10 +263,14 @@ public:
             vertex_attributes[i].destroy();
         }
         vertex_attributes.clear();
+
         if (vao_id > 0)
             glDeleteVertexArrays(1, &vao_id);
+		vao_id = 0;
+
         if (index_buffer_id > 0)
             glDeleteBuffers(1, &index_buffer_id);
+		index_buffer_id = 0;
 
     }
 
@@ -493,6 +497,7 @@ public:
      */
     void setDefaultAttribLocations (void)
     {
+		resetLocations();
         for (unsigned int i = 0; i < vertex_attributes.size(); ++i)
         {
             if (!vertex_attributes[i].getName().compare("in_Position"))
