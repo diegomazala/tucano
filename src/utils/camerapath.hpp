@@ -78,7 +78,13 @@ class CameraPath: public Tucano::Camera {
 private:
 
     /// Movement speed
-    float speed;
+    float anim_speed;
+
+	/// Animation time
+	float anim_time;
+
+	/// Start/stop animation
+	bool animating;
 
 	/// Camera position at each Key frames
 	vector< Eigen::Vector4f > key_positions;
@@ -104,6 +110,8 @@ private:
     
     /// Path shader, used for rendering the curve
     Shader* camerapath_shader;
+
+	
 
 public:
 
@@ -137,7 +145,9 @@ public:
      */
     CameraPath ()
     {
-        speed = 0.05;
+        anim_speed = 0.0015;
+		anim_time = 0.0;
+		animating = true;
 
         initOpenGLMatrices();
         camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
@@ -227,21 +237,78 @@ public:
         	camerapath_shader->unbind();
 		}
 
+		// render key positions
 		for (int i = 0; i < key_positions.size(); i++)
 		{
 			sphere.resetModelMatrix();
 			
 			Eigen::Vector3f translation = key_positions[i].head(3);
 			sphere.modelMatrixPtr()->translate( translation );
-			sphere.modelMatrixPtr()->scale( 0.05 );
+			sphere.modelMatrixPtr()->scale( 0.02 );
 			phong->render(&sphere, camera, light);
 		}
+		
+		if (key_positions.size() > 1)
+		{
+			// render camera in path
+			sphere.resetModelMatrix();
 
+			// in what Beziér piece animation is
+			int curve_piece = int(anim_time * (key_positions.size()-1));
+			float curve_step = 1.0/(float)(key_positions.size()-1);
+
+			// t is the time inside this curve piece, so normalize it [0,1]
+			float t = (anim_time - curve_step*curve_piece)/curve_step;
+
+			// compute point inside curve piece
+			Eigen::Vector4f pt;
+			pt = pow(1-t,3)*key_positions[curve_piece] + 3.0*pow(1-t,2)*t*control_points_1[curve_piece] + 3.0*(1-t)*pow(t,2)*control_points_2[curve_piece] + pow(t, 3)*key_positions[curve_piece+1];
+		
+			Eigen::Vector3f translation = pt.head(3);
+			sphere.modelMatrixPtr()->translate( translation );
+			sphere.modelMatrixPtr()->scale( 0.07 );
+			phong->render(&sphere, camera, light);
+		}
+		if (animating)
+			stepAnimation();	
 
 
         Misc::errorCheckFunc(__FILE__, __LINE__);
     }
 
+	/**
+	* @brief Move animation forward one step
+	*/
+	void stepAnimation ( void )
+	{
+		anim_time += anim_speed;
+		if (anim_time >= 1.0)
+			anim_time = anim_time - 1.0;
+	}
+
+	/**
+	* @brief Start animation following camera path
+	*/
+	void startAnimation ( void )
+	{
+		animating = true;
+	}	
+
+	/**
+	* @brief Stop animation
+	*/
+	void stopAnimation ( void )
+	{
+		animating = false;
+	}
+
+	/**
+	* @brief Resets animation to first key position
+	*/
+	void resetAnimation ( void )
+	{
+		anim_time = 0.0;
+	}
 
 	/**
 	* @brief Compute inner control points from key positions
