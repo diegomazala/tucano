@@ -43,7 +43,7 @@ public:
      */
     Model(void)
     {
-        reset();
+        resetModelMatrix();
         objectCenter = Eigen::Vector3f::Zero();
         centroid = Eigen::Vector3f::Zero();
         radius = 1.0;
@@ -88,6 +88,17 @@ public:
     }
 
     /**
+     * @brief Returns a pointer to the model matrix.
+     * @return Pointer to the odel matrix as an Affine 3f matrix.
+     */
+    Eigen::Affine3f* modelMatrixPtr (void)
+    {
+        return &modelMatrix;
+    }
+
+
+
+    /**
      * @brief Returns the scale factor for fitting the model inside a unit cube.
      * @return Scale factor.
      */
@@ -111,7 +122,7 @@ public:
     /**
      * @brief Resets the model matrix.
      */
-    void reset (void)
+    void resetModelMatrix (void)
     {
         modelMatrix = Eigen::Affine3f::Identity();
     }

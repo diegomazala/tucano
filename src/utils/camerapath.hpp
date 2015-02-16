@@ -25,6 +25,8 @@
 
 #include "camera.hpp"
 #include "mesh.hpp"
+#include "utils/plyimporter.hpp"
+#include "phongshader.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 
@@ -93,6 +95,12 @@ private:
 	/// Mesh with key positions and computed control points for drawing
 	/// smooth curve between key positions
 	Mesh curve;
+
+	/// A sphere to visually represent the curves key positions
+	Mesh sphere;
+
+	/// Phong shader for drawing spheres
+	Effects::Phong *phong;
     
     /// Path shader, used for rendering the curve
     Shader* camerapath_shader;
@@ -134,6 +142,15 @@ public:
         initOpenGLMatrices();
         camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
 		camerapath_shader->initialize();
+
+		///@TODO implement sphere by hand and put it in utils
+		MeshImporter::loadPlyFile(&sphere, "../samples/models/sphere.ply");
+		sphere.normalizeModelMatrix();
+
+
+		phong = new Effects::Phong();
+		phong->setShadersDir("../effects/shaders/");
+		phong->initialize();
 
 /*		Eigen::Vector3f pt;
 		pt << -10.0, -10.0, 0.0; 
@@ -184,29 +201,44 @@ public:
 	* and control points as vertex attributes
 	* @param camera Current camera for viewing scene
 	*/
-    void render (Tucano::Camera *camera)
+    void render (Tucano::Camera *camera, Tucano::Camera *light)
     {
-		if (key_positions.size() < 2)
-			return;
+		glEnable(GL_DEPTH_TEST);
+		if (key_positions.size() > 1)
+		{
 
-        camerapath_shader->bind();
-        Misc::errorCheckFunc(__FILE__, __LINE__);
+        	camerapath_shader->bind();
+        	Misc::errorCheckFunc(__FILE__, __LINE__);
         
-        camerapath_shader->setUniform("viewMatrix", camera->getViewMatrix());
-        camerapath_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
-        camerapath_shader->setUniform("nearPlane", camera->getNearPlane());
-        camerapath_shader->setUniform("farPlane", camera->getFarPlane());
+        	camerapath_shader->setUniform("viewMatrix", camera->getViewMatrix());
+        	camerapath_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
+        	camerapath_shader->setUniform("nearPlane", camera->getNearPlane());
+        	camerapath_shader->setUniform("farPlane", camera->getFarPlane());
 
-        Eigen::Vector4f color (1.0, 0.0, 0.0, 1.0);
-        camerapath_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
-        camerapath_shader->setUniform("in_Color", color);
+        	Eigen::Vector4f color (1.0, 0.0, 0.0, 1.0);
+        	camerapath_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
+        	camerapath_shader->setUniform("in_Color", color);
 
-		curve.setAttributeLocation(camerapath_shader);
-		curve.bindBuffers();
-        glDrawArrays(GL_LINE_STRIP, 0, key_positions.size());
-		curve.unbindBuffers();
+			curve.setAttributeLocation(camerapath_shader);
+			curve.bindBuffers();
+        	glDrawArrays(GL_LINE_STRIP, 0, key_positions.size());
+			curve.unbindBuffers();
 
-        camerapath_shader->unbind();
+        	camerapath_shader->unbind();
+		}
+
+		for (int i = 0; i < key_positions.size(); i++)
+		{
+			sphere.resetModelMatrix();
+			
+			Eigen::Vector3f translation = key_positions[i].head(3);
+			sphere.modelMatrixPtr()->translate( translation );
+			sphere.modelMatrixPtr()->scale( 0.05 );
+			phong->render(&sphere, camera, light);
+		}
+
+
+
         Misc::errorCheckFunc(__FILE__, __LINE__);
     }
 

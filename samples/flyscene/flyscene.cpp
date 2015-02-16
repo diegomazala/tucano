@@ -54,6 +54,6 @@ void Flyscene::paintGL (void)
     {
         phong->render(mesh, flycamera, light);
         flycamera->render();
-		camerapath->render(flycamera);
+		camerapath->render(flycamera, light);
     }
 }
