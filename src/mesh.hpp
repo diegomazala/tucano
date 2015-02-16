@@ -595,7 +595,7 @@ public:
         glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*sizeof(va.getType()), attrib_array, GL_STATIC_DRAW);
         va.unbind();
 
-        delete attrib_array;
+        delete [] attrib_array;
         return &vertex_attributes.back();
 
     }
@@ -627,7 +627,7 @@ public:
         glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*sizeof(va.getType()), attrib_array, GL_STATIC_DRAW);
         va.unbind();
 
-        delete attrib_array;
+        delete [] attrib_array;
         return &vertex_attributes.back();
     }
 
@@ -657,7 +657,7 @@ public:
         glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*sizeof(va.getType()), attrib_array, GL_STATIC_DRAW);
         va.unbind();
 
-        delete attrib_array;
+        delete [] attrib_array;
         return &vertex_attributes.back();
     }
 
