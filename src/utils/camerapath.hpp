@@ -134,6 +134,19 @@ public:
         initOpenGLMatrices();
         camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
 		camerapath_shader->initialize();
+
+/*		Eigen::Vector3f pt;
+		pt << -10.0, -10.0, 0.0; 
+		addKeyPosition(pt);
+		pt << -10.0, 10.0, 0.0;
+		addKeyPosition( pt );
+		pt << 10.0, 10.0, 0.0;
+		addKeyPosition( pt );
+		pt << 10.0, -10.0, 0.0;             
+		addKeyPosition( pt );
+		pt << -10.0, -10.0, 0.0;             
+		addKeyPosition( pt );
+ */
         //camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
 
@@ -229,9 +242,9 @@ public:
 		Eigen::MatrixXf b = Eigen::MatrixXf::Zero(n,3);
 
 		// build the weight matrix, it is the same for all coordinates
-		A(0, 0) = -2.0;
+		A(0, 0) = 2.0;
 		A(0, 1) = 1.0;
-		for (int i = 1; i < n-2; i++)
+		for (int i = 1; i < n-1; i++)
 		{
 			A(i, i-1) = 1.0;
 			A(i, i) = 4.0;
@@ -246,7 +259,7 @@ public:
 		b(0, 1) = key_positions[0][1] + 2.0 * key_positions[1][1];
 		b(0, 2) = key_positions[0][2] + 2.0 * key_positions[1][2];
 
-		for (int i = 1; i < n-2; i++)
+		for (int i = 1; i < n-1; i++)
 		{
 			b(i, 0) = 4.0*key_positions[i][0] + 2.0*key_positions[i+1][0];
 			b(i, 1) = 4.0*key_positions[i][1] + 2.0*key_positions[i+1][1];
@@ -260,6 +273,10 @@ public:
 		x.col(0) = A.colPivHouseholderQr().solve(b.col(0));
 		x.col(1) = A.colPivHouseholderQr().solve(b.col(1));
 		x.col(2) = A.colPivHouseholderQr().solve(b.col(2));
+
+		cout << "matrix A " << endl << A << endl << endl;
+		cout << "matrix b " << endl << b << endl << endl;
+		cout << "matrix x " << endl << x << endl << endl;
 
 		// now populate the vectors with the first control points
 		Eigen::Vector4f pt;
