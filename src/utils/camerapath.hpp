@@ -83,9 +83,6 @@ private:
 
 	/// View matrix at each key frame
 	vector< Eigen::Affine3f > key_matrix;
-	
-    /// The vertices for drawing the axis on screen
-    float vertices[8];
     
     /// Path shader, used for rendering the curve
     Shader* camerapath_shader;
@@ -141,9 +138,22 @@ public:
 	*/
 	void fillVertexData (void)
 	{
+
+		float * attrib_data = new float[key_position.size()*4];
+
+		for (int i = 0; i < key_position.size(); ++i)
+		{
+			attrib_data[i*4+0] = key_position[i][0];
+			attrib_data[i*4+1] = key_position[i][1];
+			attrib_data[i*4+2] = key_position[i][2];
+			attrib_data[i*4+3] = 1.0;
+		}
+
         glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
-        glBufferData(GL_ARRAY_BUFFER, key_position.size(), &key_position[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, key_position.size()*4*sizeof(GL_FLOAT), attrib_data, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		delete [] attrib_data;
 	}
 
 	/**
@@ -191,7 +201,7 @@ public:
         Eigen::Vector4f color (1.0, 0.0, 0.0, 1.0);
         camerapath_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
         camerapath_shader->setUniform("in_Color", color);
-        glDrawArrays(GL_LINE_STRIP, 0, key_position.size()-1);
+        glDrawArrays(GL_LINE_STRIP, 0, key_position.size());
 
         unbindBuffers();
         
