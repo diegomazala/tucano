@@ -67,9 +67,7 @@ public:
         phong_shader = loadShader("phongshader");
     }
 
-    /**
-     * @brief Render the mesh given a camera and light trackball, using a Phong shader
-     * @param mesh Given mesh
+    /** * @brief Render the mesh given a camera and light trackball, using a Phong shader * @param mesh Given mesh
      * @param cameraTrackball Given camera trackball
      * @param lightTrackball Given light trackball
      */

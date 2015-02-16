@@ -31,7 +31,6 @@
 namespace Tucano
 {
 
-
 /// Default fragment shader for rendering trackball representation.
 const string camerapath_fragment_code = "\n"
         "#version 430\n"
@@ -80,10 +79,16 @@ private:
     float speed;
 
 	/// Camera position at each Key frames
-	vector< Eigen::Vector4f > key_position;
+	vector< Eigen::Vector4f > key_positions;
+
+	/// First control point between two key positions
+	vector< Eigen::Vector4f > control_points_1;
+
+	/// Second control point between two key positions
+	vector< Eigen::Vector4f > control_points_2;
 
 	/// View matrix at each key frame
-	vector< Eigen::Affine3f > key_matrix;
+	vector< Eigen::Affine3f > key_matrices;
 
 	/// Mesh with key positions and computed control points for drawing
 	/// smooth curve between key positions
@@ -99,8 +104,10 @@ public:
      */
     void reset (void)
     {
-		key_position.clear();
-		key_matrix.clear();
+		key_positions.clear();
+		key_matrices.clear();
+		control_points_1.clear();
+		control_points_2.clear();
     }
 
     ///Default destructor.
@@ -125,9 +132,9 @@ public:
         speed = 0.05;
 
         initOpenGLMatrices();
-
-        camerapath_shader = new Shader("camerapathShader");
-        camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
+        camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
+		camerapath_shader->initialize();
+        //camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
 
 	/**
@@ -135,13 +142,15 @@ public:
 	*/
 	void fillVertexData (void)
 	{
+		computeInnerControlPoints(); 
 
 		curve.reset();
-		curve.loadVertices(key_position);
-		curve.setDefaultAttribLocations();
+		curve.loadVertices(key_positions);
+		curve.createAttribute("in_ControlPoint1", control_points_1);
+		curve.createAttribute("in_ControlPoint2", control_points_2);
 		
         Misc::errorCheckFunc(__FILE__, __LINE__);
-//		curve.createAttribute("p0", key_positions);
+//		curve.createAttribute("p0", key_positionss);
 
 	}
 
@@ -151,9 +160,9 @@ public:
 	*/
 	void addKeyPosition (Eigen::Vector3f & pt)
 	{
-		key_position.push_back ( Eigen::Vector4f(pt[0], pt[1], pt[2], 1.0) );
-		fillVertexData();
-		cout << "included key point : " << pt.transpose() << endl;
+		key_positions.push_back ( Eigen::Vector4f(pt[0], pt[1], pt[2], 1.0) );
+		if (key_positions.size() > 1)
+			fillVertexData();
 	}
 
 	/**
@@ -164,7 +173,7 @@ public:
 	*/
     void render (Tucano::Camera *camera)
     {
-		if (key_position.size() < 2)
+		if (key_positions.size() < 2)
 			return;
 
         camerapath_shader->bind();
@@ -181,7 +190,7 @@ public:
 
 		curve.setAttributeLocation(camerapath_shader);
 		curve.bindBuffers();
-        glDrawArrays(GL_LINE_STRIP, 0, key_position.size());
+        glDrawArrays(GL_LINE_STRIP, 0, key_positions.size());
 		curve.unbindBuffers();
 
         camerapath_shader->unbind();
@@ -197,17 +206,31 @@ public:
 	* two derivatives, the result is a smooth curve passing through all control points
 	* See reference at class info for more details.
 	*/
-	void computeInnerControlPoints (void)
+	void computeInnerControlPoints ( void )
 	{
-		const int n = key_position.size()-1;
-		Eigen::MatrixXf A = Eigen::MatrixXf::Zero(n,n);
+
+		control_points_1.clear();
+		control_points_2.clear();
+	
+		if (key_positions.size() == 2)
+		{
+			Eigen::Vector4f pt = (key_positions[0] + key_positions[1])*0.5;	
+			control_points_1.push_back(pt);
+			control_points_1.push_back(pt);
+			control_points_2.push_back(pt);
+			control_points_2.push_back(pt);
+			return;
+		}
+
+		const int n = key_positions.size()-1;
+		Eigen::MatrixXf A(n,n);
+		A = Eigen::MatrixXf::Zero(n,n);
 		Eigen::MatrixXf x = Eigen::MatrixXf::Zero(n,3);
 		Eigen::MatrixXf b = Eigen::MatrixXf::Zero(n,3);
 
 		// build the weight matrix, it is the same for all coordinates
 		A(0, 0) = -2.0;
 		A(0, 1) = 1.0;
-
 		for (int i = 1; i < n-2; i++)
 		{
 			A(i, i-1) = 1.0;
@@ -219,26 +242,44 @@ public:
 		A(n-1, n-1) = 7.0;
 
 		// solve the system three times, one for each coordinate (x, y, and z)
-		b(0, 0) = key_position[0][0] + 2.0 * key_position[1][0];	
-		b(0, 1) = key_position[0][1] + 2.0 * key_position[1][1];
-		b(0, 2) = key_position[0][2] + 2.0 * key_position[1][2];
+		b(0, 0) = key_positions[0][0] + 2.0 * key_positions[1][0];	
+		b(0, 1) = key_positions[0][1] + 2.0 * key_positions[1][1];
+		b(0, 2) = key_positions[0][2] + 2.0 * key_positions[1][2];
 
 		for (int i = 1; i < n-2; i++)
 		{
-			b(i, 0) = 4.0*key_position[i][0] + 2.0*key_position[i+1][0];
-			b(i, 1) = 4.0*key_position[i][1] + 2.0*key_position[i+1][1];
-			b(i, 2) = 4.0*key_position[i][2] + 2.0*key_position[i+1][2];
+			b(i, 0) = 4.0*key_positions[i][0] + 2.0*key_positions[i+1][0];
+			b(i, 1) = 4.0*key_positions[i][1] + 2.0*key_positions[i+1][1];
+			b(i, 2) = 4.0*key_positions[i][2] + 2.0*key_positions[i+1][2];
 
 		}
-		b(n-1, 0) = 8.0*key_position[n-1][0] + key_position[n][0];
-		b(n-1, 1) = 8.0*key_position[n-1][1] + key_position[n][1];
-		b(n-1, 2) = 8.0*key_position[n-1][2] + key_position[n][2];
+		b(n-1, 0) = 8.0*key_positions[n-1][0] + key_positions[n][0];
+		b(n-1, 1) = 8.0*key_positions[n-1][1] + key_positions[n][1];
+		b(n-1, 2) = 8.0*key_positions[n-1][2] + key_positions[n][2];
 	
 		x.col(0) = A.colPivHouseholderQr().solve(b.col(0));
 		x.col(1) = A.colPivHouseholderQr().solve(b.col(1));
 		x.col(2) = A.colPivHouseholderQr().solve(b.col(2));
-	}
 
+		// now populate the vectors with the first control points
+		Eigen::Vector4f pt;
+		for (int i = 0; i < n; ++i)
+		{
+			pt << x.row(i).transpose(), 1.0;
+			control_points_1.push_back (pt); 	
+		}
+		control_points_1.push_back (pt);
+
+		// control point 2 can be determined directly now
+		for (int i = 0; i < n-1; ++i)
+		{
+			pt = 2.0* key_positions[i+1] - control_points_1[i+1];
+			control_points_2.push_back (pt);
+		}
+		pt = (key_positions[n] + control_points_1[n-1])*0.5;
+		control_points_2.push_back (pt);
+		control_points_2.push_back (pt);
+	}
 
 };
 
