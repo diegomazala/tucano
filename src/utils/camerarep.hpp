@@ -24,6 +24,7 @@
 #define __CAMERAREP__
 
 #include "mesh.hpp"
+#include "phongshader.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 
@@ -86,8 +87,10 @@ public:
 		resetModelMatrix();
 		createGeometry();
 
-		camerarep_shader = new Shader("cameraRepShader");
-		camerarep_shader->initializeFromStrings(camerarep_vertex_code, camerarep_fragment_code);
+//		camerarep_shader = new Shader("cameraRepShader");
+        camerarep_shader = new Shader("../effects/shaders/", "phongshader");
+		camerarep_shader->initialize();
+//		camerarep_shader->initializeFromStrings(camerarep_vertex_code, camerarep_fragment_code);
 		
 	}
 
@@ -110,13 +113,19 @@ public:
        	camerarep_shader->setUniform("nearPlane", camera->getNearPlane());
        	camerarep_shader->setUniform("farPlane", camera->getFarPlane());
 
-       	Eigen::Vector4f color (1.0, 0.0, 0.0, 1.0);
+       	Eigen::Vector4f color (1.0, 1.0, 0.0, 1.0);
        	camerarep_shader->setUniform("modelMatrix", modelMatrix);
-       	camerarep_shader->setUniform("in_Color", color);
+		camerarep_shader->setUniform("lightViewMatrix", light->getViewMatrix());
+       	camerarep_shader->setUniform("has_color", true);
+       	camerarep_shader->setUniform("default_color", color);
 
+		setAttributeLocation(camerarep_shader);
+
+		glEnable(GL_DEPTH_TEST);
 		bindBuffers();
 		renderElements();
 		unbindBuffers();
+		glDisable(GL_DEPTH_TEST);
 
        	camerarep_shader->unbind();
 		
@@ -133,61 +142,137 @@ private:
 	void createGeometry (void)
 	{
 		vector< Eigen::Vector4f > vert;
+		vector< Eigen::Vector3f > norm;
+		vector< Eigen::Vector4f > color;
 		vector< GLuint > elementsVertices;
 		
-		vert.push_back ( Eigen::Vector4f( 0.25, -0.25, -0.5, 1.0) );
-		vert.push_back ( Eigen::Vector4f( 0.25, -0.50,  0.5, 1.0) );
-		vert.push_back ( Eigen::Vector4f( 0.25,  0.50, -0.5, 1.0) );
-		vert.push_back ( Eigen::Vector4f( 0.25,  0.25, -0.5, 1.0) );
-		vert.push_back ( Eigen::Vector4f(-0.25, -0.25, -0.5, 1.0) );
-		vert.push_back ( Eigen::Vector4f(-0.25, -0.25, -0.5, 1.0) );
-		vert.push_back ( Eigen::Vector4f(-0.25, -0.25, -0.5, 1.0) );
-		vert.push_back ( Eigen::Vector4f(-0.25, -0.25, -0.5, 1.0) );
+		// repeating vertices for each face to make life easier with normals
+		// and other attributes
+
+		// right face
+		vert.push_back ( Eigen::Vector4f( 0.25, -0.25,  0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f( 0.50, -0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f( 0.50,  0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f( 0.25,  0.25,  0.5, 1.0) );
+		norm.push_back ( Eigen::Vector3f( 1.0, 0.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 1.0, 0.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 1.0, 0.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 1.0, 0.0, 0.0) );
+		color.push_back( Eigen::Vector4f( 1.0, 0.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 1.0, 0.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 1.0, 0.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 1.0, 0.0, 0.0, 1.0) );
+		elementsVertices.push_back(0);
+		elementsVertices.push_back(1);
+		elementsVertices.push_back(2);
+		elementsVertices.push_back(2);
+		elementsVertices.push_back(3);
+		elementsVertices.push_back(0);
 
 		// left face
-		elementsVertices.push_back(0);
-		elementsVertices.push_back(1);
-		elementsVertices.push_back(2);
-		elementsVertices.push_back(2);
-		elementsVertices.push_back(3);
-		elementsVertices.push_back(0);
-		// right face
+		vert.push_back ( Eigen::Vector4f(-0.25, -0.25,  0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.50, -0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.50,  0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.25,  0.25,  0.5, 1.0) );
+		norm.push_back ( Eigen::Vector3f( -1.0, 0.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( -1.0, 0.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( -1.0, 0.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( -1.0, 0.0, 0.0) );
+		color.push_back( Eigen::Vector4f( 1.0, 0.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 1.0, 0.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 1.0, 0.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 1.0, 0.0, 0.0, 1.0) );
 		elementsVertices.push_back(4);
 		elementsVertices.push_back(7);
 		elementsVertices.push_back(6);
 		elementsVertices.push_back(6);
 		elementsVertices.push_back(5);
-		elementsVertices.push_back(4);
-		// top face
-		elementsVertices.push_back(3);
-		elementsVertices.push_back(2);
-		elementsVertices.push_back(6);
-		elementsVertices.push_back(6);
-		elementsVertices.push_back(7);
-		elementsVertices.push_back(3);
-		// bottom face
-		elementsVertices.push_back(0);
-		elementsVertices.push_back(4);
-		elementsVertices.push_back(5);
-		elementsVertices.push_back(5);
-		elementsVertices.push_back(1);
-		elementsVertices.push_back(0);
-		// front face
-		elementsVertices.push_back(1);
-		elementsVertices.push_back(2);
-		elementsVertices.push_back(6);
-		elementsVertices.push_back(6);
-		elementsVertices.push_back(5);
-		elementsVertices.push_back(1);
-		// back face
-		elementsVertices.push_back(4);
-		elementsVertices.push_back(7);
-		elementsVertices.push_back(3);
-		elementsVertices.push_back(3);
-		elementsVertices.push_back(0);
 		elementsVertices.push_back(4);
 
+		// bottom face
+		vert.push_back ( Eigen::Vector4f( 0.25, -0.25,  0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f( 0.50, -0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.25, -0.25,  0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.50, -0.50, -0.5, 1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, -1.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, -1.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, -1.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, -1.0, 0.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 1.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 1.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 1.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 1.0, 0.0, 1.0) );
+		elementsVertices.push_back(8);
+		elementsVertices.push_back(10);
+		elementsVertices.push_back(11);
+		elementsVertices.push_back(11);
+		elementsVertices.push_back(9);
+		elementsVertices.push_back(8);
+
+		// top face
+		vert.push_back ( Eigen::Vector4f( 0.25, 0.25,  0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f( 0.50, 0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.25, 0.25,  0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.50, 0.50, -0.5, 1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 1.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 1.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 1.0, 0.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 1.0, 0.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 1.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 1.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 1.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 1.0, 0.0, 1.0) );
+		elementsVertices.push_back(12);
+		elementsVertices.push_back(13);
+		elementsVertices.push_back(15);
+		elementsVertices.push_back(15);
+		elementsVertices.push_back(14);
+		elementsVertices.push_back(12);
+
+		// front face
+		vert.push_back ( Eigen::Vector4f( 0.5, -0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f( 0.5,  0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.5, -0.50, -0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.5,  0.50, -0.5, 1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 0.0, -1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 0.0, -1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 0.0, -1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 0.0, -1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 0.0, 1.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 0.0, 1.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 0.0, 1.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 0.0, 1.0, 1.0) );
+		elementsVertices.push_back(16);
+		elementsVertices.push_back(18);
+		elementsVertices.push_back(19);
+		elementsVertices.push_back(19);
+		elementsVertices.push_back(17);
+		elementsVertices.push_back(16);
+
+		// back face
+		vert.push_back ( Eigen::Vector4f( 0.25, -0.25, 0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f( 0.25,  0.25, 0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.25, -0.25, 0.5, 1.0) );
+		vert.push_back ( Eigen::Vector4f(-0.25,  0.25, 0.5, 1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 0.0, 1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 0.0, 1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 0.0, 1.0) );
+		norm.push_back ( Eigen::Vector3f( 0.0, 0.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 0.0, 1.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 0.0, 1.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 0.0, 1.0, 1.0) );
+		color.push_back( Eigen::Vector4f( 0.0, 0.0, 1.0, 1.0) );
+		elementsVertices.push_back(20);
+		elementsVertices.push_back(21);
+		elementsVertices.push_back(23);
+		elementsVertices.push_back(23);
+		elementsVertices.push_back(22);
+		elementsVertices.push_back(20);
+
+
 		loadVertices(vert);
+		loadNormals(norm);
+		loadColors(color);
 		loadIndices(elementsVertices);
 
 		setDefaultAttribLocations();

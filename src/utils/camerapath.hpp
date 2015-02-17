@@ -204,7 +204,7 @@ public:
 		key_positions.push_back ( center );
 
 		Eigen::Quaternionf quat (camera->getViewMatrix().rotation() );
-		key_quaternions.push_back (quat);
+		key_quaternions.push_back (quat.inverse());
 
 		if (key_positions.size() > 1)
 			fillVertexData();
@@ -254,7 +254,7 @@ public:
 			phong->render(&sphere, camera, light);
 		}
 		
-		renderCameraOnPath(anim_time, camera, light);
+//		renderCameraOnPath(anim_time, camera, light);
 
 		if (animating)
 			stepAnimation();	
@@ -273,13 +273,10 @@ public:
 		if (key_positions.size() > 1)
 		{
 			// render camera in path
-			sphere.resetModelMatrix();
-
 			Eigen::Affine3f m = cameraAtStep(t);
+			m.scale(0.07);
+			sphere.setModelMatrix(m);
 
-			Eigen::Vector3f translation = (pointOnPath(t)).head(3);
-			sphere.modelMatrixPtr()->translate( translation );
-			sphere.modelMatrixPtr()->scale( 0.07 );
 			Eigen::Vector4f color (0.45, 1.0, 0.5, 1.0);
 			phong->setDefaultColor (color);
 			phong->render(&sphere, camera, light);
@@ -288,8 +285,8 @@ public:
 	}
 
 	/**
-	* @brief Returns the segment given a time t in [0,1] for the whole curve 
-	* @return Curve segment number
+	* @brief returns the segment given a time t in [0,1] for the whole curve 
+	* @return curve segment number
 	*/
 	int curveSegment (float t)
 	{
@@ -300,7 +297,7 @@ public:
 	}
 
 	/**
-	* @brief Converts global t to a local t inside a curve segment
+	* @brief converts global t to a local t inside a curve segment
 	* @return local parameter t in [0,1] for a single Cubic Beziér segment
 	*/
 	float toLocalStep (float t)
@@ -312,13 +309,13 @@ public:
 	}
 
 	/**
-	* @brief Compute point on path from t in [0,1]
-	* Note that t regards the whole curve, so t=0 is the first key position
+	* @brief compute point on path from t in [0,1]
+	* note that t regards the whole curve, so t=0 is the first key position
 	* and t=1 is the last key point
 	* 
 	* t is first converted into a curve piece (a single Cubic Beziér)
 	* and a local t on this piece
-	* @param t Global t in [0,1]
+	* @param t global t in [0,1]
 	*/
 	Eigen::Vector4f pointOnPath (float global_t)
 	{
@@ -334,13 +331,14 @@ public:
 	
 
 	/**
-	* @brief Return a view matrix at a given path position
-	* @return View matrix at time t of the path
+	* @brief return a view matrix at a given path position
+	* @return view matrix at time t of the path
 	*/
 	Eigen::Affine3f cameraAtStep (float global_t)
 	{
-		
 		Eigen::Affine3f m = Eigen::Affine3f::Identity();
+		if (global_t < 0 || global_t > 1)		
+			return m;
 
 		if (key_positions.size() < 2)
 			return m;
@@ -354,11 +352,19 @@ public:
 
 		Eigen::Quaternionf qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
 
-
 		m.rotate(qt);
 		m.translation() = pt.head(3);
 
 		return m;
+	}
+
+	/**
+	* @brief Return the view matrix at current animation step
+	* @return View matrix at current animation step
+	*/
+	Eigen::Affine3f cameraAtCurrentStep (void)
+	{
+		return cameraAtStep(anim_time);
 	}
 
 	/**
