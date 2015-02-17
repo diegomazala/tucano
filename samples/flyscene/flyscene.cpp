@@ -18,9 +18,7 @@ Flyscene::~Flyscene()
 
 void Flyscene::addKeyPoint (void)
 {
-	Eigen::Vector3f pt = flycamera->getCenter();
-	camerapath->addKeyPosition(pt);
-	
+	camerapath->addKeyPosition(flycamera);
 }
 
 
@@ -36,6 +34,8 @@ void Flyscene::initialize (int width, int height)
 	flycamera->setViewport(Eigen::Vector2f ((float)width, (float)height));
 
 	camerapath = new CameraPath();
+
+	camerarep = new CameraRep();
 
 	light = new Camera();
 
@@ -55,5 +55,9 @@ void Flyscene::paintGL (void)
         phong->render(mesh, flycamera, light);
         flycamera->render();
 		camerapath->render(flycamera, light);
+
+		Eigen::Affine3f step_cam = camerapath->cameraAtStep(0.5);
+		camerarep->setModelMatrix(step_cam);
+		camerarep->render(flycamera, light);
     }
 }

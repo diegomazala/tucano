@@ -96,6 +96,14 @@ public:
         return &modelMatrix;
     }
 
+	/**
+	* @brief Sets the model matrix
+	* @param m Given new model matrix
+	*/
+	void setModelMatrix (Eigen::Affine3f &m)
+	{
+		modelMatrix = m;
+	}
 
 
     /**

@@ -7,7 +7,6 @@ set(TUCANO_DIR "../../src/")
 set(TUCANO_EFFECTS_DIR "../../effects/")
 set(TUCANO_BINARY_DIR "../../../bin/")
 
-
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 set (GLFW_LIBRARIES ${GLFW_STATIC_LIBRARIES})

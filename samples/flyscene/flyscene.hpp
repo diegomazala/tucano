@@ -6,6 +6,7 @@
 #include <phongshader.hpp>
 #include <utils/flycamera.hpp>
 #include <utils/camerapath.hpp>
+#include <utils/camerarep.hpp>
 #include <mesh.hpp>
 #include <utils/objimporter.hpp>
 
@@ -52,6 +53,9 @@ private:
 
 	// A camera path for smooth camera animation
 	Tucano::CameraPath *camerapath;
+
+	// A camera representation for animating path
+	Tucano::CameraRep *camerarep;
 
 	// Light represented as a camera
 	Tucano::Camera *light;

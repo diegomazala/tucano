@@ -95,8 +95,8 @@ private:
 	/// Second control point between two key positions
 	vector< Eigen::Vector4f > control_points_2;
 
-	/// View matrix at each key frame
-	vector< Eigen::Affine3f > key_matrices;
+	/// Rotation state at each key frame
+	vector< Eigen::Quaternion<float> > key_quaternions;
 
 	/// Mesh with key positions and computed control points for drawing
 	/// smooth curve between key positions
@@ -121,7 +121,7 @@ public:
     void reset (void)
     {
 		key_positions.clear();
-		key_matrices.clear();
+		key_quaternions.clear();
 		control_points_1.clear();
 		control_points_2.clear();
     }
@@ -156,7 +156,6 @@ public:
 		///@TODO implement sphere by hand and put it in utils
 		MeshImporter::loadPlyFile(&sphere, "../samples/models/sphere.ply");
 		sphere.normalizeModelMatrix();
-
 
 		phong = new Effects::Phong();
 		phong->setShadersDir("../effects/shaders/");
@@ -198,9 +197,15 @@ public:
 	* @brief Add key position
 	* @param pt New key point
 	*/
-	void addKeyPosition (Eigen::Vector3f & pt)
+	void addKeyPosition (Tucano::Camera* camera)
 	{
-		key_positions.push_back ( Eigen::Vector4f(pt[0], pt[1], pt[2], 1.0) );
+		Eigen::Vector4f center; 
+		center << camera->getCenter(), 1.0;
+		key_positions.push_back ( center );
+
+		Eigen::Quaternionf quat (camera->getViewMatrix().rotation() );
+		key_quaternions.push_back (quat);
+
 		if (key_positions.size() > 1)
 			fillVertexData();
 	}
@@ -218,7 +223,6 @@ public:
 		{
 
         	camerapath_shader->bind();
-        	Misc::errorCheckFunc(__FILE__, __LINE__);
         
         	camerapath_shader->setUniform("viewMatrix", camera->getViewMatrix());
         	camerapath_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
@@ -250,35 +254,112 @@ public:
 			phong->render(&sphere, camera, light);
 		}
 		
+		renderCameraOnPath(anim_time, camera, light);
+
+		if (animating)
+			stepAnimation();	
+
+        Misc::errorCheckFunc(__FILE__, __LINE__);
+    }
+
+	/**
+	* @brief Renders the camera represetation on path at given time step
+	* @param t Time on curve to place camera
+	* @param camera Given current view camera
+	* @param light Light camera
+	*/
+	void renderCameraOnPath ( float t, Tucano::Camera* camera, Tucano::Camera* light )
+	{
 		if (key_positions.size() > 1)
 		{
 			// render camera in path
 			sphere.resetModelMatrix();
 
-			// in what Beziér piece animation is
-			int curve_piece = int(anim_time * (key_positions.size()-1));
-			float curve_step = 1.0/(float)(key_positions.size()-1);
+			Eigen::Affine3f m = cameraAtStep(t);
 
-			// t is the time inside this curve piece, so normalize it [0,1]
-			float t = (anim_time - curve_step*curve_piece)/curve_step;
-
-			// compute point inside curve piece
-			Eigen::Vector4f pt;
-			pt = pow(1-t,3)*key_positions[curve_piece] + 3.0*pow(1-t,2)*t*control_points_1[curve_piece] + 3.0*(1-t)*pow(t,2)*control_points_2[curve_piece] + pow(t, 3)*key_positions[curve_piece+1];
-		
-			Eigen::Vector3f translation = pt.head(3);
+			Eigen::Vector3f translation = (pointOnPath(t)).head(3);
 			sphere.modelMatrixPtr()->translate( translation );
 			sphere.modelMatrixPtr()->scale( 0.07 );
-			color << 0.45, 1.0, 0.5, 1.0;
+			Eigen::Vector4f color (0.45, 1.0, 0.5, 1.0);
 			phong->setDefaultColor (color);
 			phong->render(&sphere, camera, light);
 		}
-		if (animating)
-			stepAnimation();	
+		
+	}
+
+	/**
+	* @brief Returns the segment given a time t in [0,1] for the whole curve 
+	* @return Curve segment number
+	*/
+	int curveSegment (float t)
+	{
+		if (t < 0 || t > 1.0)
+			return 0;
+
+		return int (t * (key_positions.size()-1));
+	}
+
+	/**
+	* @brief Converts global t to a local t inside a curve segment
+	* @return local parameter t in [0,1] for a single Cubic Beziér segment
+	*/
+	float toLocalStep (float t)
+	{
+		int segment = curveSegment(t);
+		float segment_length = 1.0 / (float)(key_positions.size()-1);
+
+		return (t - segment*segment_length)/segment_length;	
+	}
+
+	/**
+	* @brief Compute point on path from t in [0,1]
+	* Note that t regards the whole curve, so t=0 is the first key position
+	* and t=1 is the last key point
+	* 
+	* t is first converted into a curve piece (a single Cubic Beziér)
+	* and a local t on this piece
+	* @param t Global t in [0,1]
+	*/
+	Eigen::Vector4f pointOnPath (float global_t)
+	{
+		float t = toLocalStep (global_t);
+		int segment = curveSegment (global_t);
+
+		// compute point inside curve piece
+		Eigen::Vector4f pt;
+		pt = pow(1-t,3)*key_positions[segment] + 3.0*pow(1-t,2)*t*control_points_1[segment] + 3.0*(1-t)*pow(t,2)*control_points_2[segment] + pow(t, 3)*key_positions[segment+1];
+
+		return pt;	
+	}	
+	
+
+	/**
+	* @brief Return a view matrix at a given path position
+	* @return View matrix at time t of the path
+	*/
+	Eigen::Affine3f cameraAtStep (float global_t)
+	{
+		
+		Eigen::Affine3f m = Eigen::Affine3f::Identity();
+
+		if (key_positions.size() < 2)
+			return m;
+	
+		float t = toLocalStep (global_t);
+		int segment = curveSegment (global_t);
+
+		// compute point inside curve piece
+		Eigen::Vector4f pt;
+		pt = pow(1-t,3)*key_positions[segment] + 3.0*pow(1-t,2)*t*control_points_1[segment] + 3.0*(1-t)*pow(t,2)*control_points_2[segment] + pow(t, 3)*key_positions[segment+1];
+
+		Eigen::Quaternionf qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
 
 
-        Misc::errorCheckFunc(__FILE__, __LINE__);
-    }
+		m.rotate(qt);
+		m.translation() = pt.head(3);
+
+		return m;
+	}
 
 	/**
 	* @brief Move animation forward one step
@@ -376,10 +457,6 @@ public:
 		x.col(0) = A.colPivHouseholderQr().solve(b.col(0));
 		x.col(1) = A.colPivHouseholderQr().solve(b.col(1));
 		x.col(2) = A.colPivHouseholderQr().solve(b.col(2));
-
-		cout << "matrix A " << endl << A << endl << endl;
-		cout << "matrix b " << endl << b << endl << endl;
-		cout << "matrix x " << endl << x << endl << endl;
 
 		// now populate the vectors with the first control points
 		Eigen::Vector4f pt;

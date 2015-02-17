@@ -233,16 +233,18 @@ public:
 	{
 		resetViewMatrix();
 
+		// compute X axis restricted to a rotation around Y axis
         Eigen::Vector3f rotX = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitX();
         rotX.normalize();
 
+		// Z axis follows X axis rotation plus a rotation around new X axis
         Eigen::Vector3f rotZ = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitZ();
         rotZ = Eigen::AngleAxisf(rotation_X_axis, rotX) * rotZ;
         rotZ.normalize();
 
+		// Z axis is restricted to X and Y to form an orthonormal system
 		Eigen::Vector3f rotY = Eigen::AngleAxisf(rotation_X_axis, rotX) * Eigen::Vector3f::UnitY();
 		rotY.normalize();
-
 
 		/**@TODO must check if matrix is still orthonormal, it might deviate
 		* due to numerical errors. Should force it sometimes, or recompute
