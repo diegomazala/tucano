@@ -460,6 +460,8 @@ public:
 	* Since we are restricting the splines to join with same position, and first
 	* two derivatives, the result is a smooth curve passing through all control points
 	* See reference at class info for more details.
+	*
+	* To solve the tridiagonal system we use Thomas Algorithm (see Wikipedia)
 	*/
 	void computeInnerControlPoints ( void )
 	{
@@ -467,7 +469,8 @@ public:
 		control_points_1.clear();
 		control_points_2.clear();
 	
-
+		// if there are only two keypoints it is a linear segment
+		// just distribute control points equally along segment
 		if (key_positions.size() == 2)
 		{
 			Eigen::Vector4f pt = 0.75*key_positions[0] + 0.25*key_positions[1];	
@@ -485,7 +488,7 @@ public:
 		control_points_2.resize(n+1);
 
 		// in theory this should be a nxn matrix, but since it is a tridiagonal matrix
-		// we are just storing the non-zero elements
+		// we are just storing the non-zero elements as a, b, and c
 		vector <float> a_orig;
 		vector <float> b_orig;
 		vector <float> c_orig;
@@ -501,7 +504,7 @@ public:
 		c.resize(n);	
 		d.resize(n);
 
-		// build the weight matrix, it is the same for all coordinates except first and last
+		// build the weight matrix, it is the same for all lines except first and last
 		a_orig[0] = 0.0;
 		b_orig[0] = 2.0;
 		c_orig[0] = 1.0;
@@ -519,8 +522,10 @@ public:
 
 		// solve using Thomas Algorithm for tridiagonal matrices
 		// solve the system three times, one for each coordinate (x, y, and z)
+		// we copy the coefficients each time to avoid recomputing them
 		for (int coord = 0; coord < 3; ++coord)
 		{
+			// build solution vector of linear system
 			d[0] = key_positions[0][coord] + 2.0 * key_positions[1][coord];	
 			for (int i = 1; i < n-1; i++)
 				d[i] = 4.0*key_positions[i][coord] + 2.0*key_positions[i+1][coord];
@@ -531,6 +536,7 @@ public:
 			b = b_orig;
 			c = c_orig;
 
+			// forward sweep
 			c[0] = c[0]/b[0];
 			d[0] = d[0]/b[0];
 
@@ -541,11 +547,13 @@ public:
 				d[i] = (d[i] - a[i]*d[i-1]) / m;
 			}
 
+			// back substitution
 			control_points_1[n-1][coord] = d[n-1];
 			for (int i = n-2; i >= 0; --i)
 			{
 				control_points_1[i][coord] = d[i] - c[i]*control_points_1[i+1][coord];
 			}
+			// add one last control point to facilitate future operations (same size as key vector)
 			control_points_1[n][coord] = control_points_1[n-1][coord];
 		}
 
