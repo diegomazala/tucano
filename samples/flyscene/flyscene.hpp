@@ -43,6 +43,16 @@ public:
 
 	void addKeyPoint (void);
 
+	void switchFlyCamera (void)
+	{
+		camera_type = 1;
+	}
+
+	void switchPathCamera (void)
+	{
+		camera_type = 2;
+	}
+
 private:
 
 	// A simple phong shader for rendering meshes
@@ -59,6 +69,12 @@ private:
 
 	// Light represented as a camera
 	Tucano::Camera *light;
+
+	// Path camera
+	Tucano::Camera *follow_cam;
+
+	// Camera type to use for rendering (1=FlyCamera, 2=PathCamera)
+	int camera_type;
 	
 	// A mesh
 	Mesh *mesh;

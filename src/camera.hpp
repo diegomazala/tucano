@@ -319,6 +319,19 @@ public:
         projectionMatrix = mat;
     }
 
+	 /**
+     * @brief Sets the view matrix from a given an affine 3x3 matrix.
+     * @param mat Given Affine 3x3 matrix to set as view matrix.
+     */
+    void setViewMatrix(const Eigen::Affine3f& mat)
+    {
+        viewMatrix = mat;
+    }
+
+
+
+	
+
     /**
      * @brief Returns near plane value.
      * @return Near plane.

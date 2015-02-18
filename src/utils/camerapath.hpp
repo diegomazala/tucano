@@ -254,10 +254,6 @@ public:
 			phong->render(&sphere, camera, light);
 		}
 		
-//		renderCameraOnPath(anim_time, camera, light);
-
-		if (animating)
-			stepAnimation();	
 
         Misc::errorCheckFunc(__FILE__, __LINE__);
     }

@@ -6,6 +6,8 @@ Flyscene::Flyscene(void)
 	flycamera = 0;
 	light = 0;
 	camerapath = 0;
+	follow_cam = 0;
+	camera_type = 1;
 }
 
 Flyscene::~Flyscene()
@@ -14,6 +16,7 @@ Flyscene::~Flyscene()
 	delete flycamera;
 	delete light;
 	delete camerapath;
+	delete follow_cam;
 }
 
 void Flyscene::addKeyPoint (void)
@@ -37,6 +40,8 @@ void Flyscene::initialize (int width, int height)
 
 	camerarep = new CameraRep();
 
+	follow_cam = new Camera();
+
 	light = new Camera();
 
 	mesh = new Mesh();
@@ -52,13 +57,26 @@ void Flyscene::paintGL (void)
 	flycamera->updateViewMatrix();
     if (phong && mesh)
     {
-        phong->render(mesh, flycamera, light);
-        flycamera->render();
-		camerapath->render(flycamera, light);
+		camerapath->stepAnimation();
+		if (camera_type == 1)
+		{
+        	phong->render(mesh, flycamera, light);
+        	flycamera->render();
+			camerapath->render(flycamera, light);
 
-		Eigen::Affine3f step_cam = camerapath->cameraAtCurrentStep();
-		step_cam.scale(0.1);
-		camerarep->setModelMatrix(step_cam);
-		camerarep->render(flycamera, light);
+			Eigen::Affine3f step_cam = camerapath->cameraAtCurrentStep();
+			step_cam.scale(0.1);
+			camerarep->setModelMatrix(step_cam);
+			camerarep->render(flycamera, light);
+		}
+		if (camera_type == 2)
+		{
+			follow_cam->setProjectionMatrix( flycamera->getProjectionMatrix() );
+			follow_cam->setViewport ( flycamera->getViewport() );
+			Eigen::Affine3f path_cam_view = camerapath->cameraAtCurrentStep();
+
+			follow_cam->setViewMatrix (path_cam_view.inverse());
+			phong->render(mesh, follow_cam, light);
+		}
     }
 }
