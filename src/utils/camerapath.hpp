@@ -70,14 +70,19 @@ const string camerapath_vertex_code = "\n"
 /**
  * @brief Camera path class, defines control points and a cubic Bezier approximation
  * for defining a smooth camera path from key frames.
+ *
  * Reference: https://www.particleincell.com/2012/bezier-splines/
+ *
+ * Notation:
+ * We refer to time as the curve parameter (analogy to particle moving along path)
+ * We refer to curve as the whole path, and a segment as one Cubic Bezíér that composes path
  **/
 class CameraPath: public Tucano::Camera {
 
 
 private:
 
-    /// Movement speed
+    /// Movement speed, arc length increment for each animation step
     float anim_speed;
 
 	/// Animation time
@@ -95,14 +100,20 @@ private:
 	/// Second control point between two key positions
 	vector< Eigen::Vector4f > control_points_2;
 
+	/// Arc-length approximation splitting each Beziér segment into linear segments 
+	vector< vector <float> > arc_lengths;
+
+	/// Total path length
+	float path_length;
+
 	/// Rotation state at each key frame
 	vector< Eigen::Quaternion<float> > key_quaternions;
 
-	/// Mesh with key positions and computed control points for drawing
+	/// Mesh with path's key positions and computed control points for drawing
 	/// smooth curve between key positions
 	Mesh curve;
 
-	/// A sphere to visually represent the curves key positions
+	/// A sphere to visually represent the path's key positions
 	Mesh sphere;
 
 	/// Phong shader for drawing spheres
@@ -110,9 +121,7 @@ private:
     
     /// Path shader, used for rendering the curve
     Shader* camerapath_shader;
-
 	
-
 public:
 
     /**
@@ -124,6 +133,8 @@ public:
 		key_quaternions.clear();
 		control_points_1.clear();
 		control_points_2.clear();
+		arc_lengths.clear();
+		path_length = 0.0;
     }
 
     ///Default destructor.
@@ -145,7 +156,7 @@ public:
      */
     CameraPath ()
     {
-        anim_speed = 0.0015;
+        anim_speed = 0.015;
 		anim_time = 0.0;
 		animating = true;
 
@@ -161,18 +172,6 @@ public:
 		phong->setShadersDir("../effects/shaders/");
 		phong->initialize();
 
-/*		Eigen::Vector3f pt;
-		pt << -10.0, -10.0, 0.0; 
-		addKeyPosition(pt);
-		pt << -10.0, 10.0, 0.0;
-		addKeyPosition( pt );
-		pt << 10.0, 10.0, 0.0;
-		addKeyPosition( pt );
-		pt << 10.0, -10.0, 0.0;             
-		addKeyPosition( pt );
-		pt << -10.0, -10.0, 0.0;             
-		addKeyPosition( pt );
- */
         //camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
 
@@ -182,14 +181,16 @@ public:
 	void fillVertexData (void)
 	{
 		computeInnerControlPoints(); 
+		computeArcLength();
 
 		curve.reset();
 		curve.loadVertices(key_positions);
 		curve.createAttribute("in_ControlPoint1", control_points_1);
 		curve.createAttribute("in_ControlPoint2", control_points_2);
 		
+		#ifdef TUCANODEBUG
         Misc::errorCheckFunc(__FILE__, __LINE__);
-//		curve.createAttribute("p0", key_positionss);
+		#endif
 
 	}
 
@@ -214,6 +215,7 @@ public:
 	* @brief Renders smooth path
 	* End points for each Beziér is passed as line_strip
 	* and control points as vertex attributes
+	* Inside geometry shader each Beziér segment is approximate by linear segments
 	* @param camera Current camera for viewing scene
 	*/
     void render (Tucano::Camera *camera, Tucano::Camera *light)
@@ -244,7 +246,7 @@ public:
 		// render key positions
 		Eigen::Vector4f color (0.95, 0.38, 0.38, 1.0);
 		phong->setDefaultColor( color );
-		for (int i = 0; i < key_positions.size(); i++)
+		for (unsigned int i = 0; i < key_positions.size(); i++)
 		{
 			sphere.resetModelMatrix();
 			
@@ -259,8 +261,8 @@ public:
     }
 
 	/**
-	* @brief Renders the camera represetation on path at given time step
-	* @param t Time on curve to place camera
+	* @brief Renders the camera represetation on path at given time 
+	* @param t Time on path to place camera
 	* @param camera Given current view camera
 	* @param light Light camera
 	*/
@@ -269,7 +271,7 @@ public:
 		if (key_positions.size() > 1)
 		{
 			// render camera in path
-			Eigen::Affine3f m = cameraAtStep(t);
+			Eigen::Affine3f m = cameraAtTime(t);
 			m.scale(0.07);
 			sphere.setModelMatrix(m);
 
@@ -281,7 +283,7 @@ public:
 	}
 
 	/**
-	* @brief returns the segment given a time t in [0,1] for the whole curve 
+	* @brief returns the segment given a time t in [0,1] for the whole path 
 	* @return curve segment number
 	*/
 	int curveSegment (float t)
@@ -293,10 +295,10 @@ public:
 	}
 
 	/**
-	* @brief converts global t to a local t inside a curve segment
-	* @return local parameter t in [0,1] for a single Cubic Beziér segment
+	* @brief converts global parameter t to a local t inside a segment
+	* @return Local parameter t in [0,1] for a single Cubic Beziér segment
 	*/
-	float toLocalStep (float t)
+	float toLocalParameter (float t)
 	{
 		int segment = curveSegment(t);
 		float segment_length = 1.0 / (float)(key_positions.size()-1);
@@ -305,46 +307,45 @@ public:
 	}
 
 	/**
-	* @brief compute point on path from t in [0,1]
-	* note that t regards the whole curve, so t=0 is the first key position
-	* and t=1 is the last key point
-	* 
-	* t is first converted into a curve piece (a single Cubic Beziér)
-	* and a local t on this piece
+	* @brief Returns a point at time t on a given Beziér segment
+	* @param t Beziér segment parameter
+	* @param segment Beziér segment on path
+	* @return Point on curve
+	*/
+	Eigen::Vector4f pointOnSegment (float t, int segment)
+	{
+		Eigen::Vector4f pt;
+		pt = pow(1-t,3)*key_positions[segment] + 3.0*pow(1-t,2)*t*control_points_1[segment] + 3.0*(1-t)*pow(t,2)*control_points_2[segment] + pow(t, 3)*key_positions[segment+1];
+		return pt;	
+	}
+
+	/**
+	* @brief compute point on path given t in [0,1]
+	*
+	* Note that t refers to the whole path, so t=0 is the first key position
+	* and t=1 is the last key position
 	* @param t global t in [0,1]
 	*/
 	Eigen::Vector4f pointOnPath (float global_t)
 	{
-		float t = toLocalStep (global_t);
+		float t = toLocalParameter (global_t);
 		int segment = curveSegment (global_t);
-
-		// compute point inside curve piece
-		Eigen::Vector4f pt;
-		pt = pow(1-t,3)*key_positions[segment] + 3.0*pow(1-t,2)*t*control_points_1[segment] + 3.0*(1-t)*pow(t,2)*control_points_2[segment] + pow(t, 3)*key_positions[segment+1];
-
-		return pt;	
+		return pointOnSegment(t, segment);	
 	}	
 	
 
 	/**
-	* @brief return a view matrix at a given path position
+	* @brief return a view matrix at a given path parameter 
 	* @return view matrix at time t of the path
 	*/
-	Eigen::Affine3f cameraAtStep (float global_t)
+	Eigen::Affine3f cameraAtTime (float global_t)
 	{
 		Eigen::Affine3f m = Eigen::Affine3f::Identity();
-		if (global_t < 0 || global_t > 1)		
-			return m;
 
-		if (key_positions.size() < 2)
-			return m;
-	
-		float t = toLocalStep (global_t);
+		float t = toLocalParameter (global_t);
 		int segment = curveSegment (global_t);
 
-		// compute point inside curve piece
-		Eigen::Vector4f pt;
-		pt = pow(1-t,3)*key_positions[segment] + 3.0*pow(1-t,2)*t*control_points_1[segment] + 3.0*(1-t)*pow(t,2)*control_points_2[segment] + pow(t, 3)*key_positions[segment+1];
+		Eigen::Vector4f pt = pointOnSegment(t, segment);
 
 		Eigen::Quaternionf qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
 
@@ -355,12 +356,63 @@ public:
 	}
 
 	/**
-	* @brief Return the view matrix at current animation step
-	* @return View matrix at current animation step
+	* @brief Return the view matrix at current animation time 
+	* @return View matrix at current animation time
 	*/
-	Eigen::Affine3f cameraAtCurrentStep (void)
+	Eigen::Affine3f cameraAtCurrentTime (void)
 	{
-		return cameraAtStep(anim_time);
+		return pathAtArcLength(anim_time);
+	}
+
+	/**
+	* @brief Returns a camera matrix on curve give s as arc length parameter
+	* @param s Arc length parameter in [0,1]
+	* @return Matrix on path at s
+	*/
+	Eigen::Affine3f pathAtArcLength (float s)
+	{
+		Eigen::Affine3f m = Eigen::Affine3f::Identity();
+		if (s < 0.0 || s > path_length)		
+			return m;
+
+		if (key_positions.size() < 2)
+			return m;
+	
+		float arc_length = s;
+
+		// find in which Beziér segment we should look
+		unsigned int segment = 0;
+		for (; segment < key_positions.size()-1; ++segment)
+		{
+			if (arc_lengths[segment+1][0] > arc_length)
+				break;
+		}	
+
+		// look inside Beziér segment in which linear approximation we should look for 
+		unsigned int sub_seg = 0;
+		for (; sub_seg < arc_lengths[segment].size()-1; ++sub_seg)
+		{
+			if (arc_lengths[segment][sub_seg+1] > arc_length)
+				break;
+		}
+
+		// convert from arc length (s) to time parameter (t)
+		// percentage inside sub segment
+		float alpha = (arc_length - arc_lengths[segment][sub_seg]) / 
+					(arc_lengths[segment][sub_seg+1] - arc_lengths[segment][sub_seg]);
+
+		// find parameter [0,1] inside Beziér segment
+		float t_ini = sub_seg / (float)(arc_lengths[segment].size()-1);
+		float t_end = (sub_seg+1) / (float)(arc_lengths[segment].size()-1);
+		float t_s = t_ini + alpha * (t_end - t_ini);
+
+		// convert to global parameter of the path
+		t_s = t_s / (float)(key_positions.size()-1);
+
+		// add time to beginning of segment
+		t_s += segment / (float)(key_positions.size()-1);	
+
+		return cameraAtTime(t_s);	
 	}
 
 	/**
@@ -369,8 +421,10 @@ public:
 	void stepAnimation ( void )
 	{
 		anim_time += anim_speed;
-		if (anim_time >= 1.0)
-			anim_time = anim_time - 1.0;
+
+		// restart if necessary
+		if (anim_time >= path_length)
+			anim_time = anim_time - path_length;
 	}
 
 	/**
@@ -399,6 +453,7 @@ public:
 
 	/**
 	* @brief Compute inner control points from key positions
+	*
 	* For each pair of subsequent key positions, compute two control points
 	* to define a Beziér Spline.
 	* Since we are restricting the splines to join with same position, and first
@@ -413,9 +468,10 @@ public:
 	
 		if (key_positions.size() == 2)
 		{
-			Eigen::Vector4f pt = (key_positions[0] + key_positions[1])*0.5;	
+			Eigen::Vector4f pt = 0.75*key_positions[0] + 0.25*key_positions[1];	
 			control_points_1.push_back(pt);
 			control_points_1.push_back(pt);
+			pt << 0.25*key_positions[0] + 0.75*key_positions[1];
 			control_points_2.push_back(pt);
 			control_points_2.push_back(pt);
 			return;
@@ -478,6 +534,59 @@ public:
 		pt = (key_positions[n] + control_points_1[n-1])*0.5;
 		control_points_2.push_back (pt);
 		control_points_2.push_back (pt);
+	}
+
+	/**
+	* @brief Compute an approximation of the arclength
+	*
+	* approximates the curve by linear segments
+	*/
+	void computeArcLength (void)
+	{
+		float divs = 100.0;
+		Eigen::Vector4f p0;
+		Eigen::Vector4f p1;
+		float dist = 0.0;
+		path_length = 0.0;
+
+		arc_lengths.clear();
+
+		p0 = key_positions[0];
+		for (unsigned int seg = 0; seg < key_positions.size()-1; ++seg)
+		{
+			vector <float> seg_lengths;
+			for (int i = 0; i < divs; ++i)
+			{
+				p1 = pointOnSegment( (float)i/divs, seg);
+				dist += (p1-p0).norm();
+				seg_lengths.push_back(dist);
+				p0 = p1;
+			}
+			// to make life easier when converting from t to s,
+			// we also repeat the last sub segment length at the end
+			// even though it will be covered by the first sub segment
+			// of the next Beziér segment
+			// note that we do not increment dist, since it will be done
+			// in the next iteration
+			p1 = key_positions[seg+1];
+			seg_lengths.push_back( dist + (p1-p0).norm() );
+	
+			arc_lengths.push_back (seg_lengths);
+		}	
+		// the last segment connecting to the final key position
+		// there is no segment starting at this key position, so it
+		// must be treated apart
+		p1 = key_positions[key_positions.size()-1];
+		dist += (p1-p0).norm();
+		
+		path_length = dist;
+
+		// insert a last vector with only the total distance
+		// makes life easier when converting from arc length to time parameter
+		vector <float> last_seg;
+		last_seg.push_back (dist);
+		arc_lengths.push_back(last_seg);
+
 	}
 
 };

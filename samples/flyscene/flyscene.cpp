@@ -64,7 +64,7 @@ void Flyscene::paintGL (void)
         	flycamera->render();
 			camerapath->render(flycamera, light);
 
-			Eigen::Affine3f step_cam = camerapath->cameraAtCurrentStep();
+			Eigen::Affine3f step_cam = camerapath->cameraAtCurrentTime();
 			step_cam.scale(0.1);
 			camerarep->setModelMatrix(step_cam);
 			camerarep->render(flycamera, light);
@@ -73,7 +73,7 @@ void Flyscene::paintGL (void)
 		{
 			follow_cam->setProjectionMatrix( flycamera->getProjectionMatrix() );
 			follow_cam->setViewport ( flycamera->getViewport() );
-			Eigen::Affine3f path_cam_view = camerapath->cameraAtCurrentStep();
+			Eigen::Affine3f path_cam_view = camerapath->cameraAtCurrentTime();
 
 			follow_cam->setViewMatrix (path_cam_view.inverse());
 			phong->render(mesh, follow_cam, light);

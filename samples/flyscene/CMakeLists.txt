@@ -23,6 +23,8 @@ endif()
 
 
 add_definitions(-DTUCANODEBUG)
+add_definitions ("-Wall")
+add_definitions ("-g")
 
 pkg_check_modules(EIGEN3 REQUIRED eigen3)
 include_directories(
