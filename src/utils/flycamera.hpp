@@ -301,8 +301,7 @@ public:
      */
     void moveDown ( void )
     {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())) * Eigen::Vector3f(0.0, 1.0, 0.0);
-		translation_vector += dir * speed;
+		translation_vector += Eigen::Vector3f::UnitY() * speed;
     }
 
     /**
@@ -310,8 +309,7 @@ public:
      */
     void moveUp ( void )
     {
-		Eigen::Vector3f dir = (Eigen::AngleAxisf(rotation_X_axis, Eigen::Vector3f::UnitX())) * Eigen::Vector3f(0.0, -1.0, 0.0);
-    	translation_vector += dir * speed;
+    	translation_vector -= Eigen::Vector3f::UnitY() * speed;
 	}
 
     /**

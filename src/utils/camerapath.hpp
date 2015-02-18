@@ -124,6 +124,7 @@ private:
 	
 public:
 
+
     /**
      * @brief Resets the path 
      */
@@ -466,6 +467,7 @@ public:
 		control_points_1.clear();
 		control_points_2.clear();
 	
+
 		if (key_positions.size() == 2)
 		{
 			Eigen::Vector4f pt = 0.75*key_positions[0] + 0.25*key_positions[1];	
@@ -478,62 +480,91 @@ public:
 		}
 
 		const int n = key_positions.size()-1;
-		Eigen::MatrixXf A(n,n);
-		A = Eigen::MatrixXf::Zero(n,n);
-		Eigen::MatrixXf x = Eigen::MatrixXf::Zero(n,3);
-		Eigen::MatrixXf b = Eigen::MatrixXf::Zero(n,3);
 
-		// build the weight matrix, it is the same for all coordinates
-		A(0, 0) = 2.0;
-		A(0, 1) = 1.0;
+		control_points_1.resize(n+1);
+		control_points_2.resize(n+1);
+
+		// in theory this should be a nxn matrix, but since it is a tridiagonal matrix
+		// we are just storing the non-zero elements
+		vector <float> a_orig;
+		vector <float> b_orig;
+		vector <float> c_orig;
+		vector <float> a;
+		vector <float> b;
+		vector <float> c;
+		vector <float> d;
+		a_orig.resize(n);
+		b_orig.resize(n);
+		c_orig.resize(n);
+		a.resize(n);
+		b.resize(n);
+		c.resize(n);	
+		d.resize(n);
+
+		// build the weight matrix, it is the same for all coordinates except first and last
+		a_orig[0] = 0.0;
+		b_orig[0] = 2.0;
+		c_orig[0] = 1.0;
+		
 		for (int i = 1; i < n-1; i++)
 		{
-			A(i, i-1) = 1.0;
-			A(i, i) = 4.0;
-			A(i, i+1) = 1.0;
+			a_orig[i] = 1.0;
+			b_orig[i] = 4.0;
+			c_orig[i] = 1.0;
 		}
 
-		A(n-1, n-2) = 2.0;
-		A(n-1, n-1) = 7.0;
+		a_orig[n-1] = 2.0;
+		b_orig[n-1] = 7.0;
+		c_orig[n-1] = 0.0;
 
+		// solve using Thomas Algorithm for tridiagonal matrices
 		// solve the system three times, one for each coordinate (x, y, and z)
-		b(0, 0) = key_positions[0][0] + 2.0 * key_positions[1][0];	
-		b(0, 1) = key_positions[0][1] + 2.0 * key_positions[1][1];
-		b(0, 2) = key_positions[0][2] + 2.0 * key_positions[1][2];
-
-		for (int i = 1; i < n-1; i++)
+		for (int coord = 0; coord < 3; ++coord)
 		{
-			b(i, 0) = 4.0*key_positions[i][0] + 2.0*key_positions[i+1][0];
-			b(i, 1) = 4.0*key_positions[i][1] + 2.0*key_positions[i+1][1];
-			b(i, 2) = 4.0*key_positions[i][2] + 2.0*key_positions[i+1][2];
-
-		}
-		b(n-1, 0) = 8.0*key_positions[n-1][0] + key_positions[n][0];
-		b(n-1, 1) = 8.0*key_positions[n-1][1] + key_positions[n][1];
-		b(n-1, 2) = 8.0*key_positions[n-1][2] + key_positions[n][2];
+			d[0] = key_positions[0][coord] + 2.0 * key_positions[1][coord];	
+			for (int i = 1; i < n-1; i++)
+				d[i] = 4.0*key_positions[i][coord] + 2.0*key_positions[i+1][coord];
+			d[n-1] = 8.0*key_positions[n-1][coord] + key_positions[n][coord];
 	
-		x.col(0) = A.colPivHouseholderQr().solve(b.col(0));
-		x.col(1) = A.colPivHouseholderQr().solve(b.col(1));
-		x.col(2) = A.colPivHouseholderQr().solve(b.col(2));
+			// copy coefficients, we are going to reuse them for every coordinate
+			a = a_orig;
+			b = b_orig;
+			c = c_orig;
 
-		// now populate the vectors with the first control points
-		Eigen::Vector4f pt;
-		for (int i = 0; i < n; ++i)
-		{
-			pt << x.row(i).transpose(), 1.0;
-			control_points_1.push_back (pt); 	
+			c[0] = c[0]/b[0];
+			d[0] = d[0]/b[0];
+
+			for (int i = 1; i < n; ++i)
+			{
+				float m = b[i] - a[i]*c[i-1];
+				c[i] = c[i] / m;
+				d[i] = (d[i] - a[i]*d[i-1]) / m;
+			}
+
+			control_points_1[n-1][coord] = d[n-1];
+			for (int i = n-2; i >= 0; --i)
+			{
+				control_points_1[i][coord] = d[i] - c[i]*control_points_1[i+1][coord];
+			}
+			control_points_1[n][coord] = control_points_1[n-1][coord];
 		}
-		control_points_1.push_back (pt);
+
+		// set w = 1 for all control points
+		for (int i = 0; i <= n; ++i)
+		{
+			control_points_1[i][3] = 1.0;
+		}
 
 		// control point 2 can be determined directly now
+		Eigen::Vector4f pt;
 		for (int i = 0; i < n-1; ++i)
 		{
 			pt = 2.0* key_positions[i+1] - control_points_1[i+1];
-			control_points_2.push_back (pt);
+			control_points_2[i] = pt;
 		}
 		pt = (key_positions[n] + control_points_1[n-1])*0.5;
-		control_points_2.push_back (pt);
-		control_points_2.push_back (pt);
+		control_points_2[n-1] = pt;
+		control_points_2[n] = pt;
 	}
 
 	/**
