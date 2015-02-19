@@ -31,41 +31,10 @@
 namespace Tucano
 {
 
-const string camera_fragment_code = "\n"
-        "#version 430\n"
-        "in vec4 ex_Color;\n"
-        "out vec4 out_Color;\n"
-        "in float depth;\n"
-        "void main(void)\n"
-        "{\n"
-        "    out_Color = ex_Color;\n"
-        "    gl_FragDepth = depth;\n"
-        "}\n";
-
-const string camera_vertex_code = "\n"
-        "#version 430\n"
-        "layout(location=0) in vec4 in_Position;\n"
-        "out vec4 ex_Color;\n"
-        "out float depth;\n"
-        "uniform mat4 modelMatrix;\n"
-        "uniform mat4 viewMatrix;\n"
-        "uniform mat4 projectionMatrix;\n"
-        "uniform vec4 in_Color;\n"
-        "uniform float nearPlane;\n"
-        "uniform float farPlane;\n"
-        "void main(void)\n"
-        "{\n"
-        "   gl_Position = (viewMatrix * modelMatrix) * in_Position;\n"
-        "   depth = (farPlane+nearPlane)/(farPlane-nearPlane) + ( (2*nearPlane*farPlane)/(farPlane-nearPlane) ) * (1/gl_Position[2]);\n"
-        "   depth = (depth+1.0)/2.0;\n"
-        "   gl_Position = projectionMatrix * gl_Position;\n"
-        "   ex_Color = in_Color;\n"
-        "}\n";
-
 /**
  * @brief Defines an abstract camera with a projection and view matrices.
  *
- * It also contains a visual representation of the camera for rendering purposes.
+ * For a visual representation of a camera use the Shapers::CameraRep class
  **/
 class Camera {
 
@@ -106,18 +75,6 @@ protected:
 
     /// Field of view angle in y axis.
     float fovy;
-
-    /// The vertices for the visual representation of the camera.
-    Eigen::Vector4f vertices;
-
-    /// Buffer Objects for camera's representation:
-    GLuint* bufferIDs;
-
-    /// Flag to use default shaders hard-coded as consts, or use given shaders from files
-    bool use_default_shaders;
-
-    /// Shader to render camera representation
-    Shader* cameraShader;
 
     /// Flag to indicate if using a perspective or othograpic projection.
     bool use_perspective;
@@ -329,9 +286,6 @@ public:
     }
 
 
-
-	
-
     /**
      * @brief Returns near plane value.
      * @return Near plane.
@@ -351,25 +305,10 @@ public:
     }
 
     /**
-     * @brief Loads Trackball Shader file.
-     **/
-    void loadShader (void)
-    {
-        if (use_default_shaders)
-            cameraShader->initializeFromStrings(camera_vertex_code, camera_fragment_code);
-        else
-            cameraShader->initialize();
-    }
-
-    /**
      * @brief Default destructor.
      */
     ~Camera()
     {
-        //Delete camera shader.
-        if(cameraShader) {
-            delete cameraShader;
-        }
     }
 
     /**
@@ -387,26 +326,8 @@ public:
      * @brief Default constructor
      * @param shader_dir Optional directory containing camera shaders, otherwise uses default shaders
      */
-    Camera (string shader_dir = "")
+    Camera (void)
     {
-
-        // creates the mesh that will be used to represent the trackball's sphere.
-        createCameraRepresentation();
-
-        // initialize the shader used for trackball rendering:
-        if (shader_dir.empty())
-        {
-            cameraShader = new Shader("cameraShader");
-            use_default_shaders = true;
-        }
-        else
-        {
-            cameraShader = new Shader(shader_dir, "cameraShader");
-            use_default_shaders = false;
-        }
-
-        // initialize buffers used for trackball rendering:
-        bufferIDs = new GLuint[3];
 
         frustum_left = -1.0;
         frustum_right = 1.0;
@@ -416,7 +337,6 @@ public:
         far_plane = 100.0;
         fovy = 90.0;
 
-        loadShader();
         reset();
     }
 
@@ -572,73 +492,6 @@ public:
     {
         viewMatrix.scale(scale_factor);
     }
-
-    /**
-     * @brief Creates a visual representation of the camera.
-     * @todo implement this method! Only buffers are set.
-     * Represents the camera as a truncated pyramid (frustum) and its coordinate axes.
-     */
-    void createCameraRepresentation (void)
-    {
-//        glGenVertexArrays(1, &bufferIDs[0]);
-//        glGenBuffers(2, &bufferIDs[1]);
-//        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
-//        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
-//        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    /**
-     * @brief Binds buffers for rendering camera's representation.
-     */
-    void bindBuffers (void)
-    {
-        //VAO:
-        glBindVertexArray(bufferIDs[0]);
-
-        //VBO:
-        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(0);
-    }
-
-    /**
-     * @brief Unbinds render buffers.
-     */
-    void unbindBuffers (void)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-        glDisableVertexAttribArray(0);
-    }
-
-    /**
-     * @brief Renders the camera representation.
-     *
-     * Renders a truncated pyramid (frustum) to represent the camera.
-     * It will be placed and oriented according to the view matrix.
-     */
-    void render (void)
-    {
-        cameraShader->bind();
-
-        cameraShader->setUniform("viewMatrix", viewMatrix.data(), 4, GL_FALSE, 1);
-        cameraShader->setUniform("projectionMatrix", projectionMatrix.data(), 4 ,GL_FALSE, 1);
-        cameraShader->setUniform("nearPlane", near_plane);
-        cameraShader->setUniform("farPlane", far_plane);
-
-        bindBuffers();
-
-        //X:
-        Eigen::Vector4f colorVector(1.0, 0.0, 0.0, 1.0);
-        cameraShader->setUniform("modelMatrix",(Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(PI/2.0,Eigen::Vector3f(0.0,1.0,0.0))).data(), 4, GL_FALSE, 1);
-        cameraShader->setUniform("in_Color",colorVector.data(),4,1);
-        glDrawArrays(GL_LINE_LOOP, 0, 200);
-        Misc::errorCheckFunc(__FILE__, __LINE__);
-
-        unbindBuffers();
-
-        cameraShader->unbind();
-    }
-
 };
 
 }

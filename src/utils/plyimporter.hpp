@@ -33,6 +33,9 @@ namespace Tucano
 
 namespace MeshImporter
 {
+	// avoid warnings of unused function
+	static bool loadPlyFile (Mesh* mesh, string filename) __attribute__ ((unused));
+
 
     static int normal_cb( p_ply_argument argument )
     {

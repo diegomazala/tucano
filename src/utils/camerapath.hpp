@@ -25,46 +25,12 @@
 
 #include "camera.hpp"
 #include "mesh.hpp"
-#include "utils/plyimporter.hpp"
-#include "phongshader.hpp"
+#include "shapes/sphere.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 
 namespace Tucano
 {
-
-/// Default fragment shader for rendering trackball representation.
-const string camerapath_fragment_code = "\n"
-        "#version 430\n"
-        "in vec4 ex_Color;\n"
-        "out vec4 out_Color;\n"
-        "in float depth;\n"
-        "void main(void)\n"
-        "{\n"
-        "    out_Color = ex_Color;\n"
-        "    gl_FragDepth = depth;\n"
-        "}\n";
-
-/// Default vertex shader for rendering trackball representation.
-const string camerapath_vertex_code = "\n"
-        "#version 430\n"
-        "in vec4 in_Position;\n"
-        "out vec4 ex_Color;\n"
-        "out float depth;\n"
-        "uniform mat4 modelMatrix;\n"
-        "uniform mat4 viewMatrix;\n"
-        "uniform mat4 projectionMatrix;\n"
-        "uniform vec4 in_Color;\n"
-        "uniform float nearPlane;\n"
-        "uniform float farPlane;\n"
-        "void main(void)\n"
-        "{\n"
-        "   gl_Position = (viewMatrix * modelMatrix) * in_Position;\n"
-        "   depth = (farPlane+nearPlane)/(farPlane-nearPlane) + ( (2*nearPlane*farPlane)/(farPlane-nearPlane) ) * (1/gl_Position[2]);\n"
-        "   depth = (depth+1.0)/2.0;\n"
-        "   gl_Position = projectionMatrix * gl_Position;\n"
-        "   ex_Color = in_Color;\n"
-        "}\n";
 
 
 /**
@@ -78,7 +44,6 @@ const string camerapath_vertex_code = "\n"
  * We refer to curve as the whole path, and a segment as one Cubic Bezíér that composes path
  **/
 class CameraPath: public Tucano::Camera {
-
 
 private:
 
@@ -114,11 +79,8 @@ private:
 	Mesh curve;
 
 	/// A sphere to visually represent the path's key positions
-	Mesh sphere;
+	Shapes::Sphere sphere;
 
-	/// Phong shader for drawing spheres
-	Effects::Phong *phong;
-    
     /// Path shader, used for rendering the curve
     Shader* camerapath_shader;
 	
@@ -164,14 +126,6 @@ public:
         initOpenGLMatrices();
         camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
 		camerapath_shader->initialize();
-
-		///@TODO implement sphere by hand and put it in utils
-		MeshImporter::loadPlyFile(&sphere, "../samples/models/sphere.ply");
-		sphere.normalizeModelMatrix();
-
-		phong = new Effects::Phong();
-		phong->setShadersDir("../effects/shaders/");
-		phong->initialize();
 
         //camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
@@ -245,43 +199,20 @@ public:
 		}
 
 		// render key positions
-		Eigen::Vector4f color (0.95, 0.38, 0.38, 1.0);
-		phong->setDefaultColor( color );
 		for (unsigned int i = 0; i < key_positions.size(); i++)
 		{
 			sphere.resetModelMatrix();
 			
 			Eigen::Vector3f translation = key_positions[i].head(3);
 			sphere.modelMatrixPtr()->translate( translation );
-			sphere.modelMatrixPtr()->scale( 0.02 );
-			phong->render(&sphere, camera, light);
+			sphere.modelMatrixPtr()->scale( 0.03 );
+			sphere.render(camera, light);
 		}
 		
-
+		#ifdef TUCANODEBUG
         Misc::errorCheckFunc(__FILE__, __LINE__);
+		#endif
     }
-
-	/**
-	* @brief Renders the camera represetation on path at given time 
-	* @param t Time on path to place camera
-	* @param camera Given current view camera
-	* @param light Light camera
-	*/
-	void renderCameraOnPath ( float t, Tucano::Camera* camera, Tucano::Camera* light )
-	{
-		if (key_positions.size() > 1)
-		{
-			// render camera in path
-			Eigen::Affine3f m = cameraAtTime(t);
-			m.scale(0.07);
-			sphere.setModelMatrix(m);
-
-			Eigen::Vector4f color (0.45, 1.0, 0.5, 1.0);
-			phong->setDefaultColor (color);
-			phong->render(&sphere, camera, light);
-		}
-		
-	}
 
 	/**
 	* @brief returns the segment given a time t in [0,1] for the whole path 

@@ -175,7 +175,7 @@ public:
         glEnableVertexAttribArray(0);
     }
 
-    void unBindBuffers (void)
+    void unbindBuffers (void)
     {
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glDisableVertexAttribArray(0);

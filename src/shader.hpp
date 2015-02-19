@@ -812,6 +812,28 @@ public:
         glDeleteProgram(shaderProgram);
     }
 
+	/**
+	* @brief Generates a list with all active attributes
+	* @param attribs Vector of strings to hold attributes names
+	*/
+	void getActiveAttributes( vector< string > &attribs )
+	{
+		int maxlength = 0;
+		int numattribs = 0;
+
+		glGetProgramiv (shaderProgram, GL_ACTIVE_ATTRIBUTES, &numattribs);
+		glGetProgramiv (shaderProgram, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxlength);
+
+		int length = 0;
+		int size = 0;
+		GLuint type = 0;
+		char name[maxlength];
+		for (int i = 0; i < numattribs; ++i)
+		{
+			glGetActiveAttrib(shaderProgram, i, maxlength, &length, &size, &type, &name[0]);
+			attribs.push_back (name);
+		}
+	}
 
     /**
      * Given the name of a uniform used inside the shader, returns it's location.

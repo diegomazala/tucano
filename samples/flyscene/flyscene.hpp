@@ -6,7 +6,7 @@
 #include <phongshader.hpp>
 #include <utils/flycamera.hpp>
 #include <utils/camerapath.hpp>
-#include <utils/camerarep.hpp>
+#include <shapes/camerarep.hpp>
 #include <mesh.hpp>
 #include <utils/objimporter.hpp>
 
