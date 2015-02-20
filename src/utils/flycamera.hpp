@@ -246,11 +246,6 @@ public:
 		Eigen::Vector3f rotY = Eigen::AngleAxisf(rotation_X_axis, rotX) * Eigen::Vector3f::UnitY();
 		rotY.normalize();
 
-		/**@TODO must check if matrix is still orthonormal, it might deviate
-		* due to numerical errors. Should force it sometimes, or recompute
-		* it using cross products
-		**/
-
         rotation_matrix.row(2) = rotZ;
         rotation_matrix.row(1) = rotY;
         rotation_matrix.row(0) = rotX;

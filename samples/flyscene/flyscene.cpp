@@ -61,7 +61,8 @@ void Flyscene::paintGL (void)
 
     if (phong && mesh)
     {
-		camerapath->stepAnimation();
+		if (camerapath->isAnimating())
+			camerapath->stepForward();
 		if (camera_type == 1)
 		{
         	phong->render(mesh, flycamera, light);

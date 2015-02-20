@@ -41,6 +41,15 @@ public:
 		return flycamera;
 	}
 
+	/**
+	* Returns a pointer to the camerapath instance
+	* @return pointer to camerapath
+	*/
+	CameraPath* cameraPath(void)
+	{
+		return camerapath;
+	}
+
 	void addKeyPoint (void);
 
 	void switchFlyCamera (void)

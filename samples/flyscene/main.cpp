@@ -34,13 +34,18 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		flyscene->getCamera()->moveDown();
 	if (key == GLFW_KEY_E && (action == GLFW_PRESS || action == GLFW_REPEAT))
 		flyscene->getCamera()->moveUp();	
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+	if (key == GLFW_KEY_K && action == GLFW_PRESS)
 		flyscene->addKeyPoint();
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 		flyscene->switchFlyCamera();
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
 		flyscene->switchPathCamera();
-
+	if (key == GLFW_KEY_COMMA && (action == GLFW_PRESS || action == GLFW_REPEAT))
+		flyscene->cameraPath()->stepBackward();
+	if (key == GLFW_KEY_PERIOD && (action == GLFW_PRESS || action == GLFW_REPEAT))
+		flyscene->cameraPath()->stepForward();
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+		flyscene->cameraPath()->toggleAnimation();
 }
 
 static void mouseButtonCallback (GLFWwindow* window, int button, int action, int mods)

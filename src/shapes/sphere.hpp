@@ -123,7 +123,7 @@ public:
 	}
 
 	/**
-	* @brief Render camera representation
+	* @brief Render sphere
 	*/
 	void render (Tucano::Camera *camera, Tucano::Camera *light)
 	{
@@ -165,10 +165,11 @@ private:
 
 
 	/**
-	* @brief Define sphere geometry
+	* @brief Define a unitary sphere geometry
 	*
 	* Sphere is created by starting with an octahedron and subdividing triangles
 	* for a nice reference see: https://sites.google.com/site/dlampetest/python/triangulating-a-sphere-recursively
+	* No need to set normal, just use the position in shader since it is the same
 	*/
 	void createGeometry (int subdivisions = 4)
 	{

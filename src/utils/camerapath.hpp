@@ -267,6 +267,68 @@ public:
 	
 
 	/**
+	* @brief Returns the log of a quaternion log(q)
+	* @param q Given quaternion
+	* @return log(q)
+	*/
+	Eigen::Quaternionf logQuaternion (const Eigen::Quaternionf& q)
+	{
+		Eigen::Quaternionf logq;
+
+		logq.w() = log ( q.norm() );
+		logq.vec() = q.vec().normalized() * acos ( q.w() / q.norm());
+
+		return logq;
+	
+	}
+
+	/**
+	* @brief Returns the  exp of a quaternion exp(q)
+	* @param q Given quaternion
+	* @return exp(q)
+	*/
+	Eigen::Quaternionf expQuaternion (const Eigen::Quaternionf& q)
+	{
+		Eigen::Quaternionf expq;
+
+		expq.w() = exp(q.w()) * cos( q.vec().norm() );
+		expq.vec() = exp(q.w()) * q.vec().normalized() * sin( q.vec().norm() );
+
+		return expq;
+	
+	}
+
+
+	/**
+	* @brief SQUAD - Spherical and Quadrangle quaternion interpolation
+	* @param seg The current Bezièr segment
+	* @param t Interpolatio time
+	*/
+	Eigen::Quaternionf squad (int seg, float t)
+	{
+		Eigen::Quaternionf s0, s1;
+
+		s0 = (-1.0*logQuaternion(key_quaternions[seg+1]*key_quaternions[seg].inverse()).coeffs() + logQuaternion(key_quaternions[seg-1]*key_quaternions[seg].inverse()).coeffs());
+		s0 = expQuaternion(s0);
+		s0.w() *= 0.25;
+		s0.vec() *= 0.25;
+		s0 = s0 * key_quaternions[seg];
+
+		s1 = (-1.0*logQuaternion(key_quaternions[seg+2]*key_quaternions[seg+1].inverse()).coeffs() + logQuaternion(key_quaternions[seg]*key_quaternions[seg+1].inverse()).coeffs());
+		s1 = expQuaternion(s1);
+		s1.w() *= 0.25;
+		s1.vec() *= 0.25;
+		s1 = s1 * key_quaternions[seg+1];
+
+
+		Eigen::Quaternionf q1 = key_quaternions[seg].slerp(t, key_quaternions[seg+1]); 
+		Eigen::Quaternionf q2 = s0.slerp(t, s1);
+		Eigen::Quaternionf res = q1.slerp(2.0*t*(1.0-t), q2);
+
+		return res;
+	}
+
+	/**
 	* @brief return a view matrix at a given path parameter 
 	* @return view matrix at time t of the path
 	*/
@@ -279,8 +341,13 @@ public:
 
 		Eigen::Vector4f pt = pointOnSegment(t, segment);
 
-		Eigen::Quaternionf qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
+		Eigen::Quaternionf qt;
+		if (segment > 0 && key_positions.size() - segment > 2)
+			qt = squad(segment, t);
+		else		
+			qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
 
+		qt.normalize();
 		m.rotate(qt);
 		m.translation() = pt.head(3);
 
@@ -348,9 +415,26 @@ public:
 	}
 
 	/**
+	* @brief Toggle animation
+	*/
+	void toggleAnimation (void)
+	{
+		animating = !animating;
+	}
+
+	/**
+	* @brief Returns if Animation is running or not
+	* @return True if animation is running, false otherwise
+	*/
+	bool isAnimating (void)
+	{
+		return animating;
+	}
+
+	/**
 	* @brief Move animation forward one step
 	*/
-	void stepAnimation ( void )
+	void stepForward ( void )
 	{
 		anim_time += anim_speed;
 
@@ -359,6 +443,17 @@ public:
 			anim_time = anim_time - path_length;
 	}
 
+	/**
+	* @brief Move animation backward one step
+	*/
+	void stepBackward ( void )
+	{
+		anim_time -= anim_speed;
+
+		// restart if necessary
+		if (anim_time < 0.0)
+			anim_time = anim_time + path_length;
+	}
 	/**
 	* @brief Start animation following camera path
 	*/
