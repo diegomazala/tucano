@@ -1,8 +1,25 @@
+# CMakeLists.txt
+#
+# Purpose: to compile tucano examples.
+# If you want to simply use tucano, you don't need this file; just get the header files.
+#
+# List of dependencies common to all examples:
+#  - glew
+#  - eigen3
+#  - an OpenGL 4.3+ compatible driver
+#  - pkg-config
+#
+# List of dependencies of some examples:
+#  - Qt5
+#  - GLFW
+
 cmake_minimum_required(VERSION 2.8.12)
 set(PROJECT_NAME "tucano")
 project(${PROJECT_NAME} C CXX)
 
 # Tucano directories.
+#
+# Where executables of the examples are put.
 set(TUCANO_BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
 set(TUCANO_DOCUMENTATION_DIR "${PROJECT_SOURCE_DIR}/doc")
 set(TUCANO_EFFECTS_DIR "${PROJECT_SOURCE_DIR}/effects")
@@ -32,7 +49,8 @@ endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# This is for not hard-coding the eigen location.
+# Eigen 3.
+# pkg-config is used so we don't hard-code the location of eigen.
 find_package(PkgConfig REQUIRED)
 if(NOT PKG_CONFIG_FOUND)
   message(SEND_ERROR "pkg-config not found on your system")
