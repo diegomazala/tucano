@@ -1,5 +1,10 @@
 #!/bin/sh
+#
 # Automatically setup the documentation directory, so you can run `make webdoc` later on.
+#
+# Usage:
+#  - first, execute this file.
+#  - then, go to the usual build directory, run cmake .. from there, and finally `make webdoc`. That's it.
 
 msg() {
   echo "--> $*"
