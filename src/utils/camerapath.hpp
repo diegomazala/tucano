@@ -295,9 +295,7 @@ public:
 		expq.vec() = exp(q.w()) * q.vec().normalized() * sin( q.vec().norm() );
 
 		return expq;
-	
 	}
-
 
 	/**
 	* @brief SQUAD - Spherical and Quadrangle quaternion interpolation
@@ -308,18 +306,17 @@ public:
 	{
 		Eigen::Quaternionf s0, s1;
 
-		s0 = (-1.0*logQuaternion(key_quaternions[seg+1]*key_quaternions[seg].inverse()).coeffs() + logQuaternion(key_quaternions[seg-1]*key_quaternions[seg].inverse()).coeffs());
+		s0 = -1.0*(logQuaternion(key_quaternions[seg+1]*key_quaternions[seg].inverse()).coeffs() + logQuaternion(key_quaternions[seg-1]*key_quaternions[seg].inverse()).coeffs());
 		s0 = expQuaternion(s0);
 		s0.w() *= 0.25;
 		s0.vec() *= 0.25;
 		s0 = s0 * key_quaternions[seg];
 
-		s1 = (-1.0*logQuaternion(key_quaternions[seg+2]*key_quaternions[seg+1].inverse()).coeffs() + logQuaternion(key_quaternions[seg]*key_quaternions[seg+1].inverse()).coeffs());
+		s1 = -1.0*(logQuaternion(key_quaternions[seg+2]*key_quaternions[seg+1].inverse()).coeffs() + logQuaternion(key_quaternions[seg]*key_quaternions[seg+1].inverse()).coeffs());
 		s1 = expQuaternion(s1);
 		s1.w() *= 0.25;
 		s1.vec() *= 0.25;
 		s1 = s1 * key_quaternions[seg+1];
-
 
 		Eigen::Quaternionf q1 = key_quaternions[seg].slerp(t, key_quaternions[seg+1]); 
 		Eigen::Quaternionf q2 = s0.slerp(t, s1);
