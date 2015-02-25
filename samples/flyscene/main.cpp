@@ -85,16 +85,25 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
+/*	camera_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Camera Window", NULL, NULL);
+	if (!camera_window)
+		std::cerr << "Failed to create the GLFW camera window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+*/
+
+
 	glfwMakeContextCurrent(main_window);
 	glfwSetKeyCallback(main_window, keyCallback);
 	glfwSetMouseButtonCallback(main_window, mouseButtonCallback);
 	glfwSetCursorPosCallback(main_window, cursorPosCallback);
 
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, true);
+	glfwSetInputMode(main_window, GLFW_STICKY_KEYS, true);
 
 	initialize();
 
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(main_window))
 	{
 		// render here
 		flyscene->paintGL();
