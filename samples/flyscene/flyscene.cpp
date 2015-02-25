@@ -44,7 +44,7 @@ void Flyscene::initialize (int width, int height)
 	follow_cam = new Camera();
 	follow_cam->setProjectionMatrix( flycamera->getProjectionMatrix() );
 	//right side of window
-	follow_cam->setViewport(Eigen::Vector4f ((float)width, 0.0, (float)width*2.0+20.0, (float)height));
+	follow_cam->setViewport(Eigen::Vector4f ((float)width+20, 0.0, (float)width, (float)height));
 
 	light = new Camera();
 

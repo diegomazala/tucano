@@ -46,7 +46,7 @@ protected:
     /// View, or extrinsic, matrix.
     Eigen::Affine3f viewMatrix;
 
-    /// Viewport dimensions [minX, minY, maxX, maxY].
+    /// Viewport dimensions [minX, minY, width, height].
     Eigen::Vector4f viewport;
 
     /// Near plane used for projection matrix.
@@ -219,7 +219,7 @@ public:
     /**
      * @brief Returns the viewport coordinates.
      *
-     * Viewport vector is as follows [minX, minY, maxX, maxY]
+     * Viewport vector is as follows [minX, minY, width, height]
      * @return Viewport coordinates.
      */
     Eigen::Vector4f getViewport (void)
@@ -230,12 +230,11 @@ public:
     /**
      * @brief Returns the dimensions of the viewport.
      *
-     * Viewport dimensions are as follows [maxX - minX, maxY - minY]
      * @return Viewport dimensions.
      */
     Eigen::Vector2i getViewportSize (void)
     {
-        return Eigen::Vector2i(viewport[2]-viewport[0], viewport[3]-viewport[1]);
+        return Eigen::Vector2i(viewport[2], viewport[3]);
     }
 
 	/**
@@ -244,7 +243,7 @@ public:
 	*/
 	float getViewportAspectRatio (void)
 	{
-		return (viewport[2] - viewport[0]) / (viewport[3] - viewport[1]);
+		return (viewport[2] / viewport[3]);
 	}
 
     /**
