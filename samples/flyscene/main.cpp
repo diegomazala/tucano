@@ -68,7 +68,8 @@ static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
 int main(int argc, char *argv[])
 {
-	GLFWwindow* window;
+	GLFWwindow* main_window;
+	GLFWwindow* camera_window;
 
 	if (!glfwInit()) 
 	{
@@ -76,18 +77,18 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "TUCANO :: Flythrough Camera", NULL, NULL);
-	if (!window)
+	main_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "TUCANO :: Flythrough Camera", NULL, NULL);
+	if (!main_window)
 	{
 		std::cerr << "Failed to create the GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
 
-	glfwMakeContextCurrent(window);
-	glfwSetKeyCallback(window, keyCallback);
-	glfwSetMouseButtonCallback(window, mouseButtonCallback);
-	glfwSetCursorPosCallback(window, cursorPosCallback);
+	glfwMakeContextCurrent(main_window);
+	glfwSetKeyCallback(main_window, keyCallback);
+	glfwSetMouseButtonCallback(main_window, mouseButtonCallback);
+	glfwSetCursorPosCallback(main_window, cursorPosCallback);
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, true);
 
@@ -98,7 +99,7 @@ int main(int argc, char *argv[])
 		// render here
 		flyscene->paintGL();
 
-		glfwSwapBuffers( window );
+		glfwSwapBuffers( main_window );
 		glfwPollEvents();
 	}
 

@@ -379,8 +379,6 @@ public:
 	*/
 	Eigen::Quaternionf squad (int seg, float t)
 	{
-		Eigen::Quaternionf s0, s1;
-
 		Eigen::Quaternionf s0 = control_quaternions_1[seg];
 		Eigen::Quaternionf s1 = control_quaternions_2[seg];
 
