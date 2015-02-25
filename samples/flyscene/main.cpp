@@ -69,7 +69,6 @@ static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 int main(int argc, char *argv[])
 {
 	GLFWwindow* main_window;
-	GLFWwindow* camera_window;
 
 	if (!glfwInit()) 
 	{
@@ -77,22 +76,14 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	main_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "TUCANO :: Flythrough Camera", NULL, NULL);
+	// double x dimension for splitview and add margin
+	main_window = glfwCreateWindow(WINDOW_WIDTH*2 + 20, WINDOW_HEIGHT, "TUCANO :: Flythrough Camera", NULL, NULL);
 	if (!main_window)
 	{
 		std::cerr << "Failed to create the GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-
-/*	camera_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Camera Window", NULL, NULL);
-	if (!camera_window)
-		std::cerr << "Failed to create the GLFW camera window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-*/
-
 
 	glfwMakeContextCurrent(main_window);
 	glfwSetKeyCallback(main_window, keyCallback);
@@ -101,17 +92,24 @@ int main(int argc, char *argv[])
 
 	glfwSetInputMode(main_window, GLFW_STICKY_KEYS, true);
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+   	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+   	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	initialize();
+
 
 	while (!glfwWindowShouldClose(main_window))
 	{
-		// render here
+		glfwMakeContextCurrent(main_window);
+		flyscene->switchFlyCamera();
 		flyscene->paintGL();
-
 		glfwSwapBuffers( main_window );
+
 		glfwPollEvents();
 	}
 
+	glfwDestroyWindow(main_window);
 	glfwTerminate();
 	return 0;
 }

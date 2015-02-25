@@ -46,7 +46,7 @@ protected:
     /// View, or extrinsic, matrix.
     Eigen::Affine3f viewMatrix;
 
-    /// Viewport dimensions.
+    /// Viewport dimensions [minX, minY, maxX, maxY].
     Eigen::Vector4f viewport;
 
     /// Near plane used for projection matrix.

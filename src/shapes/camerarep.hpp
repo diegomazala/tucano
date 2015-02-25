@@ -106,6 +106,10 @@ public:
 	*/
 	void render (Tucano::Camera *camera, Tucano::Camera *light)
 	{
+
+	    Eigen::Vector4f viewport = camera->getViewport();
+        glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
 		camerarep_shader->bind();
         
 		camerarep_shader->setUniform("viewMatrix", camera->getViewMatrix());

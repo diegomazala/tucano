@@ -132,10 +132,6 @@ public:
 
 		sphere_shader->bind();
 
-//		cout << "view : " << endl << camera->getViewMatrix().matrix() << endl;
-//		cout << "model : " << endl << modelMatrix.matrix() << endl;
-//		cout << "light : " << endl << light->getViewMatrix().matrix() << endl << endl;
-        
        	sphere_shader->setUniform("modelMatrix", modelMatrix);
 		sphere_shader->setUniform("viewMatrix", camera->getViewMatrix());
        	sphere_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
