@@ -117,7 +117,7 @@ public:
 	* @brief Sets the sphere color
 	* @param c New color
 	*/
-	void setColor (Eigen::Vector4f &c)
+	void setColor (const Eigen::Vector4f &c)
 	{
 		color = c;
 	}

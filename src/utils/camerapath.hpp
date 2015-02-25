@@ -78,11 +78,17 @@ private:
 	/// smooth curve between key positions
 	Mesh curve;
 
+	// Mesh containing segments from key points to control points, for visual debug
+	Mesh control_segments;
+
 	/// A sphere to visually represent the path's key positions
 	Shapes::Sphere sphere;
 
     /// Path shader, used for rendering the curve
     Shader* camerapath_shader;
+
+	/// To render simple lines
+	Shader* phong_shader;
 	
 public:
 
@@ -127,6 +133,9 @@ public:
         camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
 		camerapath_shader->initialize();
 
+		phong_shader = new Shader("../effects/shaders/", "phongshader");
+		phong_shader->initialize();
+
         //camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
 
@@ -142,6 +151,18 @@ public:
 		curve.loadVertices(key_positions);
 		curve.createAttribute("in_ControlPoint1", control_points_1);
 		curve.createAttribute("in_ControlPoint2", control_points_2);
+
+		control_segments.reset();
+
+		vector < Eigen::Vector4f > control_segs;
+		for (unsigned int i = 0; i < key_positions.size()-1; ++i)
+		{
+			control_segs.push_back(key_positions[i]);
+			control_segs.push_back(control_points_1[i]);
+			control_segs.push_back(key_positions[i+1]);
+			control_segs.push_back(control_points_2[i]);		
+		}
+		control_segments.loadVertices(control_segs);
 		
 		#ifdef TUCANODEBUG
         Misc::errorCheckFunc(__FILE__, __LINE__);
@@ -196,8 +217,29 @@ public:
 			curve.unbindBuffers();
 
         	camerapath_shader->unbind();
+
+			phong_shader->bind();
+			
+			phong_shader->setUniform("viewMatrix", camera->getViewMatrix());
+        	phong_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
+			phong_shader->setUniform("lightViewMatrix", light->getViewMatrix());
+
+        	color << 1.0, 1.0, 0.0, 1.0;
+        	phong_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
+        	phong_shader->setUniform("default_color", color);
+			phong_shader->setUniform("has_color", false);
+
+			control_segments.setAttributeLocation(phong_shader);
+			control_segments.bindBuffers();
+        	glDrawArrays(GL_LINES, 0, control_points_1.size()*4);
+			control_segments.unbindBuffers();
+
+        	phong_shader->unbind();
+
+
 		}
 
+		sphere.setColor( Eigen::Vector4f (1.0, 0.48, 0.16, 1.0) );
 		// render key positions
 		for (unsigned int i = 0; i < key_positions.size(); i++)
 		{
@@ -208,6 +250,32 @@ public:
 			sphere.modelMatrixPtr()->scale( 0.03 );
 			sphere.render(camera, light);
 		}
+
+		sphere.setColor( Eigen::Vector4f (0.48, 1.0, 0.16, 1.0) );
+		// render control points
+		for (unsigned int i = 0; i < control_points_1.size(); i++)
+		{
+			sphere.resetModelMatrix();
+			
+			Eigen::Vector3f translation = control_points_1[i].head(3);
+			sphere.modelMatrixPtr()->translate( translation );
+			sphere.modelMatrixPtr()->scale( 0.03 );
+			sphere.render(camera, light);
+		}
+
+		sphere.setColor( Eigen::Vector4f (0.48, 0.16, 1.0, 1.0) );
+		// render control points
+		for (unsigned int i = 0; i < control_points_2.size(); i++)
+		{
+			sphere.resetModelMatrix();
+			
+			Eigen::Vector3f translation = control_points_2[i].head(3);
+			sphere.modelMatrixPtr()->translate( translation );
+			sphere.modelMatrixPtr()->scale( 0.03 );
+			sphere.render(camera, light);
+		}
+
+		
 		
 		#ifdef TUCANODEBUG
         Misc::errorCheckFunc(__FILE__, __LINE__);
@@ -313,13 +381,14 @@ public:
 		s0.w() *= 0.25;
 		s0.vec() *= 0.25;
 		s0 = s0 * key_quaternions[seg];
+		s0.normalize();
 
 		s1 = (-1.0*logQuaternion(key_quaternions[seg+2]*key_quaternions[seg+1].inverse()).coeffs() + logQuaternion(key_quaternions[seg]*key_quaternions[seg+1].inverse()).coeffs());
 		s1 = expQuaternion(s1);
 		s1.w() *= 0.25;
 		s1.vec() *= 0.25;
 		s1 = s1 * key_quaternions[seg+1];
-
+		s1.normalize();
 
 		Eigen::Quaternionf q1 = key_quaternions[seg].slerp(t, key_quaternions[seg+1]); 
 		Eigen::Quaternionf q2 = s0.slerp(t, s1);
@@ -347,7 +416,6 @@ public:
 		else		
 			qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
 
-		qt.normalize();
 		m.rotate(qt);
 		m.translation() = pt.head(3);
 

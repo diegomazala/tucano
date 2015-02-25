@@ -138,7 +138,7 @@ public:
      *
      * @param filename Given mesh file.
      */
-    void openMesh (string filename)
+    virtual void openMesh (string filename)
     {
         QString str (filename.c_str());
         QStringList strlist = str.split(".");
