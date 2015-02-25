@@ -172,7 +172,7 @@ public:
      * @brief Returns the view matrix as an Affine 3x3 matrix
      * @return View Matrix.
      */
-    Eigen::Affine3f getViewMatrix (void)
+    Eigen::Affine3f getViewMatrix (void) const
     {
         return viewMatrix;
     }
@@ -181,7 +181,7 @@ public:
      * @brief Returns the view matrix as an 4x4 matrix
      * @return Projection Matrix.
      */
-    Eigen::Matrix4f getProjectionMatrix (void)
+    Eigen::Matrix4f getProjectionMatrix (void) const
     {
         return projectionMatrix;
     }
@@ -190,7 +190,7 @@ public:
      * @brief Returns a 3x3 matrix containing only the rotation of the view matrix.
      * @return The rotation part of the view matrix as a 3x3 matrix.
      */
-    Eigen::Matrix3f getRotationMatrix (void)
+    Eigen::Matrix3f getRotationMatrix (void) const
     {
         return viewMatrix.rotation();
     }
@@ -200,7 +200,7 @@ public:
      * @brief Returns the translation part of the view matrix as a vector.
      * @return The translation part of the view matrix.
      */
-    Eigen::Vector3f getTranslationMatrix (void)
+    Eigen::Vector3f getTranslationMatrix (void) const
     {
         return viewMatrix.translation();
     }    
@@ -211,7 +211,7 @@ public:
      * Usually this is element(1,1) of the projection matrix.
      * @return The perspective scale factor
      */
-    float getPerspectiveScale (void)
+    float getPerspectiveScale (void) const
     {
         return (float)1.0f/tan((fovy/2.0f)*(PI/180.0f));
     }
@@ -222,7 +222,7 @@ public:
      * Viewport vector is as follows [minX, minY, width, height]
      * @return Viewport coordinates.
      */
-    Eigen::Vector4f getViewport (void)
+    Eigen::Vector4f getViewport (void) const
     {
         return viewport;
     }
@@ -232,7 +232,7 @@ public:
      *
      * @return Viewport dimensions.
      */
-    Eigen::Vector2i getViewportSize (void)
+    Eigen::Vector2i getViewportSize (void) const
     {
         return Eigen::Vector2i(viewport[2], viewport[3]);
     }
@@ -241,7 +241,7 @@ public:
 	* @brief Returns the viewport aspect ratio
 	* @return Viewport aspect ratio x/y
 	*/
-	float getViewportAspectRatio (void)
+	float getViewportAspectRatio (void) const
 	{
 		return (viewport[2] / viewport[3]);
 	}
@@ -289,7 +289,7 @@ public:
      * @brief Returns near plane value.
      * @return Near plane.
      */
-    float getNearPlane (void)
+    float getNearPlane (void) const
     {
         return near_plane;
     }
@@ -298,7 +298,7 @@ public:
      * @brief Returns far plane value.
      * @return Far plane.
      */
-    float getFarPlane (void)
+    float getFarPlane (void) const
     {
         return far_plane;
     }
@@ -314,7 +314,7 @@ public:
       * @brief Returns current field of view angle in y axis.
       * @return Field of view angle.
       */
-    float getFovy (void)
+    float getFovy (void) const
     {
         return fovy;
     }

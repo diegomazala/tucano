@@ -22,7 +22,7 @@ class Model {
 protected:
 
     /// Model matrix, holds information about the models location and orientation.
-    Eigen::Affine3f modelMatrix;
+    Eigen::Affine3f model_matrix;
 
     /// Center of the mesh object.
     Eigen::Vector3f objectCenter;
@@ -84,16 +84,16 @@ public:
      */
     Eigen::Affine3f getModelMatrix (void)
     {
-        return modelMatrix;
+        return model_matrix;
     }
 
     /**
      * @brief Returns a pointer to the model matrix.
      * @return Pointer to the odel matrix as an Affine 3f matrix.
      */
-    Eigen::Affine3f* modelMatrixPtr (void)
+    Eigen::Affine3f* modelMatrix (void)
     {
-        return &modelMatrix;
+        return &model_matrix;
     }
 
 	/**
@@ -102,7 +102,7 @@ public:
 	*/
 	void setModelMatrix (Eigen::Affine3f &m)
 	{
-		modelMatrix = m;
+		model_matrix = m;
 	}
 
 
@@ -122,8 +122,8 @@ public:
      */
     void normalizeModelMatrix (void)
     {
-        modelMatrix.scale(scale);
-        modelMatrix.translate(-centroid);
+        model_matrix.scale(scale);
+        model_matrix.translate(-centroid);
     }
 
 
@@ -132,7 +132,7 @@ public:
      */
     void resetModelMatrix (void)
     {
-        modelMatrix = Eigen::Affine3f::Identity();
+        model_matrix = Eigen::Affine3f::Identity();
     }
 
     /**

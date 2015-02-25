@@ -132,7 +132,7 @@ public:
 
 		sphere_shader->bind();
 
-       	sphere_shader->setUniform("modelMatrix", modelMatrix);
+       	sphere_shader->setUniform("modelMatrix", model_matrix);
 		sphere_shader->setUniform("viewMatrix", camera->getViewMatrix());
        	sphere_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
 		sphere_shader->setUniform("lightViewMatrix", light->getViewMatrix());

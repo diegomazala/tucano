@@ -39,7 +39,7 @@ void Flyscene::initialize (int width, int height)
 
 	camerapath = new CameraPath();
 
-	camerarep = new CameraRep();
+	camerarep = new Shapes::CameraRep();
 
 	follow_cam = new Camera();
 	follow_cam->setProjectionMatrix( flycamera->getProjectionMatrix() );
@@ -71,7 +71,7 @@ void Flyscene::paintGL (void)
 		
         	phong->render(mesh, flycamera, light);
 			// render coordinate systema at lower right corner
-        	flycamera->render();
+        	flycamera->renderAtCorner();
 			// render the camera path and key points
 			camerapath->render(flycamera, light);
 
@@ -81,20 +81,32 @@ void Flyscene::paintGL (void)
 
 			// render the animated camera
 			camerarep->render(flycamera, light);
-		}
-//		if (camera_type == 2)
-			
-		{
 			Eigen::Affine3f path_cam_view = camerapath->cameraAtCurrentTime();
 			follow_cam->setViewMatrix (path_cam_view.inverse());
 
 			phong->render(mesh, follow_cam, light);
+			
+			float anim_time = camerapath->animTime();
+			float anim_speed = camerapath->animSpeed();
+			Tucano::Shapes::CoordinateAxes axes;
+			for (int i = -2; i <= 2; ++i)
+			{
+				float t = anim_time + 6*i*anim_speed;
+					Eigen::Affine3f cam = camerapath->pathAtArcLength(t);
+					cam.scale(0.2);
+					axes.setModelMatrix(cam);
+					axes.render(*flycamera, *light);
+					axes.resetModelMatrix();
+					//camerarep->render(flycamera, light);
+			}
+ 			
+
 		}
     }
 	// clear central margin black
 	glScissor(viewport[2], viewport[1], 20, viewport[1]+viewport[3]);
 	glEnable(GL_SCISSOR_TEST);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClearColor(0.3, 0.6, 0.9, 0.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_SCISSOR_TEST);
 

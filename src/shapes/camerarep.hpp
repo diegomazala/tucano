@@ -31,6 +31,10 @@
 namespace Tucano
 {
 
+namespace Shapes
+{
+
+
 /// Default fragment shader for rendering camera representation.
 const string camerarep_fragment_code = "\n"
         "#version 430\n"
@@ -106,7 +110,6 @@ public:
 	*/
 	void render (Tucano::Camera *camera, Tucano::Camera *light)
 	{
-
 	    Eigen::Vector4f viewport = camera->getViewport();
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
@@ -118,7 +121,7 @@ public:
        	camerarep_shader->setUniform("farPlane", camera->getFarPlane());
 
        	Eigen::Vector4f color (1.0, 1.0, 0.0, 1.0);
-       	camerarep_shader->setUniform("modelMatrix", modelMatrix);
+       	camerarep_shader->setUniform("modelMatrix", model_matrix);
 		camerarep_shader->setUniform("lightViewMatrix", light->getViewMatrix());
        	camerarep_shader->setUniform("has_color", true);
        	camerarep_shader->setUniform("default_color", color);
@@ -285,6 +288,6 @@ private:
 
 
 };
-
+}
 }
 #endif

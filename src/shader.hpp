@@ -98,7 +98,7 @@ public:
      * Usually used to initialize the instance when passing shaders as strings, and not files.
      * @param name The string to be set as shader identification. User mantained.
      */
-    Shader (string name)
+    Shader (string name = "")
     {
         shaderName = name;
         vertexShader = 0; fragmentShader = 0; geometryShader = 0; shaderProgram = 0; computeShaders = vector<GLuint>();
@@ -124,6 +124,15 @@ public:
     {
         deleteShaders();
     }
+
+	/**
+	* @brief Sets the shader name, very useful for debugging
+	* @param name Shader name
+	*/
+	void setShaderName (string name)
+	{
+		shaderName = name;
+	}
 
     /**
      * @brief Returns a string with the shader name.

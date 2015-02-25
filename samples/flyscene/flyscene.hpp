@@ -74,7 +74,7 @@ private:
 	Tucano::CameraPath *camerapath;
 
 	// A camera representation for animating path
-	Tucano::CameraRep *camerarep;
+	Tucano::Shapes::CameraRep *camerarep;
 
 	// Light represented as a camera
 	Tucano::Camera *light;

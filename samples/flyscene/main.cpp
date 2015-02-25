@@ -48,6 +48,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		flyscene->cameraPath()->toggleAnimation();
 	if (key == GLFW_KEY_0 && action == GLFW_PRESS)
 		flyscene->cameraPath()->toggleDrawControlPoints();
+	if (key == GLFW_KEY_9 && action == GLFW_PRESS)
+		flyscene->cameraPath()->toggleDrawQuaternions();
 }
 
 static void mouseButtonCallback (GLFWwindow* window, int button, int action, int mods)

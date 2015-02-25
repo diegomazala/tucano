@@ -59,6 +59,9 @@ private:
 	/// Flag to render control points
 	bool draw_control_points;
 
+	/// Flag to render quaternions at key positions
+	bool draw_quaternions;
+
 	/// Camera position at each Key frames
 	vector< Eigen::Vector4f > key_positions;
 
@@ -92,6 +95,9 @@ private:
 
 	/// A sphere to visually represent the path's key positions
 	Shapes::Sphere sphere;
+
+	/// Coordinate axes for visualizing quaternions at key positions
+	Shapes::CoordinateAxes axes;
 
     /// Path shader, used for rendering the curve
     Shader* camerapath_shader;
@@ -138,6 +144,7 @@ public:
 		anim_time = 0.0;
 		animating = true;
 		draw_control_points = false;
+		draw_quaternions = true;
 
         initOpenGLMatrices();
         camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
@@ -252,10 +259,9 @@ public:
 				for (unsigned int i = 0; i < control_points_1.size(); i++)
 				{
 					sphere.resetModelMatrix();
-					
 					Eigen::Vector3f translation = control_points_1[i].head(3);
-					sphere.modelMatrixPtr()->translate( translation );
-					sphere.modelMatrixPtr()->scale( 0.03 );
+					sphere.modelMatrix()->translate( translation );
+					sphere.modelMatrix()->scale( 0.03 );
 					sphere.render(camera, light);
 				}
 
@@ -265,15 +271,25 @@ public:
 				for (unsigned int i = 0; i < control_points_2.size(); i++)
 				{
 					sphere.resetModelMatrix();
-					
 					Eigen::Vector3f translation = control_points_2[i].head(3);
-					sphere.modelMatrixPtr()->translate( translation );
-					sphere.modelMatrixPtr()->scale( 0.03 );
+					sphere.modelMatrix()->translate( translation );
+					sphere.modelMatrix()->scale( 0.03 );
 					sphere.render(camera, light);
 				}
 
 			}
 
+		}
+
+		if (draw_quaternions)
+		{
+			for (unsigned int i = 0; i < key_quaternions.size(); ++i)
+			{
+				axes.resetModelMatrix();
+				axes.modelMatrix()->rotate(key_quaternions[i]);
+				axes.modelMatrix()->scale(0.2);
+				axes.render(*camera, *light);	
+			}
 		}
 
 		sphere.setColor( Eigen::Vector4f (1.0, 0.48, 0.16, 1.0) );
@@ -283,12 +299,10 @@ public:
 			sphere.resetModelMatrix();
 			
 			Eigen::Vector3f translation = key_positions[i].head(3);
-			sphere.modelMatrixPtr()->translate( translation );
-			sphere.modelMatrixPtr()->scale( 0.03 );
+			sphere.modelMatrix()->translate( translation );
+			sphere.modelMatrix()->scale( 0.03 );
 			sphere.render(camera, light);
 		}
-
-		
 		
 		#ifdef TUCANODEBUG
         Misc::errorCheckFunc(__FILE__, __LINE__);
@@ -497,6 +511,15 @@ public:
 	}
 
 	/**
+	* @brief Toggle render control quaternions 
+	*/
+	void toggleDrawQuaternions (void)
+	{
+		draw_quaternions = !draw_quaternions;
+	}
+
+
+	/**
 	* @brief Returns if Animation is running or not
 	* @return True if animation is running, false otherwise
 	*/
@@ -552,6 +575,25 @@ public:
 		anim_time = 0.0;
 	}
 
+	/**
+	* @brief Return current animation time
+	* @return anim time	
+	*/
+	float animTime ( void )
+	{
+		return anim_time;
+	}
+
+	/**
+	* @brief Return animation speed where 1 covers the whole curve in one step
+	* @return Animation speed
+	*/
+	float animSpeed ( void )
+	{
+		return anim_speed;
+	
+	}
+	
 
     /**
     * @brief Compute control points for SQUAD
@@ -600,8 +642,6 @@ public:
         }
 
     }
-
-
 
 
 	/**
