@@ -56,6 +56,9 @@ private:
 	/// Start/stop animation
 	bool animating;
 
+	/// Flag to render control points
+	bool draw_control_points;
+
 	/// Camera position at each Key frames
 	vector< Eigen::Vector4f > key_positions;
 
@@ -134,6 +137,7 @@ public:
         anim_speed = 0.015;
 		anim_time = 0.0;
 		animating = true;
+		draw_control_points = false;
 
         initOpenGLMatrices();
         camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
@@ -225,24 +229,50 @@ public:
 
         	camerapath_shader->unbind();
 
-			phong_shader->bind();
+			if (draw_control_points)
+			{
+				phong_shader->bind();
 			
-			phong_shader->setUniform("viewMatrix", camera->getViewMatrix());
-        	phong_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
-			phong_shader->setUniform("lightViewMatrix", light->getViewMatrix());
+				phong_shader->setUniform("viewMatrix", camera->getViewMatrix());
+				phong_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
+				phong_shader->setUniform("lightViewMatrix", light->getViewMatrix());
 
-        	color << 1.0, 1.0, 0.0, 1.0;
-        	phong_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
-        	phong_shader->setUniform("default_color", color);
-			phong_shader->setUniform("has_color", false);
+				color << 1.0, 1.0, 0.0, 1.0;
+				phong_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
+				phong_shader->setUniform("default_color", color);
+				phong_shader->setUniform("has_color", false);
+				control_segments.setAttributeLocation(phong_shader);
+				control_segments.bindBuffers();
+				glDrawArrays(GL_LINES, 0, control_points_1.size()*4);
+				control_segments.unbindBuffers();
+				phong_shader->unbind();
 
-			control_segments.setAttributeLocation(phong_shader);
-			control_segments.bindBuffers();
-        	glDrawArrays(GL_LINES, 0, control_points_1.size()*4);
-			control_segments.unbindBuffers();
+				sphere.setColor( Eigen::Vector4f (0.48, 1.0, 0.16, 1.0) );
+				// render control points
+				for (unsigned int i = 0; i < control_points_1.size(); i++)
+				{
+					sphere.resetModelMatrix();
+					
+					Eigen::Vector3f translation = control_points_1[i].head(3);
+					sphere.modelMatrixPtr()->translate( translation );
+					sphere.modelMatrixPtr()->scale( 0.03 );
+					sphere.render(camera, light);
+				}
 
-        	phong_shader->unbind();
 
+				sphere.setColor( Eigen::Vector4f (0.48, 0.16, 1.0, 1.0) );
+				// render control points
+				for (unsigned int i = 0; i < control_points_2.size(); i++)
+				{
+					sphere.resetModelMatrix();
+					
+					Eigen::Vector3f translation = control_points_2[i].head(3);
+					sphere.modelMatrixPtr()->translate( translation );
+					sphere.modelMatrixPtr()->scale( 0.03 );
+					sphere.render(camera, light);
+				}
+
+			}
 
 		}
 
@@ -253,30 +283,6 @@ public:
 			sphere.resetModelMatrix();
 			
 			Eigen::Vector3f translation = key_positions[i].head(3);
-			sphere.modelMatrixPtr()->translate( translation );
-			sphere.modelMatrixPtr()->scale( 0.03 );
-			sphere.render(camera, light);
-		}
-
-		sphere.setColor( Eigen::Vector4f (0.48, 1.0, 0.16, 1.0) );
-		// render control points
-		for (unsigned int i = 0; i < control_points_1.size(); i++)
-		{
-			sphere.resetModelMatrix();
-			
-			Eigen::Vector3f translation = control_points_1[i].head(3);
-			sphere.modelMatrixPtr()->translate( translation );
-			sphere.modelMatrixPtr()->scale( 0.03 );
-			sphere.render(camera, light);
-		}
-
-		sphere.setColor( Eigen::Vector4f (0.48, 0.16, 1.0, 1.0) );
-		// render control points
-		for (unsigned int i = 0; i < control_points_2.size(); i++)
-		{
-			sphere.resetModelMatrix();
-			
-			Eigen::Vector3f translation = control_points_2[i].head(3);
 			sphere.modelMatrixPtr()->translate( translation );
 			sphere.modelMatrixPtr()->scale( 0.03 );
 			sphere.render(camera, light);
@@ -480,6 +486,14 @@ public:
 	void toggleAnimation (void)
 	{
 		animating = !animating;
+	}
+
+	/**
+	* @brief Toggle render control points
+	*/
+	void toggleDrawControlPoints (void)
+	{
+		draw_control_points = !draw_control_points;
 	}
 
 	/**

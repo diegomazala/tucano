@@ -1,4 +1,4 @@
-#ifndef __FLYSCENE__
+		#ifndef __FLYSCENE__
 #define __FLYSCENE__
 
 #include <GL/glew.h>
