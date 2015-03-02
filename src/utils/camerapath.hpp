@@ -199,6 +199,17 @@ public:
 		key_positions.push_back ( center );
 
 		Eigen::Quaternionf quat (camera->getViewMatrix().rotation() );
+/*		Eigen::Matrix3f m;
+		Eigen::Vector3f rx, ry, rz;
+		rz << center.head(3);
+		rz.normalize();
+		ry << 0.0, 1.0, 0.0;
+		rx = ry.cross(rz);
+		m.row(0) = rx;
+		m.row(1) = ry;
+		m.row(2) = rz;
+		Eigen::Quaternionf quat(m);
+*/
 		key_quaternions.push_back (quat.inverse());
 
 		if (key_positions.size() > 1)
@@ -360,7 +371,6 @@ public:
 		return pointOnSegment(t, segment);	
 	}	
 	
-
 	/**
 	* @brief Returns the log of a quaternion log(q)
 	* @param q Given quaternion
@@ -374,7 +384,6 @@ public:
 		logq.vec() = q.vec().normalized() * acos ( q.w() / q.norm());
 
 		return logq;
-	
 	}
 
 	/**
@@ -409,6 +418,7 @@ public:
 		return res;
 	}
 
+	
 	/**
 	* @brief return a view matrix at a given path parameter 
 	* @return view matrix at time t of the path
@@ -416,9 +426,14 @@ public:
 	Eigen::Affine3f cameraAtTime (float global_t)
 	{
 		Eigen::Affine3f m = Eigen::Affine3f::Identity();
+		
+		float t_a = arcLengthToTime(global_t);
 
-		float t = toLocalParameter (global_t);
-		int segment = curveSegment (global_t);
+		if (t_a == -1.0)
+			return m;
+
+		float t = toLocalParameter (t_a);
+		int segment = curveSegment (t_a);
 
 		Eigen::Vector4f pt = pointOnSegment(t, segment);
 
@@ -434,29 +449,46 @@ public:
 		return m;
 	}
 
+	void printDebugInfo (void)
+	{
+		float global_t = anim_time;
+		float t = toLocalParameter (global_t);
+		int segment = curveSegment (global_t);
+
+		Eigen::Quaternionf qt;
+		if (segment > 0 && key_positions.size() - segment > 2)
+			qt = squad(segment, t);
+		else		
+			qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
+
+		cout << "quat : (" << qt.w() << " , " << qt.vec().transpose() << " ) " << endl;
+	}
+
 	/**
 	* @brief Return the view matrix at current animation time 
 	* @return View matrix at current animation time
 	*/
 	Eigen::Affine3f cameraAtCurrentTime (void)
 	{
-		return pathAtArcLength(anim_time);
+		return cameraAtTime(anim_time);
 	}
 
 	/**
-	* @brief Returns a camera matrix on curve give s as arc length parameter
+	* @brief Converts from given arc length to time parameter
 	* @param s Arc length parameter in [0,1]
-	* @return Matrix on path at s
+	* @return Time at given arc length 
 	*/
-	Eigen::Affine3f pathAtArcLength (float s)
+	float arcLengthToTime (float s)
 	{
-		Eigen::Affine3f m = Eigen::Affine3f::Identity();
-		if (s < 0.0 || s > path_length)		
-			return m;
-
 		if (key_positions.size() < 2)
-			return m;
+			return -1.0;
 	
+		if (s < 0.0)
+			return 0;
+
+		if (s > path_length)		
+			return path_length;
+
 		float arc_length = s;
 
 		// find in which Beziér segment we should look
@@ -491,7 +523,7 @@ public:
 		// add time to beginning of segment
 		t_s += segment / (float)(key_positions.size()-1);	
 
-		return cameraAtTime(t_s);	
+		return t_s;
 	}
 
 	/**

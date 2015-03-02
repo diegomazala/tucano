@@ -86,20 +86,21 @@ void Flyscene::paintGL (void)
 
 			phong->render(mesh, follow_cam, light);
 			
+			/*
 			float anim_time = camerapath->animTime();
 			float anim_speed = camerapath->animSpeed();
 			Tucano::Shapes::CoordinateAxes axes;
 			for (int i = -2; i <= 2; ++i)
 			{
 				float t = anim_time + 6*i*anim_speed;
-					Eigen::Affine3f cam = camerapath->pathAtArcLength(t);
+					Eigen::Affine3f cam = camerapath->cameraAtTime(t);
 					cam.scale(0.2);
 					axes.setModelMatrix(cam);
 					axes.render(*flycamera, *light);
 					axes.resetModelMatrix();
 					//camerarep->render(flycamera, light);
 			}
- 			
+ 			*/
 
 		}
     }
