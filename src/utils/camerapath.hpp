@@ -80,11 +80,8 @@ private:
 	/// Rotation state at each key frame
 	vector< Eigen::Quaternion<float> > key_quaternions;
 
-    /// First control quaternions for SQUAD
-    vector < Eigen::Quaternion<float> > control_quaternions_1;
-
-    /// Second control quaternions for SQUAD
-    vector < Eigen::Quaternion<float> > control_quaternions_2;
+    /// Control quaternions for SQUAD
+    vector < Eigen::Quaternion<float> > control_quaternions;
 
 	/// Mesh with path's key positions and computed control points for drawing
 	/// smooth curve between key positions
@@ -190,7 +187,7 @@ public:
 
 	/**
 	* @brief Add key position
-	* @param pt New key point
+		* @param pt New key point
 	*/
 	void addKeyPosition (Tucano::Camera* camera)
 	{
@@ -373,6 +370,7 @@ public:
 	
 	/**
 	* @brief Returns the log of a quaternion log(q)
+	* q in the form [cos(a), sin(a) v], log(q) = [0, a v]
 	* @param q Given quaternion
 	* @return log(q)
 	*/
@@ -380,14 +378,24 @@ public:
 	{
 		Eigen::Quaternionf logq;
 
-		logq.w() = log ( q.norm() );
-		logq.vec() = q.vec().normalized() * acos ( q.w() / q.norm());
+
+		logq.w() = 0.0;
+		float angle = acos(q.w());
+		float sinangle = sin(angle);
+		if ( fabs(sinangle) >= 1e-03)
+			logq.vec() = angle * q.vec() / sinangle;
+		else 
+			logq.vec() = q.vec();
+
+//		logq.w() = log ( q.norm() );
+//		logq.vec() = q.vec().normalized() * acos ( q.w() / q.norm());
 
 		return logq;
 	}
 
 	/**
 	* @brief Returns the  exp of a quaternion exp(q)
+	* q in the form [0, a v], exp(q) = [cos(a), sin(a) v] with |v|=1
 	* @param q Given quaternion
 	* @return exp(q)
 	*/
@@ -395,8 +403,16 @@ public:
 	{
 		Eigen::Quaternionf expq;
 
-		expq.w() = exp(q.w()) * cos( q.vec().norm() );
-		expq.vec() = exp(q.w()) * q.vec().normalized() * sin( q.vec().norm() );
+		float angle = sqrt(q.x()*q.x()+q.y()*q.y()+q.z()*q.z());
+		expq.w() = cos(angle);
+		float sinangle = sin(angle);
+		if (sinangle >= 1e-03)
+			expq.vec() = sin(angle) * q.vec() / angle;
+		else
+			expq.vec() = q.vec();
+
+//		expq.w() = exp(q.w()) * cos( q.vec().norm() );
+//		expq.vec() = exp(q.w()) * q.vec().normalized() * sin( q.vec().norm() );
 
 		return expq;
 	}
@@ -408,16 +424,37 @@ public:
 	*/
 	Eigen::Quaternionf squad (int seg, float t)
 	{
-		Eigen::Quaternionf s0 = control_quaternions_1[seg];
-		Eigen::Quaternionf s1 = control_quaternions_2[seg];
+		Eigen::Quaternionf s0 = control_quaternions[seg];
+		Eigen::Quaternionf s1 = control_quaternions[seg+1];
 
 		Eigen::Quaternionf q1 = key_quaternions[seg].slerp(t, key_quaternions[seg+1]); 
+
+		float dot = key_quaternions[seg].w()*key_quaternions[seg+1].w()+key_quaternions[seg].vec().dot(key_quaternions[seg+1].vec());
+
+		if (dot < 0)
+		{
+			Eigen::Quaternionf qinv;
+			qinv.w() = key_quaternions[seg+1].w()*-1;
+			qinv.vec() = key_quaternions[seg+1].vec()*-1;
+			q1 = key_quaternions[seg].slerp(t, qinv);
+		}	
+
+		return q1;
+
 		Eigen::Quaternionf q2 = s0.slerp(t, s1);
+		dot = s0.w()*s1.w()+s0.vec().dot(s1.vec());
+
+		if (dot < 0)
+		{
+			Eigen::Quaternionf qinv;
+			qinv.w() = s1.w()*-1;
+			qinv.vec() = s1.vec()*-1;
+			q2 = s0.slerp(t, qinv);
+		}	
+
 		Eigen::Quaternionf res = q1.slerp(2.0*t*(1.0-t), q2);
 
-
-		res.normalize();
-
+	
 		return res;
 	}
 
@@ -441,10 +478,11 @@ public:
 		Eigen::Vector4f pt = pointOnSegment(t, segment);
 
 		Eigen::Quaternionf qt;
-		if (segment >= 0 && key_positions.size() - segment > 2)
-			qt = squad(segment, t);
-		else	
-			qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
+		//if (segment >= 0 && key_positions.size() - segment > 2)
+		//	qt = squad(segment, t);
+		//else	
+		//		qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
+		qt = squad(segment, t);
 
 		m.rotate(qt);
 		m.translation() = pt.head(3);
@@ -645,44 +683,25 @@ public:
     */
     void computeControlQuaternions ( void )
     {
+        control_quaternions.clear();
 
-        control_quaternions_1.clear();
-        control_quaternions_2.clear();
-
-		Eigen::Quaternionf s0, s1;
+		Eigen::Quaternionf s;
         
-        // s0 for first control point is not defined, so we just set as q0
-        s0 = key_quaternions[0];
+        // s for first control point is not defined, so we just set as q0
+        s = key_quaternions[0];
+		control_quaternions.push_back(s);
 
-        for (unsigned int seg = 0; seg < key_quaternions.size(); ++seg)
+        for (unsigned int seg = 1; seg < key_quaternions.size()-1; ++seg)
         {
-            if (seg > 0)
-            {
-		        s0 = -1.0*(logQuaternion(key_quaternions[seg+1]*key_quaternions[seg].inverse()).coeffs() + logQuaternion(key_quaternions[seg-1]*key_quaternions[seg].inverse()).coeffs());
-		        s0 = expQuaternion(s0);
-		        s0.w() *= 0.25;
-		        s0.vec() *= 0.25;
-		        s0 = s0 * key_quaternions[seg];
-            }
+			s = -0.25*(logQuaternion(key_quaternions[seg].inverse()*key_quaternions[seg-1]).coeffs() + logQuaternion(key_quaternions[seg].inverse()*key_quaternions[seg+1]).coeffs());
+			s = key_quaternions[seg]* expQuaternion(s);
 
-            if (seg < key_quaternions.size() - 1)
-            {
-		        s1 = -1.0*(logQuaternion(key_quaternions[seg+2]*key_quaternions[seg+1].inverse()).coeffs() + logQuaternion(key_quaternions[seg]*key_quaternions[seg+1].inverse()).coeffs());
-		        s1 = expQuaternion(s1);
-		        s1.w() *= 0.25;
-		        s1.vec() *= 0.25;
-		        s1 = s1 * key_quaternions[seg+1];
-            }
-            else
-                s1 = key_quaternions[key_quaternions.size()-1];
-
-            //s0.normalize();
-            //s1.normalize();
-
-            control_quaternions_1.push_back(s0);
-            control_quaternions_2.push_back(s1);
+            control_quaternions.push_back(s);
     
         }
+
+		// control point for last quaternion not defined since we dont have qi+1
+		control_quaternions.push_back(key_quaternions.back());
 
     }
 
