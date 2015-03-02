@@ -415,6 +415,9 @@ public:
 		Eigen::Quaternionf q2 = s0.slerp(t, s1);
 		Eigen::Quaternionf res = q1.slerp(2.0*t*(1.0-t), q2);
 
+
+		res.normalize();
+
 		return res;
 	}
 
@@ -438,9 +441,9 @@ public:
 		Eigen::Vector4f pt = pointOnSegment(t, segment);
 
 		Eigen::Quaternionf qt;
-		if (segment > 0 && key_positions.size() - segment > 2)
+		if (segment >= 0 && key_positions.size() - segment > 2)
 			qt = squad(segment, t);
-		else		
+		else	
 			qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
 
 		m.rotate(qt);
@@ -455,13 +458,21 @@ public:
 		float t = toLocalParameter (global_t);
 		int segment = curveSegment (global_t);
 
+		Eigen::Vector4f pt = pointOnSegment(t, segment);
+
 		Eigen::Quaternionf qt;
-		if (segment > 0 && key_positions.size() - segment > 2)
+		if (segment >= 0 && key_positions.size() - segment > 2)
 			qt = squad(segment, t);
 		else		
 			qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
 
+		Eigen::Affine3f m = Eigen::Affine3f::Identity();
+		m.rotate(qt);
+		m.translation() = pt.head(3);
+
 		cout << "quat : (" << qt.w() << " , " << qt.vec().transpose() << " ) " << endl;
+		cout << "t : " << pt.head(3).transpose() << endl;
+		cout << "m : " << endl << m.matrix() << endl << endl;
 	}
 
 	/**
@@ -665,8 +676,8 @@ public:
             else
                 s1 = key_quaternions[key_quaternions.size()-1];
 
-            s0.normalize();
-            s1.normalize();
+            //s0.normalize();
+            //s1.normalize();
 
             control_quaternions_1.push_back(s0);
             control_quaternions_2.push_back(s1);
