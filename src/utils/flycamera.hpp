@@ -246,6 +246,16 @@ public:
 	
 		rotation_X_axis += anglex;
 		rotation_Y_axis += angley;
+
+        if (rotation_X_axis > 2*M_PI)
+            rotation_X_axis -= 2*M_PI;
+        if (rotation_X_axis < 0)
+            rotation_X_axis += 2*M_PI;
+        if (rotation_Y_axis > 2*M_PI)
+            rotation_Y_axis -= 2*M_PI;
+        if (rotation_Y_axis < 0)
+            rotation_Y_axis += 2*M_PI;
+    
 	}
 
 };
