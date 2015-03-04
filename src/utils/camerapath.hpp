@@ -150,49 +150,6 @@ public:
 		phong_shader = new Shader("../effects/shaders/", "phongshader");
 		phong_shader->initialize();
 
-
-        Camera cam;
-        Eigen::Affine3f m;
-        m.matrix() << 0.84747, 0, -0.530844,  0.397393,
-            -0.0967398,  0.983254, -0.154441,  0.844536,
-            0.521955,  0.182238,  0.833278,  -4.55666,
-            0,         0,         0,         1;        
-        cam.setViewMatrix(m);
-        addKeyPosition(&cam);
-        m.matrix() << 0.32763,         0, -0.944806,   0.62106,
-                    -0.0864522,  0.995805, -0.029979,  0.385218,
-                     0.940843, 0.0915026,  0.326255,  -4.19225,
-                    0,         0,         0,         1;
-        cam.setViewMatrix(m);
-        addKeyPosition(&cam);
-
-
-
-        m.matrix() <<-0.185453,         0, -0.982653,   0.21509,
-                    -0.0642692,  0.997859, 0.0121293,  0.262105,
-                     0.980549, 0.0654038, -0.185056,  -3.99891,
-                    0,         0,         0,         1;
-        cam.setViewMatrix(m);
-        addKeyPosition(&cam);
-
-
-        m.matrix() << -0.872497,         0,  -0.48862,  0.692816,
-                    -0.0510753,  0.994522, 0.0912017,   0.39306,
-                     0.485944,   0.10453, -0.867717,  -3.73968,
-                    0,         0,         0,         1;
-        cam.setViewMatrix(m);
-        addKeyPosition(&cam);
-
-
-        m.matrix() << -0.997639,         0, 0.0686709, -0.213351,
-                    0.00538791,  0.996917, 0.0782747,  0.286434,
-                    -0.0684592, 0.0784599, -0.994564,  -3.63945,
-                    0,         0,         0,         1;
-        cam.setViewMatrix(m);
-        addKeyPosition(&cam);
-
-
-
         //camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
 
@@ -238,8 +195,8 @@ public:
 		center << camera->getCenter(), 1.0;
 		key_positions.push_back ( center );
 
-//		Eigen::Quaternionf quat (camera->getViewMatrix().rotation() );
-		Eigen::Matrix3f m;
+		Eigen::Quaternionf quat (camera->getViewMatrix().rotation() );
+/*		Eigen::Matrix3f m;
 		Eigen::Vector3f rx, ry, rz;
 		rz << center.head(3);
 		rz.normalize();
@@ -249,20 +206,9 @@ public:
 		m.row(1) = ry;
 		m.row(2) = rz;
 		Eigen::Quaternionf quat(m);
-
-        //if (key_quaternions.size() > 0)
-        if (quat.w() < 0)
-        {
-            quat.coeffs() *= -1.0;
-//            cout << "flipping" << endl;
-        }
+*/
 
 		key_quaternions.push_back (quat.inverse());
-
-        //cout << camera->getViewMatrix().matrix() <<  endl << endl;
-
-        //cout << "r " << key_quaternions.size() << endl << camera->getViewMatrix().matrix() << endl;
-        cout << "q  " << key_quaternions.size() << " " << quat.w() << " " << quat.vec().transpose() << endl << endl;
 
 		if (key_positions.size() > 1)
 			fillVertexData();
@@ -492,12 +438,12 @@ public:
 
         // before each slerp check if we are going the right direction (shortest path)
         // otherwise multiply one of the quaternions by -1
+        // Note: this might not be necessary any more, since we are checking during log method
 
 		dot = q0.w()*q1.w()+q0.vec().dot(q1.vec());
 		if (dot < 0)
 		{
             q1.coeffs() *= -1.0;
-//            cout << anim_time << " flipped first " << seg << endl;
 		}	
 		p0 = q0.slerp(t, q1); 
 
@@ -505,7 +451,6 @@ public:
 		if (dot < 0)
 		{
             s1.coeffs() *= -1.0;
-//            cout << anim_time << " flipped second " << seg << endl;
 		}	
 		p1 = s0.slerp(t, s1);
 
@@ -516,7 +461,6 @@ public:
         if (dot < 0)
         {
             p1.coeffs() *= -1.0;
-//            cout << anim_time << " flipped third " << seg <<  endl;
         }
 		res = p0.slerp(2.0*t*(1.0-t), p1);
         res.normalize();
@@ -756,8 +700,6 @@ public:
         // s for first control point is not defined, so we just set as q0
         s = key_quaternions[0];
 		control_quaternions.push_back(s);
-        //cout << endl << " ***************************** " << endl;
-        //cout << "s0 " << s.w() << " " << s.vec().transpose() << endl;
 
         for (unsigned int seg = 1; seg < key_quaternions.size()-1; ++seg)
         {
@@ -765,8 +707,6 @@ public:
 			s = key_quaternions[seg]* expQuaternion(s);
 
             control_quaternions.push_back(s);
-          //  cout << "s" << seg << " " << s.w() << " " << s.vec().transpose() << endl;
-    
         }
 
 		// control point for last quaternion not defined since we dont have qi+1
