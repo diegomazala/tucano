@@ -7,7 +7,9 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
       [ "ShaderStorageBufferFloat", "classTucano_1_1ShaderStorageBufferFloat.html", "classTucano_1_1ShaderStorageBufferFloat" ],
       [ "ShaderStorageBufferInt", "classTucano_1_1ShaderStorageBufferInt.html", "classTucano_1_1ShaderStorageBufferInt" ]
     ] ],
-    [ "camera.hpp", "camera_8hpp.html", "camera_8hpp" ],
+    [ "camera.hpp", "camera_8hpp.html", [
+      [ "Camera", "classTucano_1_1Camera.html", "classTucano_1_1Camera" ]
+    ] ],
     [ "effect.hpp", "effect_8hpp.html", [
       [ "Effect", "classTucano_1_1Effect.html", "classTucano_1_1Effect" ]
     ] ],
@@ -28,6 +30,5 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
       [ "Texture", "classTucano_1_1Texture.html", "classTucano_1_1Texture" ]
     ] ],
     [ "texturemanager.hpp", "texturemanager_8hpp.html", "texturemanager_8hpp" ],
-    [ "trackball.hpp", "trackball_8hpp.html", "trackball_8hpp" ],
     [ "tucano.hpp", "tucano_8hpp.html", null ]
 ];

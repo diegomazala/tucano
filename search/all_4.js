@@ -16,5 +16,6 @@ var searchData=
   ['endtranslation',['endTranslation',['../classTucano_1_1Trackball.html#a428d57e880d2c86e1b1dc8da5f998ab9',1,'Tucano::Trackball']]],
   ['error_5fcb',['error_cb',['../structt__ply__.html#a3f9870cbe445137d16da2173363bc810',1,'t_ply_']]],
   ['errorcheckfunc',['errorCheckFunc',['../namespaceTucano_1_1Misc.html#a503213c6201a2f9da5cc5dc63a2e2138',1,'Tucano::Misc']]],
-  ['examples_2emd',['examples.md',['../examples_8md.html',1,'']]]
+  ['examples_2emd',['examples.md',['../examples_8md.html',1,'']]],
+  ['expquaternion',['expQuaternion',['../classTucano_1_1CameraPath.html#a589ae470117110b0348e8f0cc39cdc1b',1,'Tucano::CameraPath']]]
 ];

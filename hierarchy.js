@@ -11,6 +11,8 @@ var hierarchy =
       [ "Tucano::AtomicBuffer", "classTucano_1_1AtomicBuffer.html", null ]
     ] ],
     [ "Tucano::Camera", "classTucano_1_1Camera.html", [
+      [ "Tucano::CameraPath", "classTucano_1_1CameraPath.html", null ],
+      [ "Tucano::Flycamera", "classTucano_1_1Flycamera.html", null ],
       [ "Tucano::Trackball", "classTucano_1_1Trackball.html", null ]
     ] ],
     [ "Effect", null, [

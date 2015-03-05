@@ -25,8 +25,9 @@ var searchData=
   ['initializegl',['initializeGL',['../classTucano_1_1QtPlainWidget.html#a2cf43dba895c7a5a151670b5b62ef810',1,'Tucano::QtPlainWidget::initializeGL()'],['../classTucano_1_1QtTrackballWidget.html#a7410869f9551a8afd19f8f55f5f46e63',1,'Tucano::QtTrackballWidget::initializeGL()']]],
   ['initializeshaders',['initializeShaders',['../classEffects_1_1SSAO.html#a62a1d54c24fce1f6337f10bf3b3aa87d',1,'Effects::SSAO']]],
   ['initializetf',['initializeTF',['../classTucano_1_1Shader.html#aa71b0efd7bd99dd2d62b395619b17104',1,'Tucano::Shader']]],
-  ['initopenglmatrices',['initOpenGLMatrices',['../classTucano_1_1Trackball.html#aa7c07ab83386e347e3361d9ffdce912b',1,'Tucano::Trackball']]],
+  ['initopenglmatrices',['initOpenGLMatrices',['../classTucano_1_1CameraPath.html#adbd84c0cc66381905d969ecf2145588e',1,'Tucano::CameraPath::initOpenGLMatrices()'],['../classTucano_1_1Flycamera.html#aadd00468f717086946759b9e3af59a3f',1,'Tucano::Flycamera::initOpenGLMatrices()'],['../classTucano_1_1Trackball.html#aa7c07ab83386e347e3361d9ffdce912b',1,'Tucano::Trackball::initOpenGLMatrices()']]],
   ['instance',['Instance',['../classTucano_1_1TextureManager.html#ad7bbf338608aad67bdda1dad7bbad096',1,'Tucano::TextureManager']]],
+  ['isanimating',['isAnimating',['../classTucano_1_1CameraPath.html#adeb8f663aaf891ea5e2ee8f7b38a37c7',1,'Tucano::CameraPath']]],
   ['isbinded',['isBinded',['../classTucano_1_1Framebuffer.html#ad25bd54e3b323bd80c405ccbc4a5416d',1,'Tucano::Framebuffer']]],
   ['isrotating',['isRotating',['../classTucano_1_1Trackball.html#a113b38c9a96ea75c75cb1c0662687c1c',1,'Tucano::Trackball']]],
   ['istranslating',['isTranslating',['../classTucano_1_1Trackball.html#afe73b01fa41a4dd7cfcb4e89932e25ae',1,'Tucano::Trackball']]]

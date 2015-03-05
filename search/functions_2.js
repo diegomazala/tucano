@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['camera',['Camera',['../classTucano_1_1Camera.html#ab4f5a3ab846ea045f3ee9fc80022caf9',1,'Tucano::Camera']]],
+  ['camera',['Camera',['../classTucano_1_1Camera.html#af9bc7dd3138692fe9cb07e8aafc28e43',1,'Tucano::Camera']]],
+  ['cameraatcurrenttime',['cameraAtCurrentTime',['../classTucano_1_1CameraPath.html#a482bd4aba10237952517eeb835a4c486',1,'Tucano::CameraPath']]],
+  ['cameraattime',['cameraAtTime',['../classTucano_1_1CameraPath.html#af8049bb388ae61c69bfe47bd810e0b65',1,'Tucano::CameraPath']]],
+  ['camerapath',['CameraPath',['../classTucano_1_1CameraPath.html#aedde2e6a1a562f7adcfb64d8daddee4e',1,'Tucano::CameraPath']]],
   ['changeambientpassflag',['changeAmbientPassFlag',['../classEffects_1_1SSAO.html#a761e3e9da915e71b875e3f2940643728',1,'Effects::SSAO']]],
   ['changefovy',['changeFovy',['../classTucano_1_1Camera.html#a4a03af90395fa9b0ed96e1696532a38a',1,'Tucano::Camera']]],
   ['clear',['clear',['../classTucano_1_1BufferObject.html#a5849293db0ea472f2e117bfdae239e29',1,'Tucano::BufferObject']]],
@@ -8,6 +11,9 @@ var searchData=
   ['clearattachments',['clearAttachments',['../classTucano_1_1Framebuffer.html#acfbf355673948696f87ae07a6cc1b803',1,'Tucano::Framebuffer']]],
   ['cleardepth',['clearDepth',['../classTucano_1_1Framebuffer.html#a093f4c77b1536f1791ccaa74414eff18',1,'Tucano::Framebuffer']]],
   ['color_5fcb',['color_cb',['../namespaceTucano_1_1MeshImporter.html#a09b31cc68de4395c2e845630b44058ad',1,'Tucano::MeshImporter']]],
+  ['computearclength',['computeArcLength',['../classTucano_1_1CameraPath.html#abb5cd4caa6b19b33a22995a9ffd995ca',1,'Tucano::CameraPath']]],
+  ['computecontrolquaternions',['computeControlQuaternions',['../classTucano_1_1CameraPath.html#a7e45da7e66ac6039fd265c3e188ee4e4',1,'Tucano::CameraPath']]],
+  ['computeinnercontrolpoints',['computeInnerControlPoints',['../classTucano_1_1CameraPath.html#a2087bdf54e1ce0b956fa36f203600617',1,'Tucano::CameraPath']]],
   ['computerotationangle',['computeRotationAngle',['../classTucano_1_1Trackball.html#ae9d969d12f5c675ebfa45b8c0d391fda',1,'Tucano::Trackball']]],
   ['computeshadertest',['ComputeShaderTest',['../classComputeShaderTest.html#ab001d9d5bb4fcf926b06b7a16190cd8f',1,'ComputeShaderTest']]],
   ['computesphereposition',['computeSpherePosition',['../classTucano_1_1Trackball.html#a303952b50d96aa129e421547471c04ae',1,'Tucano::Trackball']]],
@@ -16,7 +22,6 @@ var searchData=
   ['create',['create',['../classTucano_1_1BufferObject.html#ab18e91a3f099275a83d7c421454b2a07',1,'Tucano::BufferObject::create()'],['../classTucano_1_1Framebuffer.html#afdb4e8ca8d67283290ec932135c9fc37',1,'Tucano::Framebuffer::create()'],['../classTucano_1_1Texture.html#a41d9af1ffcb41290d308b2196a926f22',1,'Tucano::Texture::create(GLenum type, GLenum int_format, int w, int h, GLenum fmt, GLenum pix_type, const GLvoid *data=NULL, int dpt=256)'],['../classTucano_1_1Texture.html#aa06d2a6ce5d7c45d307a0a7be53988ac',1,'Tucano::Texture::create(int w, int h, const GLvoid *data=NULL)']]],
   ['createattribute',['createAttribute',['../classTucano_1_1Mesh.html#a02a713b933858f9e8649b611bcb358f3',1,'Tucano::Mesh::createAttribute(string name, vector&lt; Eigen::Vector4f &gt; &amp;attrib)'],['../classTucano_1_1Mesh.html#a9f4bc16be58f680424079a0023ba07a5',1,'Tucano::Mesh::createAttribute(string name, vector&lt; Eigen::Vector3f &gt; &amp;attrib)'],['../classTucano_1_1Mesh.html#a1815ac6837e136affc30981e3da6fdcc',1,'Tucano::Mesh::createAttribute(string name, vector&lt; Eigen::Vector2f &gt; &amp;attrib)']]],
   ['createbuffers',['createBuffers',['../classTucano_1_1Trackball.html#a37f109ba0d5ecd34ece7a817bce6b79d',1,'Tucano::Trackball']]],
-  ['createcamerarepresentation',['createCameraRepresentation',['../classTucano_1_1Camera.html#a5a9607b5ef3dde525ba48267734e4fb5',1,'Tucano::Camera']]],
   ['createframebuffer',['createFramebuffer',['../classTucano_1_1Framebuffer.html#a85f3d73a98a23ef226224f86996421f3',1,'Tucano::Framebuffer']]],
   ['createimage',['createImage',['../classComputeShaderTest.html#af28067bff599c712b194e6b95866d556',1,'ComputeShaderTest']]],
   ['createorthographicmatrix',['createOrthographicMatrix',['../classTucano_1_1Camera.html#a1357b59582c2d965cac3b6fd24c976a6',1,'Tucano::Camera']]],
@@ -27,5 +32,6 @@ var searchData=
   ['createssbo',['createSSBO',['../classComputeShaderTest.html#a1c3c362bfa08de469dc1b881fa561821',1,'ComputeShaderTest']]],
   ['createtexture',['createTexture',['../classTucano_1_1Framebuffer.html#a88c9b91226468333e84216249bd6f19f',1,'Tucano::Framebuffer']]],
   ['createtrackballrepresentation',['createTrackballRepresentation',['../classTucano_1_1Trackball.html#ac6ff61605c3ab50d53e96dba6715d009',1,'Tucano::Trackball']]],
-  ['createviewspacebuffer',['createViewSpaceBuffer',['../classEffects_1_1SSAO.html#a2c6995b6808a1a3efb50e7e0b17870d2',1,'Effects::SSAO']]]
+  ['createviewspacebuffer',['createViewSpaceBuffer',['../classEffects_1_1SSAO.html#a76239e59a0d79a1fb66d08da87ecdc76',1,'Effects::SSAO']]],
+  ['curvesegment',['curveSegment',['../classTucano_1_1CameraPath.html#a3aa9d58dc846f835bacad2b94e1e116c',1,'Tucano::CameraPath']]]
 ];
