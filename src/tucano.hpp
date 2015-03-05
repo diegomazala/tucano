@@ -21,7 +21,6 @@
  */
 
 #include <effect.hpp>
-#include <trackball.hpp>
 #include <bufferobject.hpp>
 #include <framebuffer.hpp>
 #include <mesh.hpp>

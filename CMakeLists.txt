@@ -56,8 +56,8 @@ set(
   ${TUCANO_SRC_DIR}/shader.hpp
   ${TUCANO_SRC_DIR}/texture.hpp
   ${TUCANO_SRC_DIR}/texturemanager.hpp
-  ${TUCANO_SRC_DIR}/trackball.hpp
   ${TUCANO_SRC_DIR}/tucano.hpp
+  ${TUCANO_SRC_DIR}/utils/trackball.hpp
   ${TUCANO_SRC_DIR}/utils/objimporter.hpp
   ${TUCANO_SRC_DIR}/utils/plyimporter.hpp
   ${TUCANO_SRC_DIR}/utils/qtplainwidget.hpp

@@ -55,13 +55,6 @@ public:
      */
     virtual ~Effect (void)
     {
-        for (unsigned int i = 0; i < shaders_list.size(); ++i)
-        {
-            if(shaders_list[i])
-            {
-                delete shaders_list[i];
-            }
-        }
         shaders_list.clear();
     }
 
@@ -87,6 +80,15 @@ public:
         shaders_list.push_back(shader_ptr);
         return shader_ptr;
     }
+
+    virtual void loadShader (Shader& shader, string shader_name)
+    {
+		shader.load(shader_name, shaders_dir);
+        shader.initialize();
+        shaders_list.push_back(&shader);
+    }
+
+
 
     /**
      * @brief Loads a shader by complete filenames (with extensions), initializes it, and inserts in shaders list.

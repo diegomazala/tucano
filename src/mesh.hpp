@@ -94,32 +94,32 @@ public:
      * @brief Returns the name of the attribute
      * @return Attribute's name
      */
-    string getName (void) {return name;}
+    string getName (void) const {return name;}
 
     /**
      * @brief Returns the number of elements of this attribute (usually number of vertices in VAO)
      * @return Number of elements
      */
-    int getSize (void) {return size;}
+    int getSize (void) const {return size;}
 
     /**
      * @brief Returns the number of elements per attribute
      * For example, returns 3 if attribute is of type vec3
      * @return Size of one attribute
      */
-    int getElementSize (void) {return element_size;}
+    int getElementSize (void) const {return element_size;}
 
     /**
      * @brief Returns the type of the attribute (ex. GL_FLOAT)
      * @return Type of attribute
      */
-    GLenum getType (void) {return type;}
+    GLenum getType (void) const {return type;}
 
     /**
      * @brief Returns the type of array (ex. GL_ARRAY_BUFFER)
      * @return Type of array
      */
-    GLenum getArrayType (void) {return array_type;}
+    GLenum getArrayType (void) const {return array_type;}
 
     /**
      * @brief Sets the type of array (default is GL_ARRAY_BUFFER)
@@ -134,7 +134,7 @@ public:
      * known beforehand
      * @return Attribute shader location
      */
-    GLint getLocation(void) {return location;}
+    GLint getLocation(void) const {return location;}
 
     /**
      * @brief Sets the location of the attribute for a shader.
@@ -321,9 +321,6 @@ protected:
 
     /// Vertex Array Object ID (VAO is just a descriptor, does not contain any data)
     GLuint vao_id;
-
-    ///Function used for openGL error handling.
-    //void errorCheckFunc(string file, int line);
 
 public:
 
@@ -524,7 +521,7 @@ public:
      * @param name Name of attribute to be queried.
      * @return True if attribute exists, false otherwise.
      */
-    bool hasAttribute (string name)
+    bool hasAttribute (const string& name) const
     {
         for (unsigned int i = 0; i < vertex_attributes.size(); ++i)
         {
@@ -548,12 +545,14 @@ public:
         for (unsigned int i = 0; i < vertex_attributes.size(); ++i)
         {
             GLint loc = shader->getAttributeLocation(vertex_attributes[i].getName().c_str());
-            //if (loc != -1)
-            {
-                vertex_attributes[i].setLocation(loc);
-            }
+            vertex_attributes[i].setLocation(loc);
         }
     }
+
+	void setAttributeLocation (const Shader& shader)
+	{
+		setAttributeLocation((Shader*)(&shader));
+	}
 
 
     /**
@@ -674,7 +673,7 @@ public:
      * If there is a index buffer it will also be binded.
      * Then, binds one buffer for each vertex attribute.
      */
-    virtual void bindBuffers (void)
+    virtual void bindBuffers (void) 
     {
 
         if (vao_id == 0)
@@ -703,7 +702,7 @@ public:
     /**
      * @brief Unbinds all buffers.
      */
-    virtual void unbindBuffers (void)
+    virtual void unbindBuffers (void) 
     {
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER,0);
@@ -719,7 +718,7 @@ public:
      * @brief Call the draw method for rendering triangles.
      * This method requires that a index buffer has been created.
      */
-    virtual void renderElements (void)
+    virtual void renderElements (void) 
     {
 
         glDrawElements(GL_TRIANGLES, numberOfElements, GL_UNSIGNED_INT, (GLvoid*)0);
@@ -731,7 +730,7 @@ public:
      * The method binds the buffers, calls the method to render triangles, and then unbinds all buffers.
      * Note that a index buffer is necessary.
      */
-    virtual void render() {
+    virtual void render (void) {
         bindBuffers();
         renderElements();
         unbindBuffers();

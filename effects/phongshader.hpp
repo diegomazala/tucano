@@ -24,6 +24,7 @@
 #define __PHONG__
 
 #include <tucano.hpp>
+#include <utils/trackball.hpp>
 
 using namespace Tucano;
 
@@ -39,7 +40,7 @@ class Phong : public Effect
 private:
 
     /// Phong Shader
-    Shader *phong_shader;
+    Shader phong_shader;
 
 	/// Default color
 	Eigen::Vector4f default_color;
@@ -51,7 +52,6 @@ public:
      */
     Phong (void)
     {
-        phong_shader = 0;
 		default_color << 0.7, 0.7, 0.7, 1.0;
     }
 
@@ -68,7 +68,7 @@ public:
     virtual void initialize (void)
     {
         // searches in default shader directory (/shaders) for shader files phongShader.(vert,frag,geom,comp)
-        phong_shader = loadShader("phongshader");
+        loadShader(phong_shader, "phongshader") ;
     }
 
 	/**
@@ -83,29 +83,29 @@ public:
      * @param cameraTrackball Given camera trackball
      * @param lightTrackball Given light trackball
      */
-    virtual void render (Tucano::Mesh* mesh = NULL, Tucano::Camera* cameraTrackball = NULL, Tucano::Camera* lightTrackball = NULL)
+    void render (Tucano::Mesh& mesh, const Tucano::Camera& cameraTrackball, const Tucano::Camera& lightTrackball)
     {
 
-        Eigen::Vector4f viewport = cameraTrackball->getViewport();
+        Eigen::Vector4f viewport = cameraTrackball.getViewport();
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-        phong_shader->bind();
+        phong_shader.bind();
 
         // sets all uniform variables for the phong shader
-        phong_shader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-        phong_shader->setUniform("modelMatrix", mesh->getModelMatrix());
-        phong_shader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-        phong_shader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
-        phong_shader->setUniform("has_color", mesh->hasAttribute("in_Color"));
-		phong_shader->setUniform("default_color", default_color);
+        phong_shader.setUniform("projectionMatrix", cameraTrackball.getProjectionMatrix());
+        phong_shader.setUniform("modelMatrix", mesh.getModelMatrix());
+        phong_shader.setUniform("viewMatrix", cameraTrackball.getViewMatrix());
+        phong_shader.setUniform("lightViewMatrix", lightTrackball.getViewMatrix());
+        phong_shader.setUniform("has_color", mesh.hasAttribute("in_Color"));
+		phong_shader.setUniform("default_color", default_color);
 
-        mesh->setAttributeLocation(phong_shader);
+        mesh.setAttributeLocation(phong_shader);
 
         glEnable(GL_DEPTH_TEST);
-        mesh->render();
+        mesh.render();
         glDisable(GL_DEPTH_TEST);
 
-        phong_shader->unbind();
+        phong_shader.unbind();
     }
 
 

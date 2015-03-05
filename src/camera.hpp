@@ -4,7 +4,6 @@
  * LCG - Laboratório de Computação Gráfica (Computer Graphics Lab) - COPPE
  * UFRJ - Federal University of Rio de Janeiro
  *
- * This file is part of Tucano Library.
  *
  * Tucano Library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,10 +40,10 @@ class Camera {
 protected:
 
     /// Projection, or intrinsic, matrix.
-    Eigen::Matrix4f projectionMatrix;
+    Eigen::Matrix4f projection_matrix;
 
     /// View, or extrinsic, matrix.
-    Eigen::Affine3f viewMatrix;
+    Eigen::Affine3f view_matrix;
 
     /// Viewport dimensions [minX, minY, width, height].
     Eigen::Vector4f viewport;
@@ -86,7 +85,7 @@ public:
      */
     void resetViewMatrix (void)
     {
-        viewMatrix = Eigen::Affine3f::Identity();
+        view_matrix = Eigen::Affine3f::Identity();
     }
 
     /**
@@ -94,7 +93,7 @@ public:
      */
     void resetProjectionMatrix (void)
     {
-        projectionMatrix = Eigen::Matrix4f::Identity();
+        projection_matrix = Eigen::Matrix4f::Identity();
     }
 
     /**
@@ -111,9 +110,9 @@ public:
      * @brief Returns the center of the camera in world space.
      * @return Camera center
      */
-    Eigen::Vector3f getCenter (void)
+    Eigen::Vector3f getCenter (void) const
     {
-        return viewMatrix.linear().inverse() * (-viewMatrix.translation());
+        return view_matrix.linear().inverse() * (-view_matrix.translation());
     }
 
     /**
@@ -124,7 +123,7 @@ public:
      */
     void getViewMatrix (GLdouble *matrix)
     {
-        Eigen::Matrix4f mv = viewMatrix.matrix();
+        Eigen::Matrix4f mv = view_matrix.matrix();
         for (int i = 0; i < 16; ++i)
         {
             matrix[i] = mv(i);
@@ -141,7 +140,7 @@ public:
     {
         for (int i = 0; i < 16; ++i)
         {
-            matrix[i] = projectionMatrix(i);
+            matrix[i] = projection_matrix(i);
         }
     }
 
@@ -155,7 +154,7 @@ public:
     inline Eigen::Vector3f projectPoint (const Eigen::Vector4f& pt, Eigen::Vector4f& viewport)
     {
         Eigen::Vector3f screen_pt = Eigen::Vector3f::Zero();
-        Eigen::Vector4f proj = viewMatrix * projectionMatrix * pt;
+        Eigen::Vector4f proj = view_matrix * projection_matrix * pt;
         if (proj[3] == 0.0)
             return screen_pt;
 
@@ -174,8 +173,17 @@ public:
      */
     Eigen::Affine3f getViewMatrix (void) const
     {
-        return viewMatrix;
+        return view_matrix;
     }
+
+	/**
+     * @brief Returns a pointer to the view matrix as an Affine 3x3 matrix
+     * @return Pointer to View Matrix.
+     */
+	 Eigen::Affine3f* viewMatrix (void)
+	{
+		return &view_matrix;
+	}
 
     /**
      * @brief Returns the view matrix as an 4x4 matrix
@@ -183,8 +191,18 @@ public:
      */
     Eigen::Matrix4f getProjectionMatrix (void) const
     {
-        return projectionMatrix;
+        return projection_matrix;
     }
+
+    /**
+     * @brief Returns a pointer to the projection matrix as an 4x4 matrix
+     * @return Pointer to projection Matrix.
+     */
+    Eigen::Matrix4f* projectionMatrix (void) 
+    {
+        return &projection_matrix;
+    }
+
 
     /**
      * @brief Returns a 3x3 matrix containing only the rotation of the view matrix.
@@ -192,7 +210,7 @@ public:
      */
     Eigen::Matrix3f getRotationMatrix (void) const
     {
-        return viewMatrix.rotation();
+        return view_matrix.rotation();
     }
 
 
@@ -202,7 +220,7 @@ public:
      */
     Eigen::Vector3f getTranslationMatrix (void) const
     {
-        return viewMatrix.translation();
+        return view_matrix.translation();
     }    
 
     /**
@@ -272,7 +290,7 @@ public:
      */
     void setProjectionMatrix(const Eigen::Matrix4f& mat)
     {
-        projectionMatrix = mat;
+        projection_matrix = mat;
     }
 
 	 /**
@@ -281,7 +299,7 @@ public:
      */
     void setViewMatrix(const Eigen::Affine3f& mat)
     {
-        viewMatrix = mat;
+        view_matrix = mat;
     }
 
 
@@ -462,7 +480,7 @@ public:
      */
     void translate (const Eigen::Vector3f& translation)
     {
-        viewMatrix.translate(translation);
+        view_matrix.translate(translation);
     }
 
     /**
@@ -471,7 +489,7 @@ public:
      */
     void rotate (const Eigen::Quaternion<float>& rotation)
     {
-        viewMatrix.rotate(rotation);
+        view_matrix.rotate(rotation);
     }
 
     /**
@@ -480,7 +498,7 @@ public:
      */
     void scale (const Eigen::Vector3f& scale_factors)
     {
-        viewMatrix.scale(scale_factors);
+        view_matrix.scale(scale_factors);
     }
 
     /**
@@ -489,7 +507,7 @@ public:
      */
     void scale (float scale_factor)
     {
-        viewMatrix.scale(scale_factor);
+        view_matrix.scale(scale_factor);
     }
 };
 

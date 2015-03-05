@@ -97,10 +97,10 @@ private:
 	Shapes::CoordinateAxes axes;
 
     /// Path shader, used for rendering the curve
-    Shader* camerapath_shader;
+    Shader camerapath_shader;
 
 	/// To render simple lines
-	Shader* phong_shader;
+	Shader phong_shader;
 	
 public:
 
@@ -144,13 +144,14 @@ public:
 		draw_quaternions = true;
 
         initOpenGLMatrices();
-        camerapath_shader = new Shader("../effects/shaders/", "beziercurve");
-		camerapath_shader->initialize();
+		
+        camerapath_shader.load("beziercurve", "../effects/shaders/");
+		camerapath_shader.initialize();
 
-		phong_shader = new Shader("../effects/shaders/", "phongshader");
-		phong_shader->initialize();
+		phong_shader.load("phongshader", "../effects/shaders/");
+		phong_shader.initialize();
 
-        //camerapath_shader->initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
+        //camerapath_shader.initializeFromStrings(camerapath_vertex_code, camerapath_fragment_code);
     }
 
 	/**
@@ -189,13 +190,13 @@ public:
 	* @brief Add key position
 		* @param pt New key point
 	*/
-	void addKeyPosition (Tucano::Camera* camera)
+	void addKeyPosition (const Tucano::Camera& camera)
 	{
 		Eigen::Vector4f center; 
-		center << camera->getCenter(), 1.0;
+		center << camera.getCenter(), 1.0;
 		key_positions.push_back ( center );
 
-		Eigen::Quaternionf quat (camera->getViewMatrix().rotation() );
+		Eigen::Quaternionf quat (camera.getViewMatrix().rotation() );
 /*		Eigen::Matrix3f m;
 		Eigen::Vector3f rx, ry, rz;
 		rz << center.head(3);
@@ -221,47 +222,47 @@ public:
 	* Inside geometry shader each Beziér segment is approximate by linear segments
 	* @param camera Current camera for viewing scene
 	*/
-    void render (Tucano::Camera *camera, Tucano::Camera *light)
+    void render (const Tucano::Camera& camera, const Tucano::Camera& light)
     {
 		glEnable(GL_DEPTH_TEST);
 		if (key_positions.size() > 1)
 		{
 
-        	camerapath_shader->bind();
+        	camerapath_shader.bind();
         
-        	camerapath_shader->setUniform("viewMatrix", camera->getViewMatrix());
-        	camerapath_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
-        	camerapath_shader->setUniform("nearPlane", camera->getNearPlane());
-        	camerapath_shader->setUniform("farPlane", camera->getFarPlane());
+        	camerapath_shader.setUniform("viewMatrix", camera.getViewMatrix());
+        	camerapath_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
+        	camerapath_shader.setUniform("nearPlane", camera.getNearPlane());
+        	camerapath_shader.setUniform("farPlane", camera.getFarPlane());
 
         	Eigen::Vector4f color (1.0, 0.0, 0.0, 1.0);
-        	camerapath_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
-        	camerapath_shader->setUniform("in_Color", color);
+        	camerapath_shader.setUniform("modelMatrix", Eigen::Affine3f::Identity());
+        	camerapath_shader.setUniform("in_Color", color);
 
 			curve.setAttributeLocation(camerapath_shader);
 			curve.bindBuffers();
         	glDrawArrays(GL_LINE_STRIP, 0, key_positions.size());
 			curve.unbindBuffers();
 
-        	camerapath_shader->unbind();
+        	camerapath_shader.unbind();
 
 			if (draw_control_points)
 			{
-				phong_shader->bind();
+				phong_shader.bind();
 			
-				phong_shader->setUniform("viewMatrix", camera->getViewMatrix());
-				phong_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
-				phong_shader->setUniform("lightViewMatrix", light->getViewMatrix());
+				phong_shader.setUniform("viewMatrix", camera.getViewMatrix());
+				phong_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
+				phong_shader.setUniform("lightViewMatrix", light.getViewMatrix());
 
 				color << 1.0, 1.0, 0.0, 1.0;
-				phong_shader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
-				phong_shader->setUniform("default_color", color);
-				phong_shader->setUniform("has_color", false);
+				phong_shader.setUniform("modelMatrix", Eigen::Affine3f::Identity());
+				phong_shader.setUniform("default_color", color);
+				phong_shader.setUniform("has_color", false);
 				control_segments.setAttributeLocation(phong_shader);
 				control_segments.bindBuffers();
 				glDrawArrays(GL_LINES, 0, control_points_1.size()*4);
 				control_segments.unbindBuffers();
-				phong_shader->unbind();
+				phong_shader.unbind();
 
 				sphere.setColor( Eigen::Vector4f (0.48, 1.0, 0.16, 1.0) );
 				// render control points
@@ -297,7 +298,7 @@ public:
 				axes.resetModelMatrix();
 				axes.modelMatrix()->rotate(key_quaternions[i]);
 				axes.modelMatrix()->scale(0.2);
-				axes.render(*camera, *light);	
+				axes.render(camera, light);	
 			}
 		}
 
@@ -488,10 +489,6 @@ public:
 		Eigen::Vector4f pt = pointOnSegment(t, segment);
 
 		Eigen::Quaternionf qt;
-		//if (segment >= 0 && key_positions.size() - segment > 2)
-		//	qt = squad(segment, t);
-		//else	
-		//		qt = key_quaternions[segment].slerp(t, key_quaternions[segment+1]);	
 		qt = squad(segment, t);
 
 		m.rotate(qt);

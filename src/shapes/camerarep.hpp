@@ -78,7 +78,7 @@ class CameraRep : public Tucano::Mesh {
 
 private:
 
-	Tucano::Shader *camerarep_shader;
+	Tucano::Shader camerarep_shader;
 
 public:
 
@@ -92,39 +92,39 @@ public:
 		createGeometry();
 
 //		camerarep_shader = new Shader("cameraRepShader");
-        camerarep_shader = new Shader("../effects/shaders/", "phongshader");
-		camerarep_shader->initialize();
-//		camerarep_shader->initializeFromStrings(camerarep_vertex_code, camerarep_fragment_code);
+        camerarep_shader.load("phongshader", "../effects/shaders/");
+		camerarep_shader.initialize();
+		///@TODO load shader from string and remove phong dependency
+//		camerarep_shader.initializeFromStrings(camerarep_vertex_code, camerarep_fragment_code);
 		
 	}
 
     ///Default destructor.
     ~CameraRep() 
 	{
-		delete camerarep_shader;
 	}
 
 
 	/**
 	* @brief Render camera representation
 	*/
-	void render (Tucano::Camera *camera, Tucano::Camera *light)
+	void render (const Tucano::Camera& camera, const Tucano::Camera& light)
 	{
-	    Eigen::Vector4f viewport = camera->getViewport();
+	    Eigen::Vector4f viewport = camera.getViewport();
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-		camerarep_shader->bind();
+		camerarep_shader.bind();
         
-		camerarep_shader->setUniform("viewMatrix", camera->getViewMatrix());
-       	camerarep_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
-       	camerarep_shader->setUniform("nearPlane", camera->getNearPlane());
-       	camerarep_shader->setUniform("farPlane", camera->getFarPlane());
+		camerarep_shader.setUniform("viewMatrix", camera.getViewMatrix());
+       	camerarep_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
+       	camerarep_shader.setUniform("nearPlane", camera.getNearPlane());
+       	camerarep_shader.setUniform("farPlane", camera.getFarPlane());
 
        	Eigen::Vector4f color (1.0, 1.0, 0.0, 1.0);
-       	camerarep_shader->setUniform("modelMatrix", model_matrix);
-		camerarep_shader->setUniform("lightViewMatrix", light->getViewMatrix());
-       	camerarep_shader->setUniform("has_color", true);
-       	camerarep_shader->setUniform("default_color", color);
+       	camerarep_shader.setUniform("modelMatrix", model_matrix);
+		camerarep_shader.setUniform("lightViewMatrix", light.getViewMatrix());
+       	camerarep_shader.setUniform("has_color", true);
+       	camerarep_shader.setUniform("default_color", color);
 
 		setAttributeLocation(camerarep_shader);
 
@@ -134,7 +134,7 @@ public:
 		unbindBuffers();
 		glDisable(GL_DEPTH_TEST);
 
-       	camerarep_shader->unbind();
+       	camerarep_shader.unbind();
 		
 	}
 

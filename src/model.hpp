@@ -54,7 +54,7 @@ public:
      * @brief Returns the center of the axis-aligned bounding box.
      * @return The center of the axis-aligned bounding box.
      */
-    virtual Eigen::Vector3f getObjectCenter (void)
+    virtual Eigen::Vector3f getObjectCenter (void) const
     {
         return objectCenter;
     }
@@ -63,7 +63,7 @@ public:
      * @brief Returns the centroid of the model.
      * @return The centroid of the mesh object. given by the mean position of all vertices.
      */
-    virtual Eigen::Vector3f getCentroid (void)
+    virtual Eigen::Vector3f getCentroid (void) const
     {
         return centroid;
     }
@@ -73,7 +73,7 @@ public:
      * The bounding sphere is computed as the distance from the farthest point to the object's centroid.
      * @return Radius of the bounding sphere.
      */
-    virtual float getBoundingSphereRadius (void)
+    virtual float getBoundingSphereRadius (void) const
     {
         return radius;
     }
@@ -82,7 +82,7 @@ public:
      * @brief Returns the model matrix.
      * @return Model matrix as an Affine 3f matrix.
      */
-    Eigen::Affine3f getModelMatrix (void)
+    Eigen::Affine3f getModelMatrix (void) const
     {
         return model_matrix;
     }
@@ -110,7 +110,7 @@ public:
      * @brief Returns the scale factor for fitting the model inside a unit cube.
      * @return Scale factor.
      */
-    float getScale (void)
+    float getScale (void) const
     {
         return scale;
     }

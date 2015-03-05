@@ -84,7 +84,7 @@ class Sphere : public Tucano::Mesh {
 private:
 
 	// Shader to render sphere
-	Tucano::Shader *sphere_shader;
+	Tucano::Shader sphere_shader;
 
 	// Sphere color
 	Eigen::Vector4f color;
@@ -101,16 +101,14 @@ public:
 
 		color << 1.0, 0.48, 0.16, 1.0;
 
-		sphere_shader = new Shader("sphereShader");
-		sphere_shader->initializeFromStrings(sphere_vertex_code, sphere_fragment_code);
+		sphere_shader.setShaderName("sphereShader");
+		sphere_shader.initializeFromStrings(sphere_vertex_code, sphere_fragment_code);
 
 	}
 
     ///Default destructor.
     ~Sphere() 
-	{
-		delete sphere_shader;
-	}
+	{}
 
 
 	/**
@@ -125,23 +123,23 @@ public:
 	/**
 	* @brief Render sphere
 	*/
-	void render (Tucano::Camera *camera, Tucano::Camera *light)
+	void render (const Tucano::Camera& camera, const Tucano::Camera& light)
 	{
-		Eigen::Vector4f viewport = camera->getViewport();
+		Eigen::Vector4f viewport = camera.getViewport();
 		glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-		sphere_shader->bind();
+		sphere_shader.bind();
 
-       	sphere_shader->setUniform("modelMatrix", model_matrix);
-		sphere_shader->setUniform("viewMatrix", camera->getViewMatrix());
-       	sphere_shader->setUniform("projectionMatrix", camera->getProjectionMatrix());
-		sphere_shader->setUniform("lightViewMatrix", light->getViewMatrix());
-       	sphere_shader->setUniform("in_Color", color);
+       	sphere_shader.setUniform("modelMatrix", model_matrix);
+		sphere_shader.setUniform("viewMatrix", camera.getViewMatrix());
+       	sphere_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
+		sphere_shader.setUniform("lightViewMatrix", light.getViewMatrix());
+       	sphere_shader.setUniform("in_Color", color);
 
 		vector <string> attribs;
-		sphere_shader->getActiveAttributes(attribs);
+		sphere_shader.getActiveAttributes(attribs);
 
- 		this->setAttributeLocation(sphere_shader);
+ 		this->setAttributeLocation(&sphere_shader);
 
 		glEnable(GL_DEPTH_TEST);
 		this->bindBuffers();
@@ -149,7 +147,7 @@ public:
 		this->unbindBuffers();
 		glDisable(GL_DEPTH_TEST);
 
-       	sphere_shader->unbind();
+       	sphere_shader.unbind();
 
 		#ifdef TUCANODEBUG
 		Misc::errorCheckFunc(__FILE__, __LINE__);

@@ -153,9 +153,9 @@ public:
         rotation_matrix.row(1) = rotY;
         rotation_matrix.row(0) = rotX;
 
-		viewMatrix.rotate (rotation_matrix);
-        viewMatrix.translate (Eigen::Vector3f(0.0, 0.0, -5.0));
-		viewMatrix.translate (translation_vector);
+		view_matrix.rotate (rotation_matrix);
+        view_matrix.translate (Eigen::Vector3f(0.0, 0.0, -5.0));
+		view_matrix.translate (translation_vector);
 	}	
 
     /**

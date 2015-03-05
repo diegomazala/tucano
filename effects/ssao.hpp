@@ -24,6 +24,7 @@
 #define __SSAO__
 
 #include "tucano.hpp"
+#include "utils/trackball.hpp"
 #include <math.h>
 
 using namespace std;
@@ -64,16 +65,16 @@ protected:
     Framebuffer* fbo;
 
     /// The per pixel AO computation shader
-    Shader* ssaoShader;
+    Shader ssao_shader;
 
     /// Save coord, normal and color to FBO
-    Shader* deferredShader;
+    Shader deferred_shader;
 
     /// Join original render with SSAO (blur it first)
-    Shader* ssaoFinalShader;
+    Shader ssao_final_shader;
 
     /// A quad mesh for framebuffer rendering
-    Mesh* quad;
+    Mesh quad;
 
     /// Flag indicating wether blur shall be applied or not.
     bool apply_blur;
@@ -137,11 +138,7 @@ public:
         apply_blur = true;
         displayAmbientPass = false;
 
-        ssaoShader = 0;
-        ssaoFinalShader = 0;
-        deferredShader = 0;
         fbo = 0;
-        quad = 0;
 	}
 
     ///Default destructor. Destroy the FBO, deletes the shaders and the sampling kernel.
@@ -149,7 +146,6 @@ public:
     {
         delete fbo;
         delete kernel;
-        delete quad;
     }
 
     /**
@@ -166,8 +162,7 @@ public:
 
         fbo = new Framebuffer();
 
-        quad = new Mesh();
-        quad->createQuad();
+        quad.createQuad();
     }
 
     /**
@@ -176,24 +171,24 @@ public:
      * @param cameraTrackball A pointer to the camera trackball object.
      * @param lightTrackball A pointer to the light trackball object.
      */
-    void createViewSpaceBuffer (Mesh* mesh, Trackball* camera_trackball, Trackball* light_trackball)
+    void createViewSpaceBuffer (Mesh& mesh, const Trackball& camera_trackball, const Trackball& light_trackball)
     {
 
         // Bind buffer to store coord, normal and color information
         fbo->clearAttachments();
         fbo->bindRenderBuffers(depthTextureID, normalTextureID, colorTextureID);
 
-        deferredShader->bind();
-        deferredShader->setUniform("projectionMatrix", camera_trackball->getProjectionMatrix());
-        deferredShader->setUniform("modelMatrix",mesh->getModelMatrix());
-        deferredShader->setUniform("viewMatrix", camera_trackball->getViewMatrix());
-        deferredShader->setUniform("lightViewMatrix", light_trackball->getViewMatrix());
-        deferredShader->setUniform("has_color", mesh->hasAttribute("in_Color"));
+        deferred_shader.bind();
+        deferred_shader.setUniform("projectionMatrix", camera_trackball.getProjectionMatrix());
+        deferred_shader.setUniform("modelMatrix",mesh.getModelMatrix());
+        deferred_shader.setUniform("viewMatrix", camera_trackball.getViewMatrix());
+        deferred_shader.setUniform("lightViewMatrix", light_trackball.getViewMatrix());
+        deferred_shader.setUniform("has_color", mesh.hasAttribute("in_Color"));
 
-        mesh->setAttributeLocation(deferredShader);
-        mesh->render();
+        mesh.setAttributeLocation(deferred_shader);
+        mesh.render();
 
-        deferredShader->unbind();
+        deferred_shader.unbind();
         fbo->unbind();
         fbo->clearDepth();
 
@@ -207,22 +202,22 @@ public:
 
         fbo->bindRenderBuffer(ssaoTextureID);
 
-        ssaoShader->bind();
+        ssao_shader.bind();
 
-        ssaoShader->setUniform("kernel", kernel, 2, numberOfSamples);
+        ssao_shader.setUniform("kernel", kernel, 2, numberOfSamples);
 
-        ssaoShader->setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
-        ssaoShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
+        ssao_shader.setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
+        ssao_shader.setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
 
-        ssaoShader->setUniform("radius", radius);
-        ssaoShader->setUniform("intensity", (float)intensity);
-        ssaoShader->setUniform("max_dist", max_dist);
-        ssaoShader->setUniform("noiseTexture", noiseTexture.bind());
+        ssao_shader.setUniform("radius", radius);
+        ssao_shader.setUniform("intensity", (float)intensity);
+        ssao_shader.setUniform("max_dist", max_dist);
+        ssao_shader.setUniform("noiseTexture", noiseTexture.bind());
 
-        quad->setAttributeLocation(ssaoShader);
-        quad->render();
+        quad.setAttributeLocation(ssao_shader);
+        quad.render();
 
-        ssaoShader->unbind();
+        ssao_shader.unbind();
         noiseTexture.unbind();
         fbo->unbind();
         fbo->clearDepth();
@@ -233,22 +228,22 @@ public:
      * @brief Blur SSAO result and mix with original render
      * @param light_trackball A pointer to the light trackball object.
      */
-    void applySSAO (Trackball* light_trackball)
+    void applySSAO (const Trackball& light_trackball)
     {
-        ssaoFinalShader->bind();
+        ssao_final_shader.bind();
 
-        ssaoFinalShader->setUniform("lightViewMatrix", light_trackball->getViewMatrix());
+        ssao_final_shader.setUniform("lightViewMatrix", light_trackball.getViewMatrix());
 
-        ssaoFinalShader->setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
-        ssaoFinalShader->setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
-        ssaoFinalShader->setUniform("colorTexture", fbo->bindAttachment(colorTextureID));
-        ssaoFinalShader->setUniform("ssaoTexture", fbo->bindAttachment(ssaoTextureID));
-        ssaoFinalShader->setUniform("blurRange", blurRange);
+        ssao_final_shader.setUniform("coordsTexture", fbo->bindAttachment(depthTextureID));
+        ssao_final_shader.setUniform("normalTexture", fbo->bindAttachment(normalTextureID));
+        ssao_final_shader.setUniform("colorTexture", fbo->bindAttachment(colorTextureID));
+        ssao_final_shader.setUniform("ssaoTexture", fbo->bindAttachment(ssaoTextureID));
+        ssao_final_shader.setUniform("blurRange", blurRange);
 
-        quad->setAttributeLocation(ssaoFinalShader);
-        quad->render();
+        quad.setAttributeLocation(ssao_final_shader);
+        quad.render();
 
-        ssaoFinalShader->unbind();
+        ssao_final_shader.unbind();
         fbo->unbind();
     }
 
@@ -267,10 +262,10 @@ public:
      * @param output_fbo Output buffer, alternative to GL back buffer for offline rendering
      * @param output_attach In case of offline rendering, the output attachment of the fbo
      */
-    virtual void render(Mesh* mesh, Trackball* camera_trackball, Trackball* light_trackball)
+    virtual void render(Mesh& mesh, const Trackball& camera_trackball, const Trackball& light_trackball)
     {
-        Eigen::Vector4f viewport = camera_trackball->getViewport();
-        Eigen::Vector2i viewport_size = camera_trackball->getViewportSize();
+        Eigen::Vector4f viewport = camera_trackball.getViewport();
+        Eigen::Vector2i viewport_size = camera_trackball.getViewportSize();
 
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
@@ -327,9 +322,9 @@ private:
      */
     void initializeShaders (void)
     {
-        ssaoShader = loadShader("ssao");
-        deferredShader = loadShader("viewspacebuffer");
-        ssaoFinalShader = loadShader("ssaofinal");
+		loadShader(ssao_shader, "ssao");
+		loadShader(deferred_shader, "viewspacebuffer");
+		loadShader(ssao_final_shader, "ssaofinal");
     }
 
     /**
