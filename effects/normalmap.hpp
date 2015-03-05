@@ -43,9 +43,7 @@ public:
      * @brief Default constructor.
      */
     NormalMap ()
-    {
-        normalmap_shader = 0;
-    }
+    {}
 
     /**
      * @brief Default destructor
@@ -58,7 +56,7 @@ public:
     virtual void initialize (void)
     {
         // searches in default shader directory (/shaders) for shader files normalmap.(vert,frag,geom,comp)
-        normalmap_shader = loadShader("normalmap");
+         loadShader(normalmap_shader, "normalmap");
     }
 
     /**
@@ -66,31 +64,31 @@ public:
      * @param mesh Given mesh
      * @param cameraTrackball Given camera trackball     
      */
-    virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
+    virtual void render (Tucano::Mesh& mesh, const Tucano::Trackball& cameraTrackball)
     {
-        Eigen::Vector4f viewport = cameraTrackball->getViewport();
+        Eigen::Vector4f viewport = cameraTrackball.getViewport();
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-        normalmap_shader->bind();
+        normalmap_shader.bind();
 
         // sets all uniform variables for the phong shader
-        normalmap_shader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-        normalmap_shader->setUniform("modelMatrix", mesh->getModelMatrix());
-        normalmap_shader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
+        normalmap_shader.setUniform("projectionMatrix", cameraTrackball.getProjectionMatrix());
+        normalmap_shader.setUniform("modelMatrix", mesh.getModelMatrix());
+        normalmap_shader.setUniform("viewMatrix", cameraTrackball.getViewMatrix());
 
-        mesh->setAttributeLocation(normalmap_shader);
+        mesh.setAttributeLocation(normalmap_shader);
 
         glEnable(GL_DEPTH_TEST);
-        mesh->render();
+        mesh.render();
         glDisable(GL_DEPTH_TEST);
 
-        normalmap_shader->unbind();
+        normalmap_shader.unbind();
     }
 
 private:
 
     /// NormalMap Shader
-    Tucano::Shader *normalmap_shader;
+    Tucano::Shader normalmap_shader;
 };
 
 }

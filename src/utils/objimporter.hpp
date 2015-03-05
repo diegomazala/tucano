@@ -33,6 +33,9 @@ namespace Tucano
 namespace MeshImporter
 {
 
+// avoid warnings of unused function
+static void loadObjFile (Mesh* mesh, string filename) __attribute__ ((unused));
+
 /**
  * @brief Loads a mesh from an OBJ file.
  *

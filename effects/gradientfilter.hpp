@@ -46,7 +46,6 @@ public:
    **/
   GradientFilter (void)
   {    
-    shader = 0;
   }
 
   /**
@@ -59,26 +58,25 @@ public:
    */
   virtual void initialize()
   {
-      shader = loadShader("gradientfilter");
-      quad = new Mesh();
-      quad->createQuad();
+      loadShader(shader, "gradientfilter");
+      quad.createQuad();
   }
 
   /**
    * @brief Applies the gradient filter to an image.
    **/
-  void renderTexture(Texture *tex, Eigen::Vector2i viewport)
+  void renderTexture(Texture& tex, Eigen::Vector2i viewport)
   {
       glViewport(0, 0, viewport[0], viewport[1]);
 
-      shader->bind();
-      shader->setUniform("imageTexture", tex->bind());
-      shader->setUniform("hdir", horizontal);
-      shader->setUniform("vdir", vertical);
-      quad->render();
+      shader.bind();
+      shader.setUniform("imageTexture", tex.bind());
+      shader.setUniform("hdir", horizontal);
+      shader.setUniform("vdir", vertical);
+      quad.render();
 
-      shader->unbind();
-      tex->unbind();
+      shader.unbind();
+      tex.unbind();
   }
 
   /**
@@ -95,10 +93,10 @@ public:
 private:
 
   /// The mean filter shader.
-  Shader* shader;
+  Shader shader;
 
   /// A quad to be rendered forcing one call of the fragment shader per image pixel
-  Mesh* quad;
+  Mesh quad;
 
   /// Apply gradient in horizontal direction.
   bool horizontal;

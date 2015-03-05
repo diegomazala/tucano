@@ -35,7 +35,7 @@ public slots:
     
 private:
 
-     Effects::Phong *phong;
+     Effects::Phong phong;
 
 };
 

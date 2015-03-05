@@ -19,6 +19,10 @@ GLWidget::~GLWidget()
 
 void GLWidget::initialize (void)
 {
+    // initialize the widget, camera and light trackball, and opens default mesh
+    Tucano::QtTrackballWidget::initialize();
+    Tucano::QtTrackballWidget::openMesh("../samples/models/toy.obj");
+
     // initialize the effects
     ssao = new Effects::SSAO();
     ssao->setShadersDir("../effects/shaders/");
@@ -32,9 +36,6 @@ void GLWidget::initialize (void)
     toon->setShadersDir("../effects/shaders/");
     toon->initialize();
 
-    // initialize the widget, camera and light trackball, and opens default mesh
-    Tucano::QtTrackballWidget::initialize();
-    Tucano::QtTrackballWidget::openMesh("../samples/models/toy.obj");
 }
 
 void GLWidget::paintGL (void)
@@ -44,21 +45,18 @@ void GLWidget::paintGL (void)
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    if (mesh)
-    {
-        if (active_effect == 0 && phong)
-        {
-            phong->render(mesh, camera_trackball, light_trackball);
-        }
-        if (active_effect == 1 && toon)
-        {
-            toon->render(mesh, camera_trackball, light_trackball);
-        }
-        if (active_effect == 2 && ssao)
-        {
-            ssao->render(mesh, camera_trackball, light_trackball);
-        }
-    }
+	if (active_effect == 0 )
+	{
+		phong->render(mesh, *camera_trackball, *light_trackball);
+	}
+	if (active_effect == 1)
+	{
+		toon->render(mesh, *camera_trackball, *light_trackball);
+	}
+	if (active_effect == 2)
+	{
+		ssao->render(mesh, *camera_trackball, *light_trackball);
+	}
 
     glEnable(GL_DEPTH_TEST);
     if (draw_trackball)

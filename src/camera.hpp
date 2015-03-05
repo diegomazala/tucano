@@ -4,7 +4,6 @@
  * LCG - Laboratório de Computação Gráfica (Computer Graphics Lab) - COPPE
  * UFRJ - Federal University of Rio de Janeiro
  *
- * This file is part of Tucano Library.
  *
  * Tucano Library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,53 +29,22 @@
 namespace Tucano
 {
 
-const string camera_fragment_code = "\n"
-        "#version 430\n"
-        "in vec4 ex_Color;\n"
-        "out vec4 out_Color;\n"
-        "in float depth;\n"
-        "void main(void)\n"
-        "{\n"
-        "    out_Color = ex_Color;\n"
-        "    gl_FragDepth = depth;\n"
-        "}\n";
-
-const string camera_vertex_code = "\n"
-        "#version 430\n"
-        "layout(location=0) in vec4 in_Position;\n"
-        "out vec4 ex_Color;\n"
-        "out float depth;\n"
-        "uniform mat4 modelMatrix;\n"
-        "uniform mat4 viewMatrix;\n"
-        "uniform mat4 projectionMatrix;\n"
-        "uniform vec4 in_Color;\n"
-        "uniform float nearPlane;\n"
-        "uniform float farPlane;\n"
-        "void main(void)\n"
-        "{\n"
-        "   gl_Position = (viewMatrix * modelMatrix) * in_Position;\n"
-        "   depth = (farPlane+nearPlane)/(farPlane-nearPlane) + ( (2*nearPlane*farPlane)/(farPlane-nearPlane) ) * (1/gl_Position[2]);\n"
-        "   depth = (depth+1.0)/2.0;\n"
-        "   gl_Position = projectionMatrix * gl_Position;\n"
-        "   ex_Color = in_Color;\n"
-        "}\n";
-
 /**
  * @brief Defines an abstract camera with a projection and view matrices.
  *
- * It also contains a visual representation of the camera for rendering purposes.
+ * For a visual representation of a camera use the Shapers::CameraRep class
  **/
 class Camera {
 
 protected:
 
     /// Projection, or intrinsic, matrix.
-    Eigen::Matrix4f projectionMatrix;
+    Eigen::Matrix4f projection_matrix;
 
     /// View, or extrinsic, matrix.
-    Eigen::Affine3f viewMatrix;
+    Eigen::Affine3f view_matrix;
 
-    /// Viewport dimensions.
+    /// Viewport dimensions [minX, minY, width, height].
     Eigen::Vector4f viewport;
 
     /// Near plane used for projection matrix.
@@ -106,18 +74,6 @@ protected:
     /// Field of view angle in y axis.
     float fovy;
 
-    /// The vertices for the visual representation of the camera.
-    Eigen::Vector4f vertices;
-
-    /// Buffer Objects for camera's representation:
-    GLuint* bufferIDs;
-
-    /// Flag to use default shaders hard-coded as consts, or use given shaders from files
-    bool use_default_shaders;
-
-    /// Shader to render camera representation
-    Shader* cameraShader;
-
     /// Flag to indicate if using a perspective or othograpic projection.
     bool use_perspective;
 
@@ -128,7 +84,7 @@ public:
      */
     void resetViewMatrix (void)
     {
-        viewMatrix = Eigen::Affine3f::Identity();
+        view_matrix = Eigen::Affine3f::Identity();
     }
 
     /**
@@ -136,7 +92,7 @@ public:
      */
     void resetProjectionMatrix (void)
     {
-        projectionMatrix = Eigen::Matrix4f::Identity();
+        projection_matrix = Eigen::Matrix4f::Identity();
     }
 
     /**
@@ -153,9 +109,9 @@ public:
      * @brief Returns the center of the camera in world space.
      * @return Camera center
      */
-    Eigen::Vector3f getCenter (void)
+    Eigen::Vector3f getCenter (void) const
     {
-        return viewMatrix.linear().inverse() * (-viewMatrix.translation());
+        return view_matrix.linear().inverse() * (-view_matrix.translation());
     }
 
     /**
@@ -166,7 +122,7 @@ public:
      */
     void getViewMatrix (GLdouble *matrix)
     {
-        Eigen::Matrix4f mv = viewMatrix.matrix();
+        Eigen::Matrix4f mv = view_matrix.matrix();
         for (int i = 0; i < 16; ++i)
         {
             matrix[i] = mv(i);
@@ -183,7 +139,7 @@ public:
     {
         for (int i = 0; i < 16; ++i)
         {
-            matrix[i] = projectionMatrix(i);
+            matrix[i] = projection_matrix(i);
         }
     }
 
@@ -197,7 +153,7 @@ public:
     inline Eigen::Vector3f projectPoint (const Eigen::Vector4f& pt, Eigen::Vector4f& viewport)
     {
         Eigen::Vector3f screen_pt = Eigen::Vector3f::Zero();
-        Eigen::Vector4f proj = viewMatrix * projectionMatrix * pt;
+        Eigen::Vector4f proj = view_matrix * projection_matrix * pt;
         if (proj[3] == 0.0)
             return screen_pt;
 
@@ -214,27 +170,46 @@ public:
      * @brief Returns the view matrix as an Affine 3x3 matrix
      * @return View Matrix.
      */
-    Eigen::Affine3f getViewMatrix (void)
+    Eigen::Affine3f getViewMatrix (void) const
     {
-        return viewMatrix;
+        return view_matrix;
     }
+
+	/**
+     * @brief Returns a pointer to the view matrix as an Affine 3x3 matrix
+     * @return Pointer to View Matrix.
+     */
+	 Eigen::Affine3f* viewMatrix (void)
+	{
+		return &view_matrix;
+	}
 
     /**
      * @brief Returns the view matrix as an 4x4 matrix
      * @return Projection Matrix.
      */
-    Eigen::Matrix4f getProjectionMatrix (void)
+    Eigen::Matrix4f getProjectionMatrix (void) const
     {
-        return projectionMatrix;
+        return projection_matrix;
     }
+
+    /**
+     * @brief Returns a pointer to the projection matrix as an 4x4 matrix
+     * @return Pointer to projection Matrix.
+     */
+    Eigen::Matrix4f* projectionMatrix (void) 
+    {
+        return &projection_matrix;
+    }
+
 
     /**
      * @brief Returns a 3x3 matrix containing only the rotation of the view matrix.
      * @return The rotation part of the view matrix as a 3x3 matrix.
      */
-    Eigen::Matrix3f getRotationMatrix (void)
+    Eigen::Matrix3f getRotationMatrix (void) const
     {
-        return viewMatrix.rotation();
+        return view_matrix.rotation();
     }
 
 
@@ -242,9 +217,9 @@ public:
      * @brief Returns the translation part of the view matrix as a vector.
      * @return The translation part of the view matrix.
      */
-    Eigen::Vector3f getTranslationMatrix (void)
+    Eigen::Vector3f getTranslationMatrix (void) const
     {
-        return viewMatrix.translation();
+        return view_matrix.translation();
     }    
 
     /**
@@ -253,7 +228,7 @@ public:
      * Usually this is element(1,1) of the projection matrix.
      * @return The perspective scale factor
      */
-    float getPerspectiveScale (void)
+    float getPerspectiveScale (void) const
     {
         return (float)1.0f/tan((fovy/2.0f)*(M_PI/180.0f));
     }
@@ -261,10 +236,10 @@ public:
     /**
      * @brief Returns the viewport coordinates.
      *
-     * Viewport vector is as follows [minX, minY, maxX, maxY]
+     * Viewport vector is as follows [minX, minY, width, height]
      * @return Viewport coordinates.
      */
-    Eigen::Vector4f getViewport (void)
+    Eigen::Vector4f getViewport (void) const
     {
         return viewport;
     }
@@ -272,13 +247,21 @@ public:
     /**
      * @brief Returns the dimensions of the viewport.
      *
-     * Viewport dimensions are as follows [maxX - minX, maxY - minY]
      * @return Viewport dimensions.
      */
-    Eigen::Vector2i getViewportSize (void)
+    Eigen::Vector2i getViewportSize (void) const
     {
-        return Eigen::Vector2i(viewport[2]-viewport[0], viewport[3]-viewport[1]);
+        return Eigen::Vector2i(viewport[2], viewport[3]);
     }
+
+	/**
+	* @brief Returns the viewport aspect ratio
+	* @return Viewport aspect ratio x/y
+	*/
+	float getViewportAspectRatio (void) const
+	{
+		return (viewport[2] / viewport[3]);
+	}
 
     /**
      * @brief Sets the viewport coordinates.
@@ -306,14 +289,24 @@ public:
      */
     void setProjectionMatrix(const Eigen::Matrix4f& mat)
     {
-        projectionMatrix = mat;
+        projection_matrix = mat;
     }
+
+	 /**
+     * @brief Sets the view matrix from a given an affine 3x3 matrix.
+     * @param mat Given Affine 3x3 matrix to set as view matrix.
+     */
+    void setViewMatrix(const Eigen::Affine3f& mat)
+    {
+        view_matrix = mat;
+    }
+
 
     /**
      * @brief Returns near plane value.
      * @return Near plane.
      */
-    float getNearPlane (void)
+    float getNearPlane (void) const
     {
         return near_plane;
     }
@@ -322,20 +315,9 @@ public:
      * @brief Returns far plane value.
      * @return Far plane.
      */
-    float getFarPlane (void)
+    float getFarPlane (void) const
     {
         return far_plane;
-    }
-
-    /**
-     * @brief Loads Trackball Shader file.
-     **/
-    void loadShader (void)
-    {
-        if (use_default_shaders)
-            cameraShader->initializeFromStrings(camera_vertex_code, camera_fragment_code);
-        else
-            cameraShader->initialize();
     }
 
     /**
@@ -343,17 +325,13 @@ public:
      */
     ~Camera()
     {
-        //Delete camera shader.
-        if(cameraShader) {
-            delete cameraShader;
-        }
     }
 
     /**
       * @brief Returns current field of view angle in y axis.
       * @return Field of view angle.
       */
-    float getFovy (void)
+    float getFovy (void) const
     {
         return fovy;
     }
@@ -362,28 +340,9 @@ public:
 
     /**
      * @brief Default constructor
-     * @param shader_dir Optional directory containing camera shaders, otherwise uses default shaders
      */
-    Camera (string shader_dir = "")
+    Camera (void)
     {
-
-        // creates the mesh that will be used to represent the trackball's sphere.
-        createCameraRepresentation();
-
-        // initialize the shader used for trackball rendering:
-        if (shader_dir.empty())
-        {
-            cameraShader = new Shader("cameraShader");
-            use_default_shaders = true;
-        }
-        else
-        {
-            cameraShader = new Shader(shader_dir, "cameraShader");
-            use_default_shaders = false;
-        }
-
-        // initialize buffers used for trackball rendering:
-        bufferIDs = new GLuint[3];
 
         frustum_left = -1.0;
         frustum_right = 1.0;
@@ -393,7 +352,6 @@ public:
         far_plane = 100.0;
         fovy = 90.0;
 
-        loadShader();
         reset();
     }
 
@@ -520,7 +478,7 @@ public:
      */
     void translate (const Eigen::Vector3f& translation)
     {
-        viewMatrix.translate(translation);
+        view_matrix.translate(translation);
     }
 
     /**
@@ -529,7 +487,7 @@ public:
      */
     void rotate (const Eigen::Quaternion<float>& rotation)
     {
-        viewMatrix.rotate(rotation);
+        view_matrix.rotate(rotation);
     }
 
     /**
@@ -538,7 +496,7 @@ public:
      */
     void scale (const Eigen::Vector3f& scale_factors)
     {
-        viewMatrix.scale(scale_factors);
+        view_matrix.scale(scale_factors);
     }
 
     /**
@@ -547,75 +505,8 @@ public:
      */
     void scale (float scale_factor)
     {
-        viewMatrix.scale(scale_factor);
+        view_matrix.scale(scale_factor);
     }
-
-    /**
-     * @brief Creates a visual representation of the camera.
-     * @todo implement this method! Only buffers are set.
-     * Represents the camera as a truncated pyramid (frustum) and its coordinate axes.
-     */
-    void createCameraRepresentation (void)
-    {
-//        glGenVertexArrays(1, &bufferIDs[0]);
-//        glGenBuffers(2, &bufferIDs[1]);
-//        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
-//        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
-//        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    /**
-     * @brief Binds buffers for rendering camera's representation.
-     */
-    void bindBuffers (void)
-    {
-        //VAO:
-        glBindVertexArray(bufferIDs[0]);
-
-        //VBO:
-        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[1]);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(0);
-    }
-
-    /**
-     * @brief Unbinds render buffers.
-     */
-    void unbindBuffers (void)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-        glDisableVertexAttribArray(0);
-    }
-
-    /**
-     * @brief Renders the camera representation.
-     *
-     * Renders a truncated pyramid (frustum) to represent the camera.
-     * It will be placed and oriented according to the view matrix.
-     */
-    void render (void)
-    {
-        cameraShader->bind();
-
-        cameraShader->setUniform("viewMatrix", viewMatrix.data(), 4, GL_FALSE, 1);
-        cameraShader->setUniform("projectionMatrix", projectionMatrix.data(), 4 ,GL_FALSE, 1);
-        cameraShader->setUniform("nearPlane", near_plane);
-        cameraShader->setUniform("farPlane", far_plane);
-
-        bindBuffers();
-
-        //X:
-        Eigen::Vector4f colorVector(1.0, 0.0, 0.0, 1.0);
-        cameraShader->setUniform("modelMatrix",(Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(M_PI/2.0,Eigen::Vector3f(0.0,1.0,0.0))).data(), 4, GL_FALSE, 1);
-        cameraShader->setUniform("in_Color",colorVector.data(),4,1);
-        glDrawArrays(GL_LINE_LOOP, 0, 200);
-        Misc::errorCheckFunc(__FILE__, __LINE__);
-
-        unbindBuffers();
-
-        cameraShader->unbind();
-    }
-
 };
 
 }

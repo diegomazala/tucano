@@ -1,4 +1,4 @@
-Using the Framebuffer Classe       {#framebuffer_tutorial}
+Using the Framebuffer Class       {#framebuffer_tutorial}
 ============================
 
 The Framebuffer Class holds a common and very useful OpenGL FBO.

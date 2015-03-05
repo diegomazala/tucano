@@ -3,15 +3,10 @@
 
 GLWidget::GLWidget(QWidget *parent) : Tucano::QtPlainWidget(parent)
 {
-    rendertexture = 0;
 }
 
 GLWidget::~GLWidget()
 {
-    if (rendertexture)
-    {
-        delete rendertexture;
-    }
 }
 
 void GLWidget::initialize (void)
@@ -19,9 +14,8 @@ void GLWidget::initialize (void)
     // the default is /shaders from your running dir
     string shaders_dir("../effects/shaders/");
 
-    rendertexture = new Effects::RenderTexture();
-    rendertexture->setShadersDir(shaders_dir);
-    rendertexture->initialize();
+    rendertexture.setShadersDir(shaders_dir);
+    rendertexture.initialize();
 
     // initialize texture with given image
     QImage image ("../samples/images/camelo.jpg");
@@ -39,9 +33,6 @@ void GLWidget::paintGL (void)
 
     // renders the given image, not that we are setting a fixed viewport that follows the widgets size
     // so it may not be scaled correctly with the image's size (just to keep the example simple)
-    if (rendertexture)
-    {
-        Eigen::Vector2i viewport (this->width(), this->height());
-        rendertexture->renderTexture(&image_texture, viewport);
-    }
+    Eigen::Vector2i viewport (this->width(), this->height());
+    rendertexture.renderTexture(image_texture, viewport);
 }

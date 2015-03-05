@@ -52,7 +52,7 @@ public slots:
      */
     void setMeanKernel (int kernel)
     {
-        meanfilter->setKernel(kernel);
+        meanfilter.setKernel(kernel);
         updateGL();
     }
 
@@ -62,7 +62,7 @@ public slots:
     void toggleHGradient (void)
     {
         apply_hgradient = !apply_hgradient;
-        gradientfilter->setDirections (apply_hgradient, apply_vgradient);
+        gradientfilter.setDirections (apply_hgradient, apply_vgradient);
         updateGL();
     }
 
@@ -72,7 +72,7 @@ public slots:
     void toggleVGradient (void)
     {
         apply_vgradient = !apply_vgradient;
-        gradientfilter->setDirections (apply_hgradient, apply_vgradient);
+        gradientfilter.setDirections (apply_hgradient, apply_vgradient);
         updateGL();
     }
 
@@ -81,13 +81,13 @@ public slots:
 private:
 
     /// Mean filter effect.
-    Effects::MeanFilter *meanfilter;
+    Effects::MeanFilter meanfilter;
 
     /// Gradient filter effect.
-    Effects::GradientFilter *gradientfilter;
+    Effects::GradientFilter gradientfilter;
 
     /// Render image effect (simply renders a texture)
-    Effects::RenderTexture *rendertexture;
+    Effects::RenderTexture rendertexture;
 
     /// FBO for multipass (enables applying more than one filter in sequence)
     Framebuffer fbo;

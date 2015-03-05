@@ -122,7 +122,7 @@ private:
     GLuint* bufferIDs;
 
     /// Trackball Shader, used just for rendering the trackball's representation.
-    Shader* trackballShader;
+    Shader trackball_shader;
 
     /// The trackball radius. It's defined as 0.8 times the smallest viewport dimension.
     float radius;
@@ -229,11 +229,11 @@ public:
     {
         if (use_default_shaders)
         {
-            trackballShader->initializeFromStrings(trackball_vertex_code, trackball_fragment_code);
+            trackball_shader.initializeFromStrings(trackball_vertex_code, trackball_fragment_code);
         }
         else
         {
-            trackballShader->initialize();
+            trackball_shader.initialize();
         }
     }
 
@@ -242,11 +242,6 @@ public:
         ///Delete buffers:
         if (bufferIDs) {
             delete [] bufferIDs;
-        }
-
-        //Delete trackball shader.
-        if(trackballShader) {
-            delete trackballShader;
         }
     }
 
@@ -307,12 +302,12 @@ public:
         // initialize the shader used for trackball rendering:
         if (shader_dir.empty())
         {
-            trackballShader = new Shader("trackballShader");
+        	trackball_shader.setShaderName("trackballShader");
             use_default_shaders = true;
         }
         else
         {
-            trackballShader = new Shader(shader_dir, "trackballShader");
+            trackball_shader.load("trackballShader", shader_dir);
             use_default_shaders = false;
         }
 
@@ -410,7 +405,7 @@ public:
     * @param pos Screen position
     * @return Returns position in normalized coordinates.
     */
-    Eigen::Vector2f nomalizePosition (const Eigen::Vector2f& pos)
+    Eigen::Vector2f normalizePosition (const Eigen::Vector2f& pos)
     {
         return Eigen::Vector2f ((pos[0]/((viewport[2]-viewport[0])/2.0)) - 1.0,
                                 1.0 - (pos[1]/((viewport[3] - viewport[1])/2.0)));
@@ -422,7 +417,7 @@ public:
      */
     void rotateCamera (const Eigen::Vector2f& pos)
     {
-        Eigen::Vector3f normalized_pos = computeSpherePosition(nomalizePosition(pos));
+        Eigen::Vector3f normalized_pos = computeSpherePosition(normalizePosition(pos));
 
         if (!rotating)
         {
@@ -444,7 +439,7 @@ public:
      */
     void translateCamera (const Eigen::Vector2f& pos)
     {
-        Eigen::Vector2f normalized_pos = nomalizePosition(pos);
+        Eigen::Vector2f normalized_pos = normalizePosition(pos);
         if (!translating)
         {
             translating = true;
@@ -597,41 +592,41 @@ public:
             float ratio = (viewport[2] - viewport[0]) / (viewport[3] - viewport[1]);
             setTrackballOrthographicMatrix(-ratio, ratio, -1.0, 1.0, 0.1, 100.0);
 
-            trackballShader->bind();
+            trackball_shader.bind();
 
             //Using unique viewMatrix for the trackball, considering only the rotation to be visualized.
             Eigen::Affine3f trackballViewMatrix = Eigen::Affine3f::Identity();
             trackballViewMatrix.translate(defaultTranslation);
             trackballViewMatrix.rotate(quaternion);
 
-            trackballShader->setUniform("viewMatrix", trackballViewMatrix);
-            trackballShader->setUniform("projectionMatrix", trackballProjectionMatrix);
-            trackballShader->setUniform("nearPlane", near_plane);
-            trackballShader->setUniform("farPlane", far_plane);
+            trackball_shader.setUniform("viewMatrix", trackballViewMatrix);
+            trackball_shader.setUniform("projectionMatrix", trackballProjectionMatrix);
+            trackball_shader.setUniform("nearPlane", near_plane);
+            trackball_shader.setUniform("farPlane", far_plane);
 
             bindBuffers();
 
             //X:
             Eigen::Vector4f colorVector(1.0, 0.0, 0.0, 1.0);
-            trackballShader->setUniform("modelMatrix", Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(M_PI/2.0,Eigen::Vector3f(0.0,1.0,0.0)));
-            trackballShader->setUniform("in_Color", colorVector);
+            trackball_shader.setUniform("modelMatrix", Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(M_PI/2.0,Eigen::Vector3f(0.0,1.0,0.0)));
+            trackball_shader.setUniform("in_Color", colorVector);
             glDrawArrays(GL_LINE_LOOP, 0, 200);
 
             //Y:
             colorVector << 0.0, 1.0, 0.0, 1.0;
-            trackballShader->setUniform("modelMatrix", Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(M_PI/2.0,Eigen::Vector3f(1.0,0.0,0.0)));
-            trackballShader->setUniform("in_Color", colorVector);
+            trackball_shader.setUniform("modelMatrix", Eigen::Affine3f::Identity()*Eigen::AngleAxis<float>(M_PI/2.0,Eigen::Vector3f(1.0,0.0,0.0)));
+            trackball_shader.setUniform("in_Color", colorVector);
             glDrawArrays(GL_LINE_LOOP, 0, 200);
 
             //Z:
             colorVector << 0.0, 0.0, 1.0, 1.0;            
-            trackballShader->setUniform("modelMatrix", Eigen::Affine3f::Identity());
-            trackballShader->setUniform("in_Color", colorVector);
+            trackball_shader.setUniform("modelMatrix", Eigen::Affine3f::Identity());
+            trackball_shader.setUniform("in_Color", colorVector);
             glDrawArrays(GL_LINE_LOOP, 0, 200);
 
             unbindBuffers();
 
-            trackballShader->unbind();
+            trackball_shader.unbind();
         }
     }
 };

@@ -98,7 +98,7 @@ public:
      * Usually used to initialize the instance when passing shaders as strings, and not files.
      * @param name The string to be set as shader identification. User mantained.
      */
-    Shader (string name)
+    Shader (string name = "")
     {
         shaderName = name;
         vertexShader = 0; fragmentShader = 0; geometryShader = 0; shaderProgram = 0; computeShaders = vector<GLuint>();
@@ -124,6 +124,15 @@ public:
     {
         deleteShaders();
     }
+
+	/**
+	* @brief Sets the shader name, very useful for debugging
+	* @param name Shader name
+	*/
+	void setShaderName (string name)
+	{
+		shaderName = name;
+	}
 
     /**
      * @brief Returns a string with the shader name.
@@ -206,16 +215,17 @@ public:
         computeShaders = vector<GLuint>();
     }
 
-    /**
-     * @brief Constructors that searches a given directory for shaders with given name.
-     *
+	/**
+	 * @brief Loads a shader given a directory and a name. Searches for all shader
+	 * extensions in directory.
+	 *
      * Receives a directory and a shader name, searches for files with the same name and extesions vert, frag, geom and comp to auto load shaders.
      * @param shader_dir Directory containing shaders.
      * @param name Shader name, must be the same as the files name without extensions.
-     */
-    Shader (string shader_dir, string name) {
-
-        shaderName = name;
+	 */
+	void load (string name, string shader_dir = "")
+	{
+	    shaderName = name;
 
         bool found = false;
 
@@ -266,6 +276,20 @@ public:
         geometryShader = 0;
         shaderProgram = 0;
         computeShaders = vector<GLuint>();
+
+	}
+
+
+    /**
+     * @brief Constructors that searches a given directory for shaders with given name.
+     *
+     * Receives a directory and a shader name, searches for files with the same name and extesions vert, frag, geom and comp to auto load shaders.
+     * @param shader_dir Directory containing shaders.
+     * @param name Shader name, must be the same as the files name without extensions.
+     */
+    Shader (string name, string shader_dir)
+	{
+		load (name, shader_dir);
     }
 
     /**
@@ -812,13 +836,35 @@ public:
         glDeleteProgram(shaderProgram);
     }
 
+	/**
+	* @brief Generates a list with all active attributes
+	* @param attribs Vector of strings to hold attributes names
+	*/
+	void getActiveAttributes( vector< string > &attribs )
+	{
+		int maxlength = 0;
+		int numattribs = 0;
+
+		glGetProgramiv (shaderProgram, GL_ACTIVE_ATTRIBUTES, &numattribs);
+		glGetProgramiv (shaderProgram, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxlength);
+
+		int length = 0;
+		int size = 0;
+		GLuint type = 0;
+		char name[maxlength];
+		for (int i = 0; i < numattribs; ++i)
+		{
+			glGetActiveAttrib(shaderProgram, i, maxlength, &length, &size, &type, &name[0]);
+			attribs.push_back (name);
+		}
+	}
 
     /**
      * Given the name of a uniform used inside the shader, returns it's location.
      * @param name Name of the uniform variable in shader.
      * @return The uniform location.
      */
-    GLint getUniformLocation (const GLchar* name)
+    GLint getUniformLocation (const GLchar* name) const
     {
         return glGetUniformLocation(shaderProgram, name);
     }
@@ -828,7 +874,7 @@ public:
      * @param name Name of the attribute variable in the shader.
      * @return The attribute location, or -1 if the attribute was not found or has an invalid name.
      */
-    GLint getAttributeLocation (const GLchar* name)
+    GLint getAttributeLocation (const GLchar* name) const
     {
         return glGetAttribLocation(shaderProgram, name);
     }

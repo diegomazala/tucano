@@ -39,7 +39,7 @@ class Toon : public Effect
 private:
 
     /// Toon shader
-    Shader* toon_shader;
+    Shader toon_shader;
 
     /// Number of colors that will be used in color quantization to create the toonish effect.
     float quantization_level;
@@ -51,7 +51,6 @@ public:
      */
     Toon (void)
     {
-        toon_shader = 0;
         quantization_level = 8;
 	}
 
@@ -74,7 +73,7 @@ public:
      */
     virtual void initialize (void)
 	{
-        toon_shader = loadShader ("toonshader");
+		loadShader(toon_shader, "toonshader");
 	}
 
     /**
@@ -83,25 +82,25 @@ public:
      * @param cameraTrackball Given camera trackball
      * @param lightTrackball Given light trackball
      */
-    virtual void render (Tucano::Mesh* mesh = NULL, Tucano::Trackball* cameraTrackball = NULL, Tucano::Trackball* lightTrackball = NULL)
+    virtual void render (Tucano::Mesh& mesh, const Tucano::Trackball& cameraTrackball, const Tucano::Trackball& lightTrackball)
 	{       
 
-        Eigen::Vector4f viewport = cameraTrackball->getViewport();
+        Eigen::Vector4f viewport = cameraTrackball.getViewport();
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-        toon_shader->bind();
+        toon_shader.bind();
 
-        toon_shader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-        toon_shader->setUniform("modelMatrix", mesh->getModelMatrix());
-        toon_shader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
-        toon_shader->setUniform("lightViewMatrix", lightTrackball->getViewMatrix());
-        toon_shader->setUniform("has_color", mesh->hasAttribute("in_Color"));
-        toon_shader->setUniform("quantizationLevel", quantization_level);
+        toon_shader.setUniform("projectionMatrix", cameraTrackball.getProjectionMatrix());
+        toon_shader.setUniform("modelMatrix", mesh.getModelMatrix());
+        toon_shader.setUniform("viewMatrix", cameraTrackball.getViewMatrix());
+        toon_shader.setUniform("lightViewMatrix", lightTrackball.getViewMatrix());
+        toon_shader.setUniform("has_color", mesh.hasAttribute("in_Color"));
+        toon_shader.setUniform("quantizationLevel", quantization_level);
 
-        mesh->setAttributeLocation(toon_shader);
-		mesh->render();
+        mesh.setAttributeLocation(toon_shader);
+		mesh.render();
 
-        toon_shader->unbind();
+        toon_shader.unbind();
 	}
 
 };

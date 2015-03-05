@@ -29,6 +29,7 @@
 #include "plyimporter.hpp"
 
 #include <tucano.hpp>
+#include <utils/trackball.hpp>
 
 #include <QGLWidget>
 #include <QMouseEvent>
@@ -51,13 +52,13 @@ class QtTrackballWidget : public QGLWidget
 protected:
 
     /// Triangle mesh.
-    Mesh* mesh;
+    Mesh mesh;
 
     /// Trackball for manipulating the camera.
-    Trackball *camera_trackball;
+    Trackball* camera_trackball;
 
     /// Trackball for manipulating the light position.
-    Trackball *light_trackball;
+    Trackball* light_trackball;
 
 public:
 
@@ -67,9 +68,8 @@ public:
      */
     explicit QtTrackballWidget(QWidget *parent) : QGLWidget(parent)
     {
-        mesh = 0;
-        camera_trackball = 0;
-        light_trackball = 0;
+		camera_trackball = 0;
+		light_trackball = 0;
     }
 
     /**
@@ -77,13 +77,8 @@ public:
      */
     ~QtTrackballWidget()
     {
-
-        if (mesh)
-            delete mesh;
-        if (camera_trackball)
-            delete camera_trackball;
-        if (light_trackball)
-            delete light_trackball;
+		delete camera_trackball;
+		delete light_trackball;
     }
 
     /**
@@ -120,13 +115,13 @@ public:
         Eigen::Vector2i size;
         size << this->width(), this->height();
 
-        camera_trackball = new Trackball();
+		camera_trackball = new Trackball();
         camera_trackball->setPerspectiveMatrix(60.0, this->width()/this->height(), 0.1f, 100.0f);
         camera_trackball->setRenderFlag(true);
 
         camera_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
-        light_trackball = new Trackball();
+		light_trackball = new Trackball();
         light_trackball->setRenderFlag(false);
         light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
@@ -138,7 +133,7 @@ public:
      *
      * @param filename Given mesh file.
      */
-    void openMesh (string filename)
+    virtual void openMesh (string filename)
     {
         QString str (filename.c_str());
         QStringList strlist = str.split(".");
@@ -150,20 +145,18 @@ public:
             return;
         }
 
-        if (mesh)
-            delete mesh;
-        mesh = new Mesh();
+		mesh.reset();
 
         if (extension.compare("ply") == 0)
         {
-            MeshImporter::loadPlyFile(mesh, filename);
+            MeshImporter::loadPlyFile(&mesh, filename);
         }
         if (extension.compare("obj") == 0)
         {
-            MeshImporter::loadObjFile(mesh, filename);
+            MeshImporter::loadObjFile(&mesh, filename);
         }
 
-        mesh->normalizeModelMatrix();
+        mesh.normalizeModelMatrix();
     }
 
 protected:

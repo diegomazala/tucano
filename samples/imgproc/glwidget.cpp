@@ -3,10 +3,6 @@
 
 GLWidget::GLWidget(QWidget *parent) : Tucano::QtPlainWidget(parent)
 {
-    meanfilter = 0;
-    gradientfilter = 0;
-    rendertexture = 0;
-
     apply_mean = false;
     apply_hgradient = false;
     apply_vgradient = false;
@@ -15,18 +11,6 @@ GLWidget::GLWidget(QWidget *parent) : Tucano::QtPlainWidget(parent)
 
 GLWidget::~GLWidget()
 {
-    if (meanfilter)
-    {
-        delete meanfilter;
-    }
-    if (gradientfilter)
-    {
-        delete gradientfilter;
-    }
-    if (rendertexture)
-    {
-        delete rendertexture;
-    }
 }
 
 void GLWidget::initialize (void)
@@ -35,17 +19,14 @@ void GLWidget::initialize (void)
     string shaders_dir("../effects/shaders/");
 
     // initialize the shader effects
-    meanfilter = new Effects::MeanFilter();
-    meanfilter->setShadersDir(shaders_dir);
-    meanfilter->initialize();
+    meanfilter.setShadersDir(shaders_dir);
+    meanfilter.initialize();
 
-    gradientfilter = new Effects::GradientFilter();
-    gradientfilter->setShadersDir(shaders_dir);
-    gradientfilter->initialize();
+    gradientfilter.setShadersDir(shaders_dir);
+    gradientfilter.initialize();
 
-    rendertexture = new Effects::RenderTexture();
-    rendertexture->setShadersDir(shaders_dir);
-    rendertexture->initialize();
+    rendertexture.setShadersDir(shaders_dir);
+    rendertexture.initialize();
 
     // initialize texture
     QImage image ("../samples/images/camelo.jpg");
@@ -73,26 +54,23 @@ void GLWidget::paintGL (void)
     // for each filter, switches between read/write buffers
     // note that any number of filters can be attached to this example
 
-    if (meanfilter && apply_mean)
+    if (apply_mean)
     {
         fbo.bindRenderBuffer(write_tex);
-        meanfilter->renderTexture(fbo.getTexture(read_tex), viewport);
+        meanfilter.renderTexture(*fbo.getTexture(read_tex), viewport);
         fbo.unbind();
         read_tex = write_tex;
         write_tex = !write_tex;
     }
-    if (gradientfilter && (apply_hgradient || apply_vgradient))
+    if (apply_hgradient || apply_vgradient)
     {
         fbo.bindRenderBuffer(write_tex);
-        gradientfilter->renderTexture(fbo.getTexture(read_tex), viewport);
+        gradientfilter.renderTexture(*fbo.getTexture(read_tex), viewport);
         fbo.unbind();
         read_tex = write_tex;
         write_tex = !write_tex;
     }
 
-    // renders the resulting image (or original image if not filter was applied)
-    if (rendertexture)
-    {
-        rendertexture->renderTexture(fbo.getTexture(read_tex), viewport);
-    }
+    // renders the resulting image (or original image if no filter was applied)
+    rendertexture.renderTexture(*fbo.getTexture(read_tex), viewport);
 }

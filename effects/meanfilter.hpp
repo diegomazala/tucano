@@ -48,7 +48,6 @@ public:
    **/
   MeanFilter (void) : kernelsize(3)
   {    
-    shader = 0;
   }
 
   /**
@@ -61,27 +60,26 @@ public:
    */
   virtual void initialize()
   {
-      shader = loadShader("meanfilter");
-      quad = new Mesh();
-      quad->createQuad();
+      loadShader(shader, "meanfilter");
+      quad.createQuad();
   }
 
   /**
    * @brief Applies the mean filter to an image.
    **/
-  void renderTexture(Texture *tex, Eigen::Vector2i viewport)
+  void renderTexture(Texture& tex, Eigen::Vector2i viewport)
   {
       glViewport(0, 0, viewport[0], viewport[1]);
-      shader->bind();
+      shader.bind();
 
-      shader->setUniform("imageTexture", tex->bind());
-      shader->setUniform("kernelsize", kernelsize);
-      shader->setUniform("viewportSize", viewport);
+      shader.setUniform("imageTexture", tex.bind());
+      shader.setUniform("kernelsize", kernelsize);
+      shader.setUniform("viewportSize", viewport);
 
-      quad->render();
+      quad.render();
 
-      shader->unbind();
-      tex->unbind();
+      shader.unbind();
+      tex.unbind();
   }
 
   /**
@@ -96,13 +94,13 @@ public:
 private:
 
   /// The mean filter shader.
-  Shader* shader;
+  Shader shader;
 
   /// The size of the mean filter kernel (window size to apply convolution)
   int kernelsize;  
 
   /// A quad to be rendered forcing one call of the fragment shader per image pixel
-  Mesh* quad;
+  Mesh quad;
 };
 
 }

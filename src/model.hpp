@@ -22,7 +22,7 @@ class Model {
 protected:
 
     /// Model matrix, holds information about the models location and orientation.
-    Eigen::Affine3f modelMatrix;
+    Eigen::Affine3f model_matrix;
 
     /// Center of the mesh object.
     Eigen::Vector3f objectCenter;
@@ -43,7 +43,7 @@ public:
      */
     Model(void)
     {
-        reset();
+        resetModelMatrix();
         objectCenter = Eigen::Vector3f::Zero();
         centroid = Eigen::Vector3f::Zero();
         radius = 1.0;
@@ -54,7 +54,7 @@ public:
      * @brief Returns the center of the axis-aligned bounding box.
      * @return The center of the axis-aligned bounding box.
      */
-    virtual Eigen::Vector3f getObjectCenter (void)
+    virtual Eigen::Vector3f getObjectCenter (void) const
     {
         return objectCenter;
     }
@@ -63,7 +63,7 @@ public:
      * @brief Returns the centroid of the model.
      * @return The centroid of the mesh object. given by the mean position of all vertices.
      */
-    virtual Eigen::Vector3f getCentroid (void)
+    virtual Eigen::Vector3f getCentroid (void) const
     {
         return centroid;
     }
@@ -73,7 +73,7 @@ public:
      * The bounding sphere is computed as the distance from the farthest point to the object's centroid.
      * @return Radius of the bounding sphere.
      */
-    virtual float getBoundingSphereRadius (void)
+    virtual float getBoundingSphereRadius (void) const
     {
         return radius;
     }
@@ -82,16 +82,35 @@ public:
      * @brief Returns the model matrix.
      * @return Model matrix as an Affine 3f matrix.
      */
-    Eigen::Affine3f getModelMatrix (void)
+    Eigen::Affine3f getModelMatrix (void) const
     {
-        return modelMatrix;
+        return model_matrix;
     }
+
+    /**
+     * @brief Returns a pointer to the model matrix.
+     * @return Pointer to the odel matrix as an Affine 3f matrix.
+     */
+    Eigen::Affine3f* modelMatrix (void)
+    {
+        return &model_matrix;
+    }
+
+	/**
+	* @brief Sets the model matrix
+	* @param m Given new model matrix
+	*/
+	void setModelMatrix (Eigen::Affine3f &m)
+	{
+		model_matrix = m;
+	}
+
 
     /**
      * @brief Returns the scale factor for fitting the model inside a unit cube.
      * @return Scale factor.
      */
-    float getScale (void)
+    float getScale (void) const
     {
         return scale;
     }
@@ -103,17 +122,17 @@ public:
      */
     void normalizeModelMatrix (void)
     {
-        modelMatrix.scale(scale);
-        modelMatrix.translate(-centroid);
+        model_matrix.scale(scale);
+        model_matrix.translate(-centroid);
     }
 
 
     /**
      * @brief Resets the model matrix.
      */
-    void reset (void)
+    void resetModelMatrix (void)
     {
-        modelMatrix = Eigen::Affine3f::Identity();
+        model_matrix = Eigen::Affine3f::Identity();
     }
 
     /**
