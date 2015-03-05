@@ -221,7 +221,7 @@ public:
 	* and control points as vertex attributes
 	* Inside geometry shader each Beziér segment is approximate by linear segments
 	* @param camera Current camera for viewing scene
-	* @param light Light camera
+	* @param light Camera representing light (position and orientation)
 	*/
     void render (const Tucano::Camera& camera, const Tucano::Camera& light)
     {

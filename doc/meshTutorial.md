@@ -16,11 +16,11 @@ If you have an `OBJ` file, you can simple load it by:
 
 ...
 
-Tucano::Mesh * mymesh = new Tucano::Mesh();
-Tucano::MeshImporter::loadObjFile(mesh, filename);
+Tucano::Mesh mymesh;
+Tucano::MeshImporter::loadObjFile(&mesh, filename);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
 
-The PLY importer is under construction...
+The PLY importer is equivalent.
 
 
 ## Vertex Attributes
@@ -38,13 +38,13 @@ To add a new attribute to your Mesh, lets say a Secondary Color Attribute, pass 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 vector< Eigen::Vector4f > secondary_color;
 //  ... fill your vector with the secondary color information ...
-mymesh->createAttribute("in_SecondaryColor", secondary_color);
+mymesh.createAttribute("in_SecondaryColor", secondary_color);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
 and link the Attributes with your Shader:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-mesh->setAttributeLocation(myshader);
+mesh.setAttributeLocation(myshader);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The setAttributeLocation method receives a pointer to a Shader, and looks for matches by name. If you name your shader *in* variables as:
@@ -59,13 +59,13 @@ they are automatically linked to the Mesh Vertex Attributes named "in_Position" 
 If you have different names for the Shader variable and the corresponding Vertex Attribute, you can still link the attribute:
     
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-mesh->setAttributeLocation("in_MyAttribute", myshader->getAttributeLocation("myVertexAttribName"));
+mesh.setAttributeLocation("in_MyAttribute", myshader->getAttributeLocation("myVertexAttribName"));
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that you might need to reset the locations when linking the names manually (`resetLocations` is already called by `setAttributeLocation`):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-mesh->resetLocations();
+mesh.resetLocations();
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -75,7 +75,7 @@ The Mesh Class extends the Model Class, that basically contains spatial informat
     
 To normalize the Mesh coordinates to fit in a unit cube centered at the origin, update the Model Matrix with the following call.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-mymesh->normalizeModelMatrix();
+mymesh.normalizeModelMatrix();
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
 > Note, however, that information such as centroid and scale are computed by the Importer, so if the Mesh was filled manually they have to be computed to use the normalization method.
@@ -84,7 +84,7 @@ mymesh->normalizeModelMatrix();
 Pass your Model Matrix to your Shader to apply the transformation:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-myshader->setUniform("modelMatrix", mymesh->getModelMatrix());
+myshader.setUniform("modelMatrix", mymesh.sgetModelMatrix());
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
 and read it in your *myshader* code:

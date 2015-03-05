@@ -29,7 +29,7 @@ Tucano::Framebuffer *fbo;
 fbo = new Tucano::Framebuffer(w, h, n);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Second method:s
+Second method:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Tucano::Framebuffer *fbo;
 fbo = new Tucano::Framebuffer(w, h, n);
@@ -40,6 +40,8 @@ Third method:
 Tucano::Framebuffer fbo;
 fbo.create(w, h, n);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+> You can use the *create* method any time you wish to recreate the fbo with different parameterss
 
 # Reading from a FBO
 

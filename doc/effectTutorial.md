@@ -29,44 +29,44 @@ class NormalMap : public Tucano::Effect {
 This class contains a single [Shader](@ref Tucano::Effect):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Tucano::Shader* normalmap_shader;
+Tucano::Shader normalmap_shader;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-> It's probably a good idea to initialize **normalmap_shader = 0** in your class constructor. If you use the effect loadShader method (explained below) the destructor will take care of deleting your shaders.
-
+  
 We need to overload the initialization method to load the shader. The `loadShader` method will look in the set shader directory for files beginning with "normalmap" and shader extensions, in this case it will find two (.vert and .frag). The method also initializes the shaders and keeps references to them for reloading and deleting.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 virtual void initialize ()
 {
-    normalmap_shader = loadShader("normalmap");
+    loadShader(normalmap_shader, "normalmap");
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 > Note that the above method assumes that the shader files (.vert, .frag, etc...) are in the "/shaders" directory relative to your executing directory. You may need to change this directory before calling the initialization using the **setShadersDir** method.
 
+> If you are using pointers for the Shaders, you can call *normalmap_shader = loadShader("normalmap");*
+
 Now, all we need is the core of the NormalMap application. We can implement it as a method that receives a [Mesh](@ref Tucano::Mesh) and a camera [Trackball](@ref Tucano::Trackball), and renders the Mesh using the normal directions as colors:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
+virtual void render (Tucano::Mesh& mesh, const Tucano::Trackball& cameraTrackball)
 {
-    Eigen::Vector4f viewport = cameraTrackball->getViewport();
+    Eigen::Vector4f viewport = cameraTrackball.getViewport();
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
     // enables the shader
-    normalmap_shader->bind();
+    normalmap_shader.bind();
 
     // passes the transformation matrices to the shader as uniforms
-    normalmap_shader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-    normalmap_shader->setUniform("modelMatrix", mesh->getModelMatrix());
-    normalmap_shader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
+    normalmap_shader.setUniform("projectionMatrix", cameraTrackball.getProjectionMatrix());
+    normalmap_shader.setUniform("modelMatrix", mesh.getModelMatrix());
+    normalmap_shader.setUniform("viewMatrix", cameraTrackball.getViewMatrix());
 
     // links the Mesh attributes with the Shader vertex attributes (in this case gl_Position and gl_Normal)
-    mesh->setAttributeLocation(phong_shader);
+    mesh.setAttributeLocation(phong_shader);
 
-    mesh->render();
+    mesh.render();
 
-    normalmap_shader->unbind();
+    normalmap_shader.unbind();
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
@@ -77,8 +77,8 @@ In the application's draw routine, we clear the screen and call the render metho
 glClearColor(1.0, 1.0, 1.0, 0.0);
 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-normalmap_shader->render(mesh, camera_trackball);
-camera_trackball->render();
+normalmap_shader.render(mesh, camera_trackball);
+camera_trackball.render();
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here are the *vertex* and *fragment* shader codes for the files "normalmap.vert" and "normalmap.frag" (they are all included in the `effects/shaders` directory):
@@ -127,10 +127,10 @@ resulting image from the first pass. If you are not familiar with FBOs, check ou
 We now need two Shaders plus a Quad Mesh and an FBO for the screen space blur:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Tucano::Shader* normalmap_shader;
-Tucano::Shader* blur_shader;
-Tucano::Mesh* quad;
-Tucano::Framebuffer *fbo;
+Tucano::Shader normalmap_shader;
+Tucano::Shader blur_shader;
+Tucano::Mesh quad;
+Tucano::Framebuffer fbo;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The initialization method is completed as follows:
@@ -138,11 +138,10 @@ The initialization method is completed as follows:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 virtual void initialize ()
 {
-    normalmap_shader = loadShader("normalmap");
-    blur_shader = loadShader("meanfilter");
-    quad = new Tucano::Mesh();
-    quad->createQuad();
-    fbo = new Tucano::Framebuffer(w, h, 1);
+    loadShader(normalmap_shader, "normalmap");
+    loadShader(blur_shader, "meanfilter");    
+    quad.createQuad();
+    fbo.create(w, h, 1);
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -153,41 +152,42 @@ We show another way to set the FBO size below, after this example.
 The render method now needs two passes, one to store the result in a FBO, and the second to blur the image:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
+
+virtual void render (Tucano::Mesh& mesh, const Tucano::Trackball& cameraTrackball)
 {
     // clears the FBO and sets the FBO first (and only) attachment as output
-    fbo->clearAttachments();
-    fbo->bindRenderBuffer(0);
+    fbo.clearAttachments();
+    fbo.bindRenderBuffer(0);
     
     // *** this part of the code is identical to the first example ***
-    Eigen::Vector4f viewport = cameraTrackball->getViewport();
+    Eigen::Vector4f viewport = cameraTrackball.getViewport();
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
     // enables the shader
-    normalmap_shader->bind();
+    normalmap_shader.bind();
 
     // passes the transformation matrices to the shader as uniforms
-    normalmap_shader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-    normalmap_shader->setUniform("modelMatrix", mesh->getModelMatrix());
-    normalmap_shader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
+    normalmap_shader.setUniform("projectionMatrix", cameraTrackball.getProjectionMatrix());
+    normalmap_shader.setUniform("modelMatrix", mesh.getModelMatrix());
+    normalmap_shader.setUniform("viewMatrix", cameraTrackball.getViewMatrix());
 
     // links the Mesh attributes with the Shader vertex attributes (in this case gl_Position and gl_Normal)
-    mesh->setAttributeLocation(phong_shader);
-    mesh->render();
-    phong_shader->unbind();
+    mesh.setAttributeLocation(phong_shader);
+    mesh.render();
+    phong_shader.unbind();
     
     // *** unbind the buffer as output buffer, and applies the blur filter ****
-    fbo->unbind(); // automatically returns the draw buffer to GL_BACK
+    fbo.unbind(); // automatically returns the draw buffer to GL_BACK
     
-    blur_shader->bind();
+    blur_shader.bind();
     // makes the FBO attachment read available from the shader
-    blur_shader->setUniform("imageTexture", fbo->bindAttachment(0));
-    // sets the blur kernel (higher == more
-    blur_shader->setUniform("kernelsize", 5);
+    blur_shader.setUniform("imageTexture", fbo.bindAttachment(0));
+    // sets the blur kernel (higher == more)
+    blur_shader.setUniform("kernelsize", 5);
 
-    quad->render();
-    blur_shader->unbind();
-    fbo->unbindAttachments();
+    quad.render();
+    blur_shader.unbind();
+    fbo.unbindAttachments();
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
@@ -195,20 +195,14 @@ And that is all!!
 The blur shaders files (meanfilter.vert and meanfilter.frag) are in the *effects/shaders* directory of the Tucano Lib.
 
 ## Alternative to setting the FBO size during the initialization.
-
-Create an empty FBO in the initialize method:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-fbo = new Tucano::Framebuffer();
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+   
 During the render method check if the FBO size is the same as the Viewport size, otherwise re-create the FBO (it will be initialized with zero)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Eigen::Vector4f viewport = cameraTrackball->getViewport();
-if (fbo->getWidth() != (viewport[2]-viewport[1]) || fbo->getHeight() != (viewport[3]-viewport[1]))
+Eigen::Vector4f viewport = cameraTrackball.getViewport();
+if (fbo.getWidth() != (viewport[2]-viewport[1]) || fbo.getHeight() != (viewport[3]-viewport[1]))
 {
-    fbo->create(viewport[2]-viewport[1], viewport[3]-viewport[1], 1);
+    fbo.create(viewport[2]-viewport[1], viewport[3]-viewport[1], 1);
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         

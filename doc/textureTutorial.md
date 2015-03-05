@@ -29,7 +29,7 @@ To access a Texture from a Shader Program, the Texture must be bound to one of t
 Tucano makes everything transparent by using the [TextureManager](@ref Tucano::TextureManager) Class. It is a singleton class that is accessed by all Texture instances. Not that there is no need to include or use the Texture Manager directly. Every time you bind a Texture, the Texture Manager will look for the first empty unit, bind the Texture to that unit and return the unit id. To make things easier, a Texture can be bound and passed to a shader with a single call:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-shader->setUniform("imageTexture", image_texture->bind());
+shader.setUniform("imageTexture", image_texture.bind());
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Texture is readily available in the Shader code as:
@@ -41,5 +41,5 @@ uniform sampler2D imageTexture;
 Don't forget to `unbind` the Texture after usage, otherwise you might quickly run out of Texture Slots.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-image_texture->unbind();
+image_texture.unbind();
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
