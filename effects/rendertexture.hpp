@@ -43,7 +43,6 @@ public:
      */
     RenderTexture (void)
     {
-        shader = 0;
     }
 
     /**
@@ -56,9 +55,8 @@ public:
      */
     virtual void initialize()
     {
-        shader = loadShader("rendertexture");
-        quad = new Mesh();
-        quad->createQuad();
+		loadShader(shader, "rendertexture");
+        quad.createQuad();
     }
 
     /**
@@ -67,26 +65,26 @@ public:
      * Renders the given texture using a proxy geometry, a quad the size of the viewport
      * to hold the texture.
      */
-    void renderTexture (Texture *tex, Eigen::Vector2i viewport)
+    void renderTexture (Texture& tex, Eigen::Vector2i viewport)
     {
         glViewport(0, 0, viewport[0], viewport[1]);
 
-        shader->bind();
-        shader->setUniform("imageTexture", tex->bind());
-        shader->setUniform("viewportSize", viewport);
-        quad->render();
+        shader.bind();
+        shader.setUniform("imageTexture", tex.bind());
+        shader.setUniform("viewportSize", viewport);
+        quad.render();
 
-        shader->unbind();
-        tex->unbind();
+        shader.unbind();
+        tex.unbind();
     }
 
 private:
 
     /// The mean filter shader.
-    Shader* shader;
+    Shader shader;
 
     /// A quad to be rendered forcing one call of the fragment shader per image pixel (its just a proxy geometry)
-    Mesh* quad;
+    Mesh quad;
 };
 
 }
