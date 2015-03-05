@@ -41,8 +41,6 @@ public:
      */
     BlurredNormalMap ()
     {
-        normalmap_shader = 0;
-        blur_shader = 0;
     }
 
     /**
@@ -56,12 +54,9 @@ public:
     virtual void initialize (void)
     {
         // searches in default shader directory (/shaders) for shader files normalmap.(vert,frag,geom,comp)
-        normalmap_shader = loadShader("normalmap");
-        blur_shader = loadShader("meanfilter");
-        quad = new Tucano::Mesh();
-        quad->createQuad();
-        fbo = new Tucano::Framebuffer();
-
+        loadShader(normalmap_shader, "normalmap");
+        loadShader(blur_shader, "meanfilter");
+        quad.createQuad();
     }
 
     /**
@@ -69,55 +64,55 @@ public:
      * @param mesh Given mesh
      * @param cameraTrackball Given camera trackball     
      */
-    virtual void render (Tucano::Mesh* mesh, Tucano::Trackball* cameraTrackball)
+    virtual void render (Tucano::Mesh& mesh, const Tucano::Trackball& cameraTrackball)
     {
-        Eigen::Vector4f viewport = cameraTrackball->getViewport();
+        Eigen::Vector4f viewport = cameraTrackball.getViewport();
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
 
-        if (fbo->getWidth() != (viewport[2]-viewport[1]) || fbo->getHeight() != (viewport[3]-viewport[1]))
+        if (fbo.getWidth() != (viewport[2]-viewport[1]) || fbo.getHeight() != (viewport[3]-viewport[1]))
         {
-            fbo->create(viewport[2]-viewport[1], viewport[3]-viewport[1], 1);
+            fbo.create(viewport[2]-viewport[1], viewport[3]-viewport[1], 1);
         }
 
         // sets the FBO first (and only) attachment as output
-        fbo->clearAttachments();
-        fbo->bindRenderBuffer(0);
+        fbo.clearAttachments();
+        fbo.bindRenderBuffer(0);
 
-        normalmap_shader->bind();
+        normalmap_shader.bind();
 
         // sets all uniform variables for the phong shader
-        normalmap_shader->setUniform("projectionMatrix", cameraTrackball->getProjectionMatrix());
-        normalmap_shader->setUniform("modelMatrix", mesh->getModelMatrix());
-        normalmap_shader->setUniform("viewMatrix", cameraTrackball->getViewMatrix());
+        normalmap_shader.setUniform("projectionMatrix", cameraTrackball.getProjectionMatrix());
+        normalmap_shader.setUniform("modelMatrix", mesh.getModelMatrix());
+        normalmap_shader.setUniform("viewMatrix", cameraTrackball.getViewMatrix());
 
-        mesh->setAttributeLocation(normalmap_shader);
+        mesh.setAttributeLocation(normalmap_shader);
 
         glEnable(GL_DEPTH_TEST);
-        mesh->render();
+        mesh.render();
         glDisable(GL_DEPTH_TEST);
 
-        normalmap_shader->unbind();
+        normalmap_shader.unbind();
 
 
         // *** unbind the buffer as output buffer, and applies the blur filter ****
-        fbo->unbind(); // automatically returns the draw buffer to GL_BACK
+        fbo.unbind(); // automatically returns the draw buffer to GL_BACK
 
-        blur_shader->bind();
-        blur_shader->setUniform("imageTexture", fbo->bindAttachment(0));
-        blur_shader->setUniform("kernelsize", 5);
-        quad->render();
-        blur_shader->unbind();
-        fbo->unbindAttachments();
+        blur_shader.bind();
+        blur_shader.setUniform("imageTexture", fbo.bindAttachment(0));
+        blur_shader.setUniform("kernelsize", 5);
+        quad.render();
+        blur_shader.unbind();
+        fbo.unbindAttachments();
     }
 
 private:
 
     /// NormalMap Shader
-    Tucano::Shader *normalmap_shader;
-    Tucano::Shader *blur_shader;
-    Tucano::Mesh* quad;
-    Tucano::Framebuffer* fbo;
+    Tucano::Shader normalmap_shader;
+    Tucano::Shader blur_shader;
+    Tucano::Mesh quad;
+    Tucano::Framebuffer fbo;
 };
 
 }
