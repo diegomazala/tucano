@@ -116,13 +116,17 @@ $(document).ready(function(){initNavTree('framebuffer_tutorial.html','');});
 <p>First method: </p>
 <div class="fragment"><div class="line"><a class="code" href="classTucano_1_1Framebuffer.html">Tucano::Framebuffer</a> *fbo;</div>
 <div class="line">fbo = <span class="keyword">new</span> <a class="code" href="classTucano_1_1Framebuffer.html">Tucano::Framebuffer</a>(w, h, n);</div>
-</div><!-- fragment --><p>Second method:s </p>
+</div><!-- fragment --><p>Second method: </p>
 <div class="fragment"><div class="line"><a class="code" href="classTucano_1_1Framebuffer.html">Tucano::Framebuffer</a> *fbo;</div>
 <div class="line">fbo = <span class="keyword">new</span> <a class="code" href="classTucano_1_1Framebuffer.html">Tucano::Framebuffer</a>(w, h, n);</div>
 </div><!-- fragment --><p>Third method: </p>
 <div class="fragment"><div class="line"><a class="code" href="classTucano_1_1Framebuffer.html">Tucano::Framebuffer</a> fbo;</div>
 <div class="line">fbo.<a class="code" href="classTucano_1_1Framebuffer.html#afdb4e8ca8d67283290ec932135c9fc37">create</a>(w, h, n);</div>
-</div><!-- fragment --><h1>Reading from a FBO</h1>
+</div><!-- fragment --><blockquote class="doxtable">
+<p>You can use the <em>create</em> method any time you wish to recreate the fbo with different parameterss</p>
+<p></p>
+</blockquote>
+<h1>Reading from a FBO</h1>
 <p>Usually FBO are accessed as textures from the Shaders. Any Texture attachment can be handled directly as a <a class="el" href="classTucano_1_1Texture.html">Texture</a> (see the <a class="el" href="texture_tutorial.html">Texture Tutorial</a> for more details). It is possible to bind an Attachment and make it accessible in the Shader program with a single call:</p>
 <div class="fragment"><div class="line">shader.setUniform(<span class="stringliteral">&quot;textureName&quot;</span>, fbo.<a class="code" href="classTucano_1_1Framebuffer.html#a843554c88d89aa3b683ee43d423ace2f">bindAttachment</a>(attachID));</div>
 </div><!-- fragment --><p>In your Shader, the Texture will be available as a sampler. For a 2D texture for example:</p>
@@ -140,7 +144,7 @@ $(document).ready(function(){initNavTree('framebuffer_tutorial.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Mar 5 2015 19:46:50 for Tucano by
+    <li class="footer">Generated on Thu Mar 5 2015 20:20:28 for Tucano by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

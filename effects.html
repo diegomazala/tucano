@@ -105,16 +105,21 @@ $(document).ready(function(){initNavTree('effects.html','');});
 <div class="contents">
 <div class="textblock"><p>In the <em>effects</em> folder you can find a few useful Shader <a class="el" href="namespaceEffects.html">Effects</a> that can be used directly with your own projects, or used as inspiration or for learning. Note that these <a class="el" href="namespaceEffects.html">Effects</a> don't depend on the window manager.</p>
 <p>All <em>effects</em> are composed of a simple class that inherits from the <a class="el" href="classTucano_1_1Effect.html">Effect Class</a>, and contains one or more <a class="el" href="classTucano_1_1Shader.html">Shaders</a>.</p>
+<p>Examples:</p>
 <ul>
-<li>phongShader - a simple Phong Shader that receives a <a class="el" href="classTucano_1_1Mesh.html">Mesh</a> and two <a class="el" href="classTucano_1_1Trackball.html">Trackballs</a>, one for the camera and one for the light direction.</li>
-<li>renderTexture - a simple shader that renders a given texture using a quad as proxy geometry.</li>
+<li>phongshader - a simple Phong Shader that receives a <a class="el" href="classTucano_1_1Mesh.html">Mesh</a> and two <a class="el" href="classTucano_1_1Trackball.html">Trackballs</a>, one for the camera and one for the light direction.</li>
+<li>rendertexture - a simple shader that renders a given texture using a quad as proxy geometry.</li>
+<li>gradientfilter - applies a Sobel filter on an image.</li>
+<li>toon - classic toon shader effect.</li>
+<li>ssao - Screen Space Ambient Occlusion - a more advanced effect that uses multiple render passes.</li>
 </ul>
 <h2>Using an Effect</h2>
 <p>The only necessary step is to include the <code>.hpp</code> file in your project, and make sure the directory containing the shaders are set corretly.</p>
-<p>For example, lets look at the phongShader effect, first include the file (make sure you have the include path set correctly so your compiler can find the file):</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;phongShader.hpp&gt;</span></div>
-</div><!-- fragment --><p>Then just create an instance of the phong effect, here we are creating as a pointer but it is not necessary:</p>
-<div class="fragment"><div class="line">Phong *phong = <span class="keyword">new</span> Phong();</div>
+<p>For example, lets look at the phongshader effect:</p>
+<p>First include the file (make sure you have the include path set correctly so your compiler can find the file):</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="phongshader_8hpp.html">phongshader.hpp</a>&gt;</span></div>
+</div><!-- fragment --><p>Then create an instance of the phong effect, here we are creating as a pointer but it is not necessary.</p>
+<div class="fragment"><div class="line">Phong* phong =  <span class="keyword">new</span> Phong();</div>
 <div class="line">phong-&gt;setShadersDir(<span class="stringliteral">&quot;../effects/shaders/&quot;</span>);</div>
 <div class="line"><span class="comment">// make sure GLEW is initialized at this moment</span></div>
 <div class="line">phong-&gt;initialize();</div>
@@ -122,19 +127,20 @@ $(document).ready(function(){initNavTree('effects.html','');});
 <p>Note that it is not necessary to create your effect variable as a pointer, just make sure the initialize() method is called after GLEW is initialized.</p>
 <p></p>
 </blockquote>
-<p>Once the effect is initialized it can be used to render a mesh. The Phong Shader example works by passing a Mesh, a camera Trackball and a light Trackball. A simple application draw method will look like this:</p>
+<p>Once the effect is initialized it can be used to render a mesh. The Phong Shader example works by passing a Mesh, a camera Trackball and a light Trackball. A simple application draw method would look like this:</p>
 <div class="fragment"><div class="line">glClearColor(1.0, 1.0, 1.0, 0.0);</div>
 <div class="line">glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</div>
 <div class="line"></div>
 <div class="line">phong-&gt;render(mesh, camera_trackball, light_trackball);</div>
-<div class="line">camera_trackball-&gt;render(); <span class="comment">// renders the trackball visual representation</span></div>
-</div><!-- fragment --><p>Some effects have set methods for the parameters, their usage is straightforward. </p>
+<div class="line">camera_trackball.render(); <span class="comment">// renders the trackball visual representation</span></div>
+</div><!-- fragment --><p>The <em>mesh</em> is rendered using the <em>camera_trackball</em> for retrieving the viewport, view and projection matrices, and the <em>light_trackball</em> for the light direction. The model matrix is retrieved from the <em>mesh</em>.</p>
+<p>Some effects have set methods for the parameters, their usage is straightforward. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Mar 5 2015 19:46:50 for Tucano by
+    <li class="footer">Generated on Thu Mar 5 2015 20:20:28 for Tucano by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
