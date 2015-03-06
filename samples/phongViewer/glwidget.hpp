@@ -14,8 +14,8 @@ class GLWidget : public Tucano::QtTrackballWidget
 
 public:
 
-    explicit GLWidget(QWidget *parent);
-    ~GLWidget();
+    explicit GLWidget(QWidget *parent) : Tucano::QtTrackballWidget(parent) {}
+    ~GLWidget() {}
     
     /**
      * @brief Initializes the shader effect

@@ -47,20 +47,20 @@ void GLWidget::paintGL (void)
 
 	if (active_effect == 0 )
 	{
-		phong->render(mesh, *camera_trackball, *light_trackball);
+		phong->render(mesh, camera_trackball, light_trackball);
 	}
 	if (active_effect == 1)
 	{
-		toon->render(mesh, *camera_trackball, *light_trackball);
+		toon->render(mesh, camera_trackball, light_trackball);
 	}
 	if (active_effect == 2)
 	{
-		ssao->render(mesh, *camera_trackball, *light_trackball);
+		ssao->render(mesh, camera_trackball, light_trackball);
 	}
 
     glEnable(GL_DEPTH_TEST);
     if (draw_trackball)
     {
-        camera_trackball->render();
+        camera_trackball.render();
     }
 }

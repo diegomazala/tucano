@@ -75,7 +75,7 @@ public:
      */
     virtual Shader* loadShader (string shader_name)
     {
-        Shader* shader_ptr = new Shader(shaders_dir, shader_name);
+        Shader* shader_ptr = new Shader(shader_name, shaders_dir);
         shader_ptr->initialize();
         shaders_list.push_back(shader_ptr);
         return shader_ptr;
