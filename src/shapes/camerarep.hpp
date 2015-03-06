@@ -84,6 +84,7 @@ public:
 
 	/**
 	* @brief Default Constructor
+	* @todo load shader from string and remove phong dependency
 	*/
 	CameraRep()
 	{
@@ -94,7 +95,6 @@ public:
 //		camerarep_shader = new Shader("cameraRepShader");
         camerarep_shader.load("phongshader", "../effects/shaders/");
 		camerarep_shader.initialize();
-		///@TODO load shader from string and remove phong dependency
 //		camerarep_shader.initializeFromStrings(camerarep_vertex_code, camerarep_fragment_code);
 		
 	}
