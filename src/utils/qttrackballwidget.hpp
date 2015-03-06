@@ -41,11 +41,28 @@ namespace Tucano
 {
 
 /**
+ * @brief This class is just to make sure that GLEW is
+ * initialized before anything else, so the constructor of
+ * this class is called before the QtTrackballWidget
+ * constructor.
+ */
+class QtGlewInitializer : public QGLWidget
+{
+public:
+    QtGlewInitializer (QWidget* parent) : QGLWidget(parent)
+    {
+        makeCurrent();
+        Misc::initGlew();
+    }
+
+};
+
+/**
  * @brief A widget with a trackball iteration for a single mesh and a single light source.
  * Extends QGLWidget class to include common methods for using ShaderLib
  * this widget already has a default camera and light trackball and associated mouse methods
  */
-class QtTrackballWidget : public QGLWidget
+class QtTrackballWidget : public QtGlewInitializer
 {
     Q_OBJECT
 
@@ -55,10 +72,10 @@ protected:
     Mesh mesh;
 
     /// Trackball for manipulating the camera.
-    Trackball* camera_trackball;
+    Trackball camera_trackball;
 
     /// Trackball for manipulating the light position.
-    Trackball* light_trackball;
+    Trackball light_trackball;
 
 public:
 
@@ -66,20 +83,12 @@ public:
      * @brief Default constructor.
      * @param parent Parent widget.
      */
-    explicit QtTrackballWidget(QWidget *parent) : QGLWidget(parent)
-    {
-		camera_trackball = 0;
-		light_trackball = 0;
-    }
+    explicit QtTrackballWidget(QWidget *parent) : QtGlewInitializer(parent) {}
 
     /**
      * @brief Default destructor.
      */
-    ~QtTrackballWidget()
-    {
-		delete camera_trackball;
-		delete light_trackball;
-    }
+    ~QtTrackballWidget () {}
 
     /**
      * @brief Initializes openGL and GLEW.
@@ -92,8 +101,6 @@ public:
         QGLFormat glCurrentFormat = this->format();
         cout << "QT GL version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << endl;
         #endif
-
-        Misc::initGlew();
     }
 
     /**
@@ -101,9 +108,9 @@ public:
      */
     virtual void resizeGL (void)
     {
-        camera_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
-        camera_trackball->setPerspectiveMatrix(camera_trackball->getFovy(), this->width()/this->height(), 0.1f, 100.0f);
-        light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        camera_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        camera_trackball.setPerspectiveMatrix(camera_trackball.getFovy(), this->width()/this->height(), 0.1f, 100.0f);
+        light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
         updateGL();
     }
 
@@ -115,15 +122,12 @@ public:
         Eigen::Vector2i size;
         size << this->width(), this->height();
 
-		camera_trackball = new Trackball();
-        camera_trackball->setPerspectiveMatrix(60.0, this->width()/this->height(), 0.1f, 100.0f);
-        camera_trackball->setRenderFlag(true);
+        camera_trackball.setPerspectiveMatrix(60.0, this->width()/this->height(), 0.1f, 100.0f);
+        camera_trackball.setRenderFlag(true);
+        camera_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
-        camera_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
-
-		light_trackball = new Trackball();
-        light_trackball->setRenderFlag(false);
-        light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        light_trackball.setRenderFlag(false);
+        light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
         updateGL();
     }
@@ -193,18 +197,18 @@ protected:
         {
             if (event->button() == Qt::LeftButton)
             {
-                camera_trackball->translateCamera(screen_pos);
+                camera_trackball.translateCamera(screen_pos);
             }
         }
         else
         {
             if (event->button() == Qt::LeftButton)
             {
-                camera_trackball->rotateCamera(screen_pos);
+                camera_trackball.rotateCamera(screen_pos);
             }
             if (event->button() == Qt::RightButton)
             {
-                light_trackball->rotateCamera(screen_pos);
+                light_trackball.rotateCamera(screen_pos);
             }
         }
         updateGL ();
@@ -221,17 +225,17 @@ protected:
         Eigen::Vector2f screen_pos (event->x(), event->y());
         if (event->modifiers() & Qt::ShiftModifier && event->buttons() & Qt::LeftButton)
         {
-            camera_trackball->translateCamera(screen_pos);
+            camera_trackball.translateCamera(screen_pos);
         }
         else
         {
             if (event->buttons() & Qt::LeftButton)
             {
-                camera_trackball->rotateCamera(screen_pos);
+                camera_trackball.rotateCamera(screen_pos);
             }
             if (event->buttons() & Qt::RightButton)
             {
-                light_trackball->rotateCamera(screen_pos);
+                light_trackball.rotateCamera(screen_pos);
             }
         }
 
@@ -249,12 +253,12 @@ protected:
     {
         if (event->button() == Qt::LeftButton)
         {
-            camera_trackball->endTranslation();
-            camera_trackball->endRotation();
+            camera_trackball.endTranslation();
+            camera_trackball.endRotation();
         }
         if (event->button() == Qt::RightButton)
         {
-            light_trackball->endRotation();
+            light_trackball.endRotation();
         }
 
         updateGL ();
@@ -274,18 +278,18 @@ protected:
 
         if (event->modifiers() & Qt::ShiftModifier) // change FOV
         {
-            camera_trackball->incrementFov(pos);
+            camera_trackball.incrementFov(pos);
         }
         else // change ZOOM
         {
             if( (pos > 0) )
             {
-                camera_trackball->increaseZoom(1.05);
+                camera_trackball.increaseZoom(1.05);
             }
 
             else if(pos < 0)
             {
-                camera_trackball->increaseZoom(1.0/1.05);
+                camera_trackball.increaseZoom(1.0/1.05);
             }
         }
         updateGL ();
