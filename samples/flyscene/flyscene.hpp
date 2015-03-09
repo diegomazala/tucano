@@ -5,7 +5,7 @@
 
 #include <phongshader.hpp>
 #include <utils/flycamera.hpp>
-#include <utils/camerapath.hpp>
+#include <utils/path.hpp>
 #include <shapes/camerarep.hpp>
 #include <mesh.hpp>
 #include <utils/objimporter.hpp>
@@ -45,7 +45,7 @@ public:
 	* Returns a pointer to the camerapath instance
 	* @return pointer to camerapath
 	*/
-	CameraPath* cameraPath(void)
+	Path* cameraPath(void)
 	{
 		return &camerapath;
 	}
@@ -71,7 +71,7 @@ private:
 	Tucano::Flycamera flycamera;
 
 	// A camera path for smooth camera animation
-	Tucano::CameraPath camerapath;
+	Tucano::Path camerapath;
 
 	// A camera representation for animating path
 	Tucano::Shapes::CameraRep camerarep;
