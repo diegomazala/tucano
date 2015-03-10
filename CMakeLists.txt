@@ -14,8 +14,7 @@
 #  - GLFW
 
 cmake_minimum_required(VERSION 2.8.12)
-set(PROJECT_NAME "tucano")
-project(${PROJECT_NAME} C CXX)
+project(tucano C CXX)
 
 # Tucano directories.
 #
