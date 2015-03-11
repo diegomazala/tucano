@@ -350,7 +350,7 @@ public:
         frustum_top = -1.0;
         near_plane = 0.1;
         far_plane = 100.0;
-        fovy = 90.0;
+        fovy = 60.0;
 
         reset();
     }

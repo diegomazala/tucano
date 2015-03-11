@@ -75,9 +75,10 @@ public:
 		start_mouse_pos = Eigen::Vector2f::Zero();
 		translation_vector = Eigen::Vector3f::Zero();
 		rotation_matrix = Eigen::Matrix3f::Identity();
-		default_translation = Eigen::Vector3f (0.0, 0.0, -5.0);
+		default_translation = Eigen::Vector3f (0.0, 0.0, -4.0);
         rotation_X_axis = 0.0;
         rotation_Y_axis = 0.0;
+		updateViewMatrix();
     }
 
     ///Default destructor.
@@ -100,6 +101,7 @@ public:
     Flycamera ()
     {
         speed = 0.05;
+		reset();
         initOpenGLMatrices();
 
     }
@@ -154,7 +156,7 @@ public:
         rotation_matrix.row(0) = rotX;
 
 		view_matrix.rotate (rotation_matrix);
-        view_matrix.translate (Eigen::Vector3f(0.0, 0.0, -5.0));
+		view_matrix.translate (default_translation);
 		view_matrix.translate (translation_vector);
 	}	
 
