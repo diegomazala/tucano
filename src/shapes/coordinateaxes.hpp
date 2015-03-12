@@ -101,6 +101,7 @@ public:
 
 	/**
 	* @brief Render camera representation
+    * @todo create 3D representation of axes (tubes) and use light
 	*/
 	void render (const Tucano::Camera &camera, const Tucano::Camera &light)
 	{
@@ -114,7 +115,8 @@ public:
        	axes_shader.setUniform("nearPlane", camera.getNearPlane());
        	axes_shader.setUniform("farPlane", camera.getFarPlane());
        	axes_shader.setUniform("modelMatrix", model_matrix);
-//		axes_shader.setUniform("lightViewMatrix", light.getViewMatrix());
+//		axes_shader.setUniform("lightViewMatriix", light.getViewMatrix());
+        (void)light;
 
 		setAttributeLocation(&axes_shader);
 

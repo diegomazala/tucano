@@ -75,7 +75,7 @@ public:
 		start_mouse_pos = Eigen::Vector2f::Zero();
 		translation_vector = Eigen::Vector3f::Zero();
 		rotation_matrix = Eigen::Matrix3f::Identity();
-		default_translation = Eigen::Vector3f (0.0, 0.0, -4.0);
+		default_translation = Eigen::Vector3f (0.0, 0.0, -2.0);
         rotation_X_axis = 0.0;
         rotation_Y_axis = 0.0;
 		updateViewMatrix();

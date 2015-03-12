@@ -92,12 +92,21 @@ public:
 		resetModelMatrix();
 		createGeometry();
 
-//		camerarep_shader = new Shader("cameraRepShader");
-        camerarep_shader.load("phongshader", "../effects/shaders/");
+        #ifdef TUCANOSHADERDIR
+        initialize(stringify(TUCANOSHADERDIR));
+        #endif
+    }
+
+    /**
+     * @brief Initializes shaders
+     * @param shader_dir Location of shader files
+     */
+    void initialize (string shader_dir = "../effects/shaders/")
+    {
+        camerarep_shader.load("phongshader", shader_dir);
 		camerarep_shader.initialize();
-//		camerarep_shader.initializeFromStrings(camerarep_vertex_code, camerarep_fragment_code);
-		
-	}
+    }
+
 
     ///Default destructor.
     ~CameraRep() 

@@ -170,7 +170,7 @@ protected:
      * @brief Callback for key press event.
      * @param event The key event that triggered the callback.
      */
-    void keyPressEvent (QKeyEvent * event)
+    virtual void keyPressEvent (QKeyEvent * event)
     {
         if (event->key() == Qt::Key_O)
         {
@@ -252,7 +252,7 @@ protected:
      * Stops rotation or translation.
      * @param event The mouse event that triggered the callback.
      */
-    void mouseReleaseEvent (QMouseEvent * event)
+    virtual void mouseReleaseEvent (QMouseEvent * event)
     {
         if (event->button() == Qt::RightButton)
         {

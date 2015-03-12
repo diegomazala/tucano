@@ -45,17 +45,17 @@ void Flyscene::paintGL (void)
 		camerapath.stepForward();
 	
 	phong.render(mesh, flycamera, light);
-	// render coordinate systema at lower right corner
+	// render coordinate system at lower right corner
 	flycamera.renderAtCorner();
 	// render the camera path and key points
 	camerapath.render(flycamera, light);
 
+	// render the animated camera
 	Eigen::Affine3f step_cam = camerapath.cameraAtCurrentTime();
 	step_cam.scale(0.1);
 	camerarep.setModelMatrix(step_cam);
-
-	// render the animated camera
 	camerarep.render(flycamera, light);
+
 	Eigen::Affine3f path_cam_view = camerapath.cameraAtCurrentTime();
 	follow_cam.setViewMatrix (path_cam_view.inverse());
 

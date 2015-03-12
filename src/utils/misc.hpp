@@ -30,6 +30,9 @@
 #include <string>
 #include <cstdlib>
 
+#define stringify( x ) stringify_literal( x )
+#define stringify_literal( x ) # x
+
 namespace Tucano
 {
 
