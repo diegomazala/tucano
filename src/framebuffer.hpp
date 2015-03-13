@@ -28,6 +28,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <limits>
 #include <GL/glew.h>
 
@@ -674,6 +675,46 @@ public:
         glReadPixels(0, 0, size[0], size[1], GL_DEPTH_COMPONENT, GL_FLOAT, &depth_values[0]);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
     }
+
+	/**
+	 * @brief Saves the buffer to a PPM image
+	 * @param filename Output ppm filename
+	 * @param attach FBO attachment to save as image (default is 0)
+	 */
+	void saveAsPPM (string filename, int attach = 0)
+	{
+		ofstream out_stream;
+		out_stream.open(filename.c_str());
+		out_stream << "P3\n";
+		out_stream << size[0] << " " << size[1] << "\n";
+		out_stream << "255\n";
+
+        bool was_binded = is_binded;
+
+        GLfloat * pixels = new GLfloat[(int)(size[0]*size[1]*4)];
+        bind();
+        glReadBuffer(GL_COLOR_ATTACHMENT0+attach);
+        glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_FLOAT, pixels);
+
+		int pos;
+	    for (int j = size[1]-1; j >= 0; --j)
+        {
+            for (int i = 0 ; i < size[0]; ++i)
+            {
+                pos = (i + size[0]*j)*4;
+				out_stream << (int)(255*pixels[pos+0]) << " " << (int)(255*pixels[pos+1]) << " " << (int)(255*pixels[pos+2]) << " ";
+			}
+			out_stream << "\n";
+		}
+		out_stream.close();
+
+	    if (!was_binded)
+        {
+            unbindFBO();
+        }
+		delete [] pixels;
+
+	}
 
     /**
      * @brief Prints the content of a GPU. Usually used for debugging.

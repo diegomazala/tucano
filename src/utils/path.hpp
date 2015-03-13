@@ -695,9 +695,16 @@ public:
 	float animSpeed ( void )
 	{
 		return anim_speed;
-	
 	}
 	
+	/**
+	* @brief Sets the animation speed
+	* @param as Given animation speed
+	*/
+	void setAnimSpeed (float as)
+	{
+		anim_speed = as;
+	}
 
     /**
     * @brief Compute control points for SQUAD
