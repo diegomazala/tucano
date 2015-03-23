@@ -21,8 +21,8 @@ if(NOT OPENGL_FOUND)
 	message(SEND_ERROR "OpenGL not found on your system.")
 endif()
 
-
 add_definitions(-DTUCANODEBUG)
+add_definitions(-DTUCANOSHADERDIR=../effects/shaders/)
 add_definitions ("-Wall")
 add_definitions ("-g")
 

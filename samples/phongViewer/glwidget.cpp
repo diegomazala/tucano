@@ -19,6 +19,6 @@ void GLWidget::paintGL (void)
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    phong.render(mesh, camera_trackball, light_trackball);
-    camera_trackball.render();
+    phong.render(mesh, camera, light_trackball);
+    camera.render();
 }

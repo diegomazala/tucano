@@ -288,6 +288,8 @@ public:
 
         radius = 1.0;
         scale = 1.0;
+
+		resetModelMatrix();
     }
 
     ///Default Destructor. Deletes the bufferIDs. vertices. normals. colors. indices and texCoords arrays.
