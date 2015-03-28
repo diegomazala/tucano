@@ -110,7 +110,7 @@ public:
     virtual void resizeGL (void)
     {
         camera.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
-        camera.setPerspectiveMatrix(camera.getFovy(), this->width()/this->height(), 0.1f, 100.0f);
+        camera.setPerspectiveMatrix(camera.getFovy(), (float)this->width()/(float)this->height(), 0.1f, 100.0f);
         light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
         updateGL();
     }
@@ -123,8 +123,7 @@ public:
         Eigen::Vector2i size;
         size << this->width(), this->height();
 
-        camera.setPerspectiveMatrix(60.0, this->width()/this->height(), 0.1f, 100.0f);
-        //camera.setRenderFlag(true);
+        camera.setPerspectiveMatrix(60.0, (float)this->width()/(float)this->height(), 0.1f, 100.0f);
         camera.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
         light_trackball.setRenderFlag(false);
