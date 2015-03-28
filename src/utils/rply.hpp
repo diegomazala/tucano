@@ -397,9 +397,9 @@ typedef uint32_t t_ply_uint32;
 /* ----------------------------------------------------------------------
  * Constants 
  * ---------------------------------------------------------------------- */
-#define WORDSIZE 256
-#define LINESIZE 1024
-#define BUFFERSIZE (8*1024)
+const int WORDSIZE = 256;
+const int LINESIZE = 1024;
+const int BUFFERSIZE = (8*1024);
 
 enum e_ply_io_mode {
     PLY_READ, 
