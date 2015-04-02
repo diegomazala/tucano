@@ -99,7 +99,7 @@ public:
 		resetModelMatrix();
 		createGeometry();
 
-		color << 1.0, 0.48, 0.16, 1.0;
+		color << 0.0, 0.48, 1.0, 1.0;
 
 		cylinder_shader.setShaderName("cylinderShader");
 		cylinder_shader.initializeFromStrings(cylinder_vertex_code, cylinder_fragment_code);
@@ -136,9 +136,6 @@ public:
 		cylinder_shader.setUniform("lightViewMatrix", light.getViewMatrix());
        	cylinder_shader.setUniform("in_Color", color);
 
-		vector <string> attribs;
-		cylinder_shader.getActiveAttributes(attribs);
-
  		this->setAttributeLocation(&cylinder_shader);
 
 		glEnable(GL_DEPTH_TEST);
@@ -155,6 +152,18 @@ public:
 		
 	}
 
+
+	/**
+	* @brief Create cylinder with given parameters
+	* @param s Number of subdivisions
+	* @param r Radius
+	* @param h Height
+	*/
+	void create (int s, float r, float h)
+	{
+		createGeometry(s, r, h);
+	}
+
 private:
 
 
@@ -163,9 +172,12 @@ private:
 	*
 	* Cylinder is created by creating two disks (caps) and generating triangles between them
 	*/
-	void createGeometry (int subdivisions = 32)
+	void createGeometry (int subdivisions = 32, float r = 1.0, float height = 2.0)
 	{
+		reset();
+
 		vector< Eigen::Vector4f > vert;
+		vector< Eigen::Vector3f > norm;
 		vector< GLuint > faces;
 
 		float x, y, theta;
@@ -173,10 +185,12 @@ private:
 		for (int i = 0; i < subdivisions; ++i)
 		{
 			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta);
-			y = cos(theta);
-			vert.push_back(Eigen::Vector4f(x, y,  1.0, 1.0));
-			vert.push_back(Eigen::Vector4f(x, y, -1.0, 1.0));
+			x = sin(theta)*r;
+			y = cos(theta)*r;
+			vert.push_back(Eigen::Vector4f(x, y, height, 1.0));
+			vert.push_back(Eigen::Vector4f(x, y, 0.0, 1.0));
+			norm.push_back(Eigen::Vector3f(x, y, 0.0));
+			norm.push_back(Eigen::Vector3f(x, y, 0.0));
 		}
 		
 		// create a face with every three vertices for cylinder body
@@ -187,7 +201,50 @@ private:
 			faces.push_back((i+2)%(subdivisions*2));
 		}
 
+		// create top cap
+		vert.push_back(Eigen::Vector4f(0.0, 0.0, height, 1.0));
+		norm.push_back(Eigen::Vector3f(0.0, 0.0,  1.0));
+		int center_index = vert.size()-1;
+		int offset = vert.size();
+		for (int i = 0; i < subdivisions; ++i)
+		{
+			theta = 2.0*M_PI*i/(float)subdivisions;
+			x = sin(theta)*r;
+			y = cos(theta)*r;
+			vert.push_back(Eigen::Vector4f(x, y, height, 1.0));
+			norm.push_back(Eigen::Vector3f(0.0, 0.0,  1.0));
+		}
+
+		for (int i = 0; i < subdivisions; ++i)
+		{
+			faces.push_back(i+offset);
+			faces.push_back((i+1)%(subdivisions) + offset);
+			faces.push_back(center_index);
+		}
+		// create bottom cap
+		vert.push_back(Eigen::Vector4f(0.0, 0.0, 0.0, 1.0));
+		norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
+		center_index = vert.size()-1;
+		offset = vert.size();
+		for (int i = 0; i < subdivisions; ++i)
+		{
+			theta = 2.0*M_PI*i/(float)subdivisions;
+			x = sin(theta)*r;
+			y = cos(theta)*r;
+			vert.push_back(Eigen::Vector4f(x, y, 0, 1.0));
+			norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
+		}
+
+		for (int i = 0; i < subdivisions; ++i)
+		{
+			faces.push_back(i+offset);
+			faces.push_back((i+1)%(subdivisions) + offset);
+			faces.push_back(center_index);
+		}
+
+
 		loadVertices(vert);
+		loadNormals(norm);
 		loadIndices(faces);
 
 		setDefaultAttribLocations();

@@ -112,10 +112,11 @@ public:
 	void renderAtCorner (void)
 	{
 	    float ratio = (viewport[2] - viewport[0]) / (viewport[3] - viewport[1]);
-        Eigen::Matrix4f rep_projection_matrix = createOrthographicMatrix(-ratio, ratio, -1.0, 1.0, 0.1, 100.0);
     
+        Eigen::Matrix4f rep_projection_matrix = createOrthographicMatrix(-ratio, ratio, -1.0, 1.0, 0.1, 100.0);
+
         Eigen::Affine3f rep_view_matrix = Eigen::Affine3f::Identity();
-        rep_view_matrix.translate( Eigen::Vector3f(1.0, -0.75, -2.0));
+        rep_view_matrix.translate( Eigen::Vector3f(1.0, -0.75, -5.0));
         
 		Camera lightcam;
 
@@ -126,7 +127,7 @@ public:
 
 		axes.resetModelMatrix();
 		axes.modelMatrix()->rotate(rotation_matrix.inverse());
-		axes.modelMatrix()->scale(0.2);
+		axes.modelMatrix()->scale(0.3);
 		axes.render(cam, lightcam);
 	}
 
