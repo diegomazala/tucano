@@ -28,7 +28,8 @@ void Flyscene::initialize (int width, int height)
 	//right side of window
 	follow_cam.setViewport(Eigen::Vector4f ((float)width+20, 0.0, (float)width, (float)height));
 
-	MeshImporter::loadObjFile(&mesh, "../samples/models/toy.obj");
+	//MeshImporter::loadObjFile(&mesh, "../samples/models/toy.obj");
+	
 	mesh.normalizeModelMatrix();
 }
 //Eigen::Vector3f last_pos;

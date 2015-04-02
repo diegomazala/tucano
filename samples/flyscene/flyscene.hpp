@@ -86,7 +86,8 @@ private:
 	int camera_type;
 	
 	// A mesh
-	Mesh mesh;
+//	Mesh mesh;
+	Tucano::Shapes::Cylinder mesh;
 };
 
 #endif // FLYSCENE

@@ -24,6 +24,7 @@
 #define __COORDINATEAXES__
 
 #include "mesh.hpp"
+#include "shapes/cylinder.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 
@@ -77,6 +78,7 @@ class CoordinateAxes : public Tucano::Mesh {
 private:
 
 	Tucano::Shader axes_shader;
+	Tucano::Shapes::Cylinder cylinder;
 
 public:
 
@@ -85,7 +87,6 @@ public:
 	*/
 	CoordinateAxes()
 	{
-
 		resetModelMatrix();
 		createGeometry();
 
@@ -118,12 +119,13 @@ public:
 //		axes_shader.setUniform("lightViewMatriix", light.getViewMatrix());
         (void)light;
 
-		setAttributeLocation(&axes_shader);
+		cylinder.setAttributeLocation(&axes_shader);
 
 		glEnable(GL_DEPTH_TEST);
-		bindBuffers();
-		glDrawArrays(GL_LINES, 0, 6);
-		unbindBuffers();
+		cylinder.render(camera, light);
+		//bindBuffers();
+		//glDrawArrays(GL_LINES, 0, 6);
+		//unbindBuffers();
 		glDisable(GL_DEPTH_TEST);
 
        	axes_shader.unbind();
