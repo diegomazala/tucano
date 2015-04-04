@@ -24,7 +24,7 @@
 #define __COORDINATEAXES__
 
 #include "mesh.hpp"
-#include "shapes/cylinder.hpp"
+#include "shapes/arrow.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 
@@ -45,7 +45,7 @@ class CoordinateAxes : public Tucano::Model {
 
 private:
 
-	Tucano::Shapes::Cylinder cylinder;
+	Tucano::Shapes::Arrow arrow;
 
 public:
 
@@ -55,7 +55,7 @@ public:
 	CoordinateAxes()
 	{
 		resetModelMatrix();
-		cylinder.create(32, 0.1, 1.0);
+		arrow.create(0.05, 0.8, 0.12, 0.2);
 	}
 
     ///Default destructor.
@@ -69,21 +69,23 @@ public:
 	*/
 	void render (const Tucano::Camera &camera, const Tucano::Camera &light)
 	{
-		cylinder.resetModelMatrix();
-		cylinder.modelMatrix()->scale(0.2);
-		cylinder.modelMatrix()->rotate(this->modelMatrix()->rotation());
+        glEnable(GL_DEPTH_TEST);
 
-		cylinder.setColor(Eigen::Vector4f(0.0, 0.0, 1.0, 1.0));
-		cylinder.render(camera, light);
+		arrow.resetModelMatrix();
+		arrow.modelMatrix()->scale(0.2);
+		arrow.modelMatrix()->rotate(this->modelMatrix()->rotation());
 
-		cylinder.modelMatrix()->rotate(Eigen::AngleAxisf(-M_PI*0.5, Eigen::Vector3f::UnitX()));
-		cylinder.setColor(Eigen::Vector4f(0.0, 1.0, 0.0, 1.0));
-		cylinder.render(camera, light);
+		arrow.setColor(Eigen::Vector4f(0.0, 0.0, 1.0, 1.0));
+		arrow.render(camera, light);
 
-		cylinder.modelMatrix()->rotate(Eigen::AngleAxisf(M_PI*0.5, Eigen::Vector3f::UnitX()));
-		cylinder.modelMatrix()->rotate(Eigen::AngleAxisf(M_PI*0.5, Eigen::Vector3f::UnitY()));
-		cylinder.setColor(Eigen::Vector4f(1.0, 0.0, 0.0, 1.0));
-		cylinder.render(camera, light);
+		arrow.modelMatrix()->rotate(Eigen::AngleAxisf(-M_PI*0.5, Eigen::Vector3f::UnitX()));
+		arrow.setColor(Eigen::Vector4f(0.0, 1.0, 0.0, 1.0));
+		arrow.render(camera, light);
+
+		arrow.modelMatrix()->rotate(Eigen::AngleAxisf(M_PI*0.5, Eigen::Vector3f::UnitX()));
+		arrow.modelMatrix()->rotate(Eigen::AngleAxisf(M_PI*0.5, Eigen::Vector3f::UnitY()));
+		arrow.setColor(Eigen::Vector4f(1.0, 0.0, 0.0, 1.0));
+		arrow.render(camera, light);
 	
 	}
 

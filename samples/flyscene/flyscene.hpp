@@ -1,4 +1,4 @@
-		#ifndef __FLYSCENE__
+#ifndef __FLYSCENE__
 #define __FLYSCENE__
 
 #include <GL/glew.h>
@@ -86,8 +86,7 @@ private:
 	int camera_type;
 	
 	// A mesh
-//	Mesh mesh;
-	Tucano::Shapes::Cylinder mesh;
+	Mesh mesh;
 };
 
 #endif // FLYSCENE

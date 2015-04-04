@@ -103,7 +103,6 @@ public:
 
         glEnable(GL_DEPTH_TEST);
         mesh.render();
-        glDisable(GL_DEPTH_TEST);
 
         phong_shader.unbind();
     }

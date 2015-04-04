@@ -20,8 +20,8 @@
  * along with Tucano Library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CYLINDER__
-#define __CYLINDER__
+#ifndef __CONE__
+#define __CONE__
 
 #include "mesh.hpp"
 #include <Eigen/Dense>
@@ -33,8 +33,8 @@ namespace Tucano
 namespace Shapes
 {
 
-/// Default fragment shader for rendering cylinder 
-const string cylinder_fragment_code = "\n"
+/// Default fragment shader for rendering cone 
+const string cone_fragment_code = "\n"
         "#version 430\n"
         "in vec4 color;\n"
 		"in vec3 normal;\n"
@@ -54,8 +54,8 @@ const string cylinder_fragment_code = "\n"
 		"	out_Color = vec4(ambientLight.xyz + diffuseLight.xyz + specularLight.xyz,1.0);\n"
         "}\n";
 
-/// Default vertex shader for rendering cylinder 
-const string cylinder_vertex_code = "\n"
+/// Default vertex shader for rendering cone 
+const string cone_vertex_code = "\n"
         "#version 430\n"
 		"layout(location=0) in vec4 in_Position;\n"
         "out vec4 color;\n"
@@ -77,52 +77,51 @@ const string cylinder_vertex_code = "\n"
 
 
 /**
- * @brief A simple cylinder shape
+ * @brief A simple cone shape
  **/
-class Cylinder : public Tucano::Mesh {
+class Cone : public Tucano::Mesh {
 
 private:
 
-	/// Shader to render cylinder 
-	Tucano::Shader cylinder_shader;
+	/// Shader to render cone 
+	Tucano::Shader cone_shader;
 
-	/// Cylinder color
+	/// Cone color
 	Eigen::Vector4f color;
 
-	/// Cylinder height
+	/// Cone height
 	float height;
 
-	/// Cylinder radius
+	/// Cone radius
 	float radius;
 
 	/// Initial position
 	Eigen::Vector4f position;
-
 
 public:
 
 	/**
 	* @brief Default Constructor
 	*/
-	Cylinder()
+	Cone()
 	{
 		resetModelMatrix();
-		create(1.0, 2.0);
+		create(0.1, 0.5);
 
 		color << 0.0, 0.48, 1.0, 1.0;
 
-		cylinder_shader.setShaderName("cylinderShader");
-		cylinder_shader.initializeFromStrings(cylinder_vertex_code, cylinder_fragment_code);
+		cone_shader.setShaderName("coneShader");
+		cone_shader.initializeFromStrings(cone_vertex_code, cone_fragment_code);
 
 	}
 
     ///Default destructor.
-    ~Cylinder() 
+    ~Cone() 
 	{}
 
 
 	/**
-	* @brief Sets the cylinder color
+	* @brief Sets the cone color
 	* @param c New color
 	*/
 	void setColor (const Eigen::Vector4f &c)
@@ -131,22 +130,22 @@ public:
 	}
 
 	/**
-	* @brief Render cylinder
+	* @brief Render cone
 	*/
 	void render (const Tucano::Camera& camera, const Tucano::Camera& light)
 	{
 		Eigen::Vector4f viewport = camera.getViewport();
 		glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-		cylinder_shader.bind();
+		cone_shader.bind();
 
-       	cylinder_shader.setUniform("modelMatrix", model_matrix);
-		cylinder_shader.setUniform("viewMatrix", camera.getViewMatrix());
-       	cylinder_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
-		cylinder_shader.setUniform("lightViewMatrix", light.getViewMatrix());
-       	cylinder_shader.setUniform("in_Color", color);
+       	cone_shader.setUniform("modelMatrix", model_matrix);
+		cone_shader.setUniform("viewMatrix", camera.getViewMatrix());
+       	cone_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
+		cone_shader.setUniform("lightViewMatrix", light.getViewMatrix());
+       	cone_shader.setUniform("in_Color", color);
 
- 		this->setAttributeLocation(&cylinder_shader);
+ 		this->setAttributeLocation(&cone_shader);
 
 		glEnable(GL_DEPTH_TEST);
 		this->bindBuffers();
@@ -154,7 +153,7 @@ public:
 		this->unbindBuffers();
 		glDisable(GL_DEPTH_TEST);
 
-       	cylinder_shader.unbind();
+       	cone_shader.unbind();
 
 		#ifdef TUCANODEBUG
 		Misc::errorCheckFunc(__FILE__, __LINE__);
@@ -164,7 +163,7 @@ public:
 
 
 	/**
-	* @brief Create cylinder with given parameters
+	* @brief Create cone with given parameters
 	* @param r Radius
 	* @param h Height
 	* @param pos Initial position
@@ -179,7 +178,7 @@ public:
 	}
 
 	/**
-	* @brief Returns cylinder height
+	* @brief Returns cone height
 	*/
 	float getHeight (void)
 	{
@@ -187,20 +186,22 @@ public:
 	}
 
 	/**
-	* @brief Returns cylinder radius 
+	* @brief Returns cone radius 
 	*/
 	float getRadius (void)
 	{
 		return radius;
 	}
 
+
 private:
 
 
 	/**
-	* @brief Define cylinder geometry
+	* @brief Define cone geometry
 	*
-	* Cylinder is created by creating two disks (caps) and generating triangles between them
+	* Cone is created by creating one disk (cap) and a vertex, and generating triangles
+	* between them 
 	*
 	* @param subdivisions Number of subdivisons for cap and body
 	*/
@@ -213,29 +214,31 @@ private:
 		vector< GLuint > faces;
 
 		float x, y, theta;
-		// create vertices for top and bottom caps
+		// create vertices for body, must recreate apex for every triangle to keep normals ok
 		for (int i = 0; i < subdivisions; ++i)
 		{
 			theta = 2.0*M_PI*i/(float)subdivisions;
 			x = sin(theta)*radius;
 			y = cos(theta)*radius;
-			vert.push_back(Eigen::Vector4f(x, y, height, 0.0) + position);
 			vert.push_back(Eigen::Vector4f(x, y, 0.0, 0.0) + position);
 			norm.push_back(Eigen::Vector3f(x, y, 0.0));
-			norm.push_back(Eigen::Vector3f(x, y, 0.0));
 		}
-		
-		// create a face with every three vertices for cylinder body
-		for (int i = 0; i < subdivisions*2; ++i)
+		// apex vertex
+		vert.push_back(Eigen::Vector4f(0.0, 0.0, height, 0.0) + position);
+		norm.push_back(Eigen::Vector3f(0.0, 0.0, 1.0));
+
+	
+		// create a face with every two vertices and apex
+		for (int i = 0; i < subdivisions; ++i)
 		{
 			faces.push_back(i);
-			faces.push_back((i+1)%(subdivisions*2));
-			faces.push_back((i+2)%(subdivisions*2));
+			faces.push_back((i+1)%(subdivisions));
+			faces.push_back(vert.size()-1);
 		}
 
-		// create top cap
-		vert.push_back(Eigen::Vector4f(position[0], position[1], height+position[2], 1.0));
-		norm.push_back(Eigen::Vector3f(0.0, 0.0,  1.0));
+		// create cap
+		vert.push_back(position);
+		norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
 		int center_index = vert.size()-1;
 		int offset = vert.size();
 		for (int i = 0; i < subdivisions; ++i)
@@ -243,27 +246,7 @@ private:
 			theta = 2.0*M_PI*i/(float)subdivisions;
 			x = sin(theta)*radius;
 			y = cos(theta)*radius;
-			vert.push_back(Eigen::Vector4f(x, y, height, 0.0) + position);
-			norm.push_back(Eigen::Vector3f(0.0, 0.0,  1.0));
-		}
-
-		for (int i = 0; i < subdivisions; ++i)
-		{
-			faces.push_back(i+offset);
-			faces.push_back((i+1)%(subdivisions) + offset);
-			faces.push_back(center_index);
-		}
-		// create bottom cap
-		vert.push_back(position);
-		norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
-		center_index = vert.size()-1;
-		offset = vert.size();
-		for (int i = 0; i < subdivisions; ++i)
-		{
-			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta)*radius;
-			y = cos(theta)*radius;
-			vert.push_back(Eigen::Vector4f(x, y, 0, 0.0) + position);
+			vert.push_back(Eigen::Vector4f(x, y, 0.0, 0.0) + position);
 			norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
 		}
 

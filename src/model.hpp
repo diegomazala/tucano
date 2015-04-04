@@ -100,7 +100,7 @@ public:
 	* @brief Sets the model matrix
 	* @param m Given new model matrix
 	*/
-	void setModelMatrix (Eigen::Affine3f &m)
+	void setModelMatrix (const Eigen::Affine3f &m)
 	{
 		model_matrix = m;
 	}
