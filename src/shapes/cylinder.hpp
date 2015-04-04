@@ -89,15 +89,11 @@ private:
 	/// Cylinder color
 	Eigen::Vector4f color;
 
-	/// Cylinder height
-	float height;
+	/// Cylinder cylinder_height
+	float cylinder_height;
 
-	/// Cylinder radius
-	float radius;
-
-	/// Initial position
-	Eigen::Vector4f position;
-
+	/// Cylinder cylinder_radius
+	float cylinder_radius;
 
 public:
 
@@ -152,7 +148,6 @@ public:
 		this->bindBuffers();
 		this->renderElements();
 		this->unbindBuffers();
-		glDisable(GL_DEPTH_TEST);
 
        	cylinder_shader.unbind();
 
@@ -167,31 +162,29 @@ public:
 	* @brief Create cylinder with given parameters
 	* @param r Radius
 	* @param h Height
-	* @param pos Initial position
 	* @param s Number of subdivisions
 	*/
-	void create (float r, float h, Eigen::Vector4f pos = Eigen::Vector4f(0.0, 0.0, 0.0, 1.0), int s = 32)
+	void create (float r, float h, int s = 32)
 	{
-		radius = r;
-		height = h;
-		position = pos;
+		cylinder_radius = r;
+		cylinder_height = h;
 		createGeometry(s);
 	}
 
 	/**
-	* @brief Returns cylinder height
+	* @brief Returns cylinder cylinder_height
 	*/
 	float getHeight (void)
 	{
-		return height;
+		return cylinder_height;
 	}
 
 	/**
-	* @brief Returns cylinder radius 
+	* @brief Returns cylinder cylinder_radius 
 	*/
 	float getRadius (void)
 	{
-		return radius;
+		return cylinder_radius;
 	}
 
 private:
@@ -217,10 +210,10 @@ private:
 		for (int i = 0; i < subdivisions; ++i)
 		{
 			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta)*radius;
-			y = cos(theta)*radius;
-			vert.push_back(Eigen::Vector4f(x, y, height, 0.0) + position);
-			vert.push_back(Eigen::Vector4f(x, y, 0.0, 0.0) + position);
+			x = sin(theta)*cylinder_radius;
+			y = cos(theta)*cylinder_radius;
+			vert.push_back(Eigen::Vector4f(x, y, cylinder_height, 1.0));
+			vert.push_back(Eigen::Vector4f(x, y, 0.0, 1.0));
 			norm.push_back(Eigen::Vector3f(x, y, 0.0));
 			norm.push_back(Eigen::Vector3f(x, y, 0.0));
 		}
@@ -234,16 +227,16 @@ private:
 		}
 
 		// create top cap
-		vert.push_back(Eigen::Vector4f(position[0], position[1], height+position[2], 1.0));
+		vert.push_back(Eigen::Vector4f(0.0, 0.0, cylinder_height, 1.0));
 		norm.push_back(Eigen::Vector3f(0.0, 0.0,  1.0));
 		int center_index = vert.size()-1;
 		int offset = vert.size();
 		for (int i = 0; i < subdivisions; ++i)
 		{
 			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta)*radius;
-			y = cos(theta)*radius;
-			vert.push_back(Eigen::Vector4f(x, y, height, 0.0) + position);
+			x = sin(theta)*cylinder_radius;
+			y = cos(theta)*cylinder_radius;
+			vert.push_back(Eigen::Vector4f(x, y, cylinder_height, 1.0));
 			norm.push_back(Eigen::Vector3f(0.0, 0.0,  1.0));
 		}
 
@@ -254,16 +247,16 @@ private:
 			faces.push_back(center_index);
 		}
 		// create bottom cap
-		vert.push_back(position);
+		vert.push_back(Eigen::Vector4f(0.0, 0.0, 0.0, 1.0));
 		norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
 		center_index = vert.size()-1;
 		offset = vert.size();
 		for (int i = 0; i < subdivisions; ++i)
 		{
 			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta)*radius;
-			y = cos(theta)*radius;
-			vert.push_back(Eigen::Vector4f(x, y, 0, 0.0) + position);
+			x = sin(theta)*cylinder_radius;
+			y = cos(theta)*cylinder_radius;
+			vert.push_back(Eigen::Vector4f(x, y, 0.0, 1.0));
 			norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
 		}
 

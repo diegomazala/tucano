@@ -89,14 +89,11 @@ private:
 	/// Cone color
 	Eigen::Vector4f color;
 
-	/// Cone height
-	float height;
+	/// Cone cone_height
+	float cone_height;
 
-	/// Cone radius
-	float radius;
-
-	/// Initial position
-	Eigen::Vector4f position;
+	/// Cone cone_radius
+	float cone_radius;
 
 public:
 
@@ -161,36 +158,33 @@ public:
 		
 	}
 
-
 	/**
 	* @brief Create cone with given parameters
 	* @param r Radius
 	* @param h Height
-	* @param pos Initial position
 	* @param s Number of subdivisions
 	*/
-	void create (float r, float h, Eigen::Vector4f pos = Eigen::Vector4f(0.0, 0.0, 0.0, 1.0), int s = 32)
+	void create (float r, float h, int s = 32)
 	{
-		radius = r;
-		height = h;
-		position = pos;
+		cone_radius = r;
+		cone_height = h;
 		createGeometry(s);
 	}
 
 	/**
-	* @brief Returns cone height
+	* @brief Returns cone cone_height
 	*/
 	float getHeight (void)
 	{
-		return height;
+		return cone_height;
 	}
 
 	/**
-	* @brief Returns cone radius 
+	* @brief Returns cone cone_radius 
 	*/
 	float getRadius (void)
 	{
-		return radius;
+		return cone_radius;
 	}
 
 
@@ -214,20 +208,20 @@ private:
 		vector< GLuint > faces;
 
 		float x, y, theta;
-		// create vertices for body, must recreate apex for every triangle to keep normals ok
+		// create vertices for body
 		for (int i = 0; i < subdivisions; ++i)
 		{
 			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta)*radius;
-			y = cos(theta)*radius;
-			vert.push_back(Eigen::Vector4f(x, y, 0.0, 0.0) + position);
+			x = sin(theta)*cone_radius;
+			y = cos(theta)*cone_radius;
+			vert.push_back(Eigen::Vector4f(x, y, 0.0, 1.0));
 			norm.push_back(Eigen::Vector3f(x, y, 0.0));
 		}
+
 		// apex vertex
-		vert.push_back(Eigen::Vector4f(0.0, 0.0, height, 0.0) + position);
+		vert.push_back(Eigen::Vector4f(0.0, 0.0, cone_height, 1.0));
 		norm.push_back(Eigen::Vector3f(0.0, 0.0, 1.0));
 
-	
 		// create a face with every two vertices and apex
 		for (int i = 0; i < subdivisions; ++i)
 		{
@@ -237,16 +231,16 @@ private:
 		}
 
 		// create cap
-		vert.push_back(position);
+		vert.push_back(Eigen::Vector4f(0.0, 0.0, 0.0, 1.0));
 		norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
 		int center_index = vert.size()-1;
 		int offset = vert.size();
 		for (int i = 0; i < subdivisions; ++i)
 		{
 			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta)*radius;
-			y = cos(theta)*radius;
-			vert.push_back(Eigen::Vector4f(x, y, 0.0, 0.0) + position);
+			x = sin(theta)*cone_radius;
+			y = cos(theta)*cone_radius;
+			vert.push_back(Eigen::Vector4f(x, y, 0.0, 1.0));
 			norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
 		}
 
