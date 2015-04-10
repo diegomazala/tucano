@@ -717,6 +717,14 @@ public:
     }
 
     /**
+     * @brief Render only points without index buffer
+     */
+    virtual void renderPoints (void)
+    {
+        glDrawArrays(GL_POINTS, 0, numberOfVertices);
+    }
+
+    /**
      * @brief Call the draw method for rendering triangles.
      * This method requires that a index buffer has been created.
      */
@@ -724,7 +732,6 @@ public:
     {
 
         glDrawElements(GL_TRIANGLES, numberOfElements, GL_UNSIGNED_INT, (GLvoid*)0);
-        //glDrawArrays(GL_TRIANGLES, 0, numberOfElements);
     }
 
     /**
@@ -732,12 +739,15 @@ public:
      * The method binds the buffers, calls the method to render triangles, and then unbinds all buffers.
      * Note that a index buffer is necessary.
      */
-    virtual void render (void) {
+    virtual void render (void)
+    {
         bindBuffers();
-        renderElements();
+        if (numberOfElements == 0)
+            renderPoints();
+        else
+            renderElements();
         unbindBuffers();
     }
-
 
     /**
      * @brief Sets the mesh as a Parallelpiped with given dimensions, scales so larger side is equal to 1.
