@@ -119,9 +119,6 @@ public:
      */
     void initialize (void)
     {
-        Eigen::Vector2i size;
-        size << this->width(), this->height();
-
         camera.setPerspectiveMatrix(60.0, (float)this->width()/(float)this->height(), 0.1f, 100.0f);
         camera.setRenderFlag(true);
         camera.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
