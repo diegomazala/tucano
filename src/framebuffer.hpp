@@ -542,7 +542,6 @@ public:
         return result;
     }
 
-
     /**
      * @brief Reads a GPU buffer and stores it in a CPU array of floats.
      *
