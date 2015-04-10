@@ -4,7 +4,6 @@
 #include <GL/glew.h>
 
 #include <phongshader.hpp>
-#include <picking.hpp>
 #include <utils/qttrackballwidget.hpp>
 
 using namespace std;
@@ -37,8 +36,6 @@ public slots:
 private:
 
     Effects::Phong phong;
-    Effects::Picking picking;
-
 };
 
 #endif // GLWIDGET
