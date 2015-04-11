@@ -20,11 +20,6 @@ add_executable(
   $<TARGET_OBJECTS:TUCANO_LIBRARY>
   )
 
-add_dependencies(
-  phongViewer
-  TUCANO_LIBRARY
-  )
-
 target_link_libraries(
   phongViewer
   ${GLEW_LIBRARIES}

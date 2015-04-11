@@ -5,3 +5,5 @@ add_subdirectory(imgproc)
 add_subdirectory(phongViewer)
 add_subdirectory(rendering)
 add_subdirectory(simpleTexture)
+
+add_subdirectory(flyscene)
