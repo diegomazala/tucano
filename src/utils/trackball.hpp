@@ -352,9 +352,9 @@ public:
      * @param far Far plane for orthographic view.
      * @return Return the created orthographic matrix.
      */
-    Eigen::Matrix4f setTrackballOrthographicMatrix (float left, float right, float bottom, float top, float near, float far)
+    Eigen::Matrix4f setTrackballOrthographicMatrix (float left, float right, float bottom, float top, float near_plane, float far_plane)
     {
-        Eigen::Matrix4f proj = createOrthographicMatrix(left, right, bottom, top, near, far);
+        Eigen::Matrix4f proj = createOrthographicMatrix(left, right, bottom, top, near_plane, far_plane);
         setTrackballProjectionMatrix(proj);
         return proj;
     }

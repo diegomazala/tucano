@@ -50,11 +50,16 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Eigen 3.
 # pkg-config is used so we don't hard-code the location of eigen.
-find_package(PkgConfig REQUIRED)
+find_package(PkgConfig)
 if(NOT PKG_CONFIG_FOUND)
-  message(SEND_ERROR "pkg-config not found on your system")
+    set( EIGEN3_INCLUDE_DIRS "$ENV{EIGEN3_INCLUDE_DIR}" )
+    if( NOT EIGEN3_INCLUDE_DIRS )
+    message( SEND_ERROR "pkg-config not found on your system. Please point the environment variable EI    GEN3_INCLUDE_DIR to the include directory of your Eigen3 installation.")
 endif()
-pkg_check_modules(EIGEN3 REQUIRED eigen3)
+else()
+    pkg_check_modules(EIGEN3 REQUIRED eigen3)
+endif()
+
 
 include_directories(
   ${EIGEN3_INCLUDE_DIRS}

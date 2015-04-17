@@ -421,21 +421,21 @@ public:
      * @param right Right plane for orthographic view.
      * @param bottom Bottom plane for orthographic view.
      * @param top Top lane for orthographic view.
-     * @param near Near plane for orthographic view.
-     * @param far Far plane for orthographic view.
+     * @param near_plane Near plane for orthographic view.
+     * @param far_plane Far plane for orthographic view.
      * @return The created orthographic matrix.
      */
-    static Eigen::Matrix4f createOrthographicMatrix (float left, float right, float bottom, float top, float near, float far)
+    static Eigen::Matrix4f createOrthographicMatrix (float left, float right, float bottom, float top, float near_plane, float far_plane)
     {
         Eigen::Matrix4f out = Eigen::Matrix4f::Zero();
 
         out(0,0) = 2.0/(right-left);
         out(1,1) = 2.0/(top-bottom);
-        out(2,2) = -2.0/(far-near);
+        out(2,2) = -2.0/(far_plane-near_plane);
         out(3,3) = 1.0;
         out(0,3) = -(right+left)/(right-left);
         out(1,3) = -(top+bottom)/(top-bottom);
-        out(2,3) = -(far+near)/(far-near);
+        out(2,3) = -(far_plane+near_plane)/(far_plane-near_plane);
 
         return out;
     }
@@ -448,13 +448,13 @@ public:
      * @param right Right plane for orthographic view.
      * @param bottom Bottom plane for orthographic view.
      * @param top Top lane for orthographic view.
-     * @param near Near plane for orthographic view.
-     * @param far Far plane for orthographic view.
+     * @param near_plane Near plane for orthographic view.
+     * @param far_plane Far plane for orthographic view.
      * @return The created orthographic matrix.
      */
-    Eigen::Matrix4f setOrthographicMatrix (float left, float right, float bottom, float top, float near, float far)
+    Eigen::Matrix4f setOrthographicMatrix (float left, float right, float bottom, float top, float near_plane, float far_plane)
     {
-        Eigen::Matrix4f proj = createOrthographicMatrix(left, right, bottom, top, near, far);
+        Eigen::Matrix4f proj = createOrthographicMatrix(left, right, bottom, top, near_plane, far_plane);
         setProjectionMatrix(proj);
         use_perspective = false;
         return proj;

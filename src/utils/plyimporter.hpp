@@ -33,8 +33,13 @@ namespace Tucano
 
 namespace MeshImporter
 {
-	// avoid warnings of unused function
+#if _WIN32  //define something for Windows (32-bit and 64-bit, this part is common)
+    #pragma warning(disable:4996)
+#else
+    // avoid warnings of unused function
 	static bool loadPlyFile (Mesh* mesh, string filename) __attribute__ ((unused));
+#endif
+
 
 
     static int normal_cb( p_ply_argument argument )
@@ -132,7 +137,7 @@ namespace MeshImporter
 
         if (value_index >= 0 && value_index < 3)
         {
-            (static_cast< vector<uint>* >(data))->push_back(ply_get_argument_value(argument));
+            (static_cast< vector<unsigned int>* >(data))->push_back(ply_get_argument_value(argument));
         }
 
         return 1;
@@ -162,7 +167,7 @@ namespace MeshImporter
         vector<Eigen::Vector3f> norm;
         vector<Eigen::Vector2f> texCoord;
         vector<Eigen::Vector4f> color;
-        std::vector<uint> indices;
+        std::vector<unsigned int> indices;
 
     //    long nvertices, ncolors, nnormals, ntriangles;
 

@@ -33,8 +33,12 @@ namespace Tucano
 namespace MeshImporter
 {
 
+#if _WIN32  //define something for Windows (32-bit and 64-bit, this part is common)
+    #pragma warning(disable:4996)
+#else
 // avoid warnings of unused function
 static void loadObjFile (Mesh* mesh, string filename) __attribute__ ((unused));
+#endif
 
 /**
  * @brief Loads a mesh from an OBJ file.

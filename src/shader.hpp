@@ -851,12 +851,13 @@ public:
 		int length = 0;
 		int size = 0;
 		GLuint type = 0;
-		char name[maxlength];
+		char* name = new char[maxlength];
 		for (int i = 0; i < numattribs; ++i)
 		{
-			glGetActiveAttrib(shaderProgram, i, maxlength, &length, &size, &type, &name[0]);
-			attribs.push_back (name);
+			glGetActiveAttrib(shaderProgram, i, maxlength, &length, &size, &type, name);
+			attribs.push_back(name);
 		}
+        delete [] name;
 	}
 
     /**
