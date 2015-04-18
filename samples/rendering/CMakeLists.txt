@@ -20,11 +20,6 @@ add_executable(
   $<TARGET_OBJECTS:TUCANO_LIBRARY>
   )
 
-add_dependencies(
-  rendering
-  TUCANO_LIBRARY
-  )
-
 target_link_libraries(
   rendering
   ${GLEW_LIBRARIES}

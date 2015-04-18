@@ -20,11 +20,6 @@ add_executable(
   $<TARGET_OBJECTS:TUCANO_LIBRARY>
   )
 
-add_dependencies(
-  imgproc
-  TUCANO_LIBRARY
-  )
-
 target_link_libraries(
   imgproc
   ${GLEW_LIBRARIES}

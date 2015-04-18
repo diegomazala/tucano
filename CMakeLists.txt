@@ -40,8 +40,8 @@ if(NOT OPENGL_FOUND)
 endif()
 
 # Qt5.
-find_package(Qt5OpenGL REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt5OpenGL)
+find_package(Qt5Widgets)
 if (Qt5_POSITION_INDEPENDENT_CODE)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
@@ -71,34 +71,18 @@ include_directories(
   ${TUCANO_SRC_DIR}
   )
 
-set(
-  TUCANO_SOURCES
-  ${TUCANO_SRC_DIR}/bufferobject.hpp
-  ${TUCANO_SRC_DIR}/camera.hpp
-  ${TUCANO_SRC_DIR}/effect.hpp
-  ${TUCANO_SRC_DIR}/framebuffer.hpp
-  ${TUCANO_SRC_DIR}/mesh.hpp
-  ${TUCANO_SRC_DIR}/model.hpp
-  ${TUCANO_SRC_DIR}/shader.hpp
-  ${TUCANO_SRC_DIR}/texture.hpp
-  ${TUCANO_SRC_DIR}/texturemanager.hpp
-  ${TUCANO_SRC_DIR}/tucano.hpp
+file(
+  GLOB TUCANO_SOURCES
+  "${TUCANO_SRC_DIR}/*.hpp"
   )
 
-set(
-  TUCANO_SOURCES_UTILS
-  ${TUCANO_SRC_DIR}/utils/misc.hpp
-  ${TUCANO_SRC_DIR}/utils/trackball.hpp
-  ${TUCANO_SRC_DIR}/utils/objimporter.hpp
-  ${TUCANO_SRC_DIR}/utils/plyimporter.hpp
-  ${TUCANO_SRC_DIR}/utils/qtplainwidget.hpp
-  ${TUCANO_SRC_DIR}/utils/qttrackballwidget.hpp
-  ${TUCANO_SRC_DIR}/utils/rply.hpp
+file(
+  GLOB TUCANO_SOURCES_UTILS
+  "${TUCANO_SRC_DIR}/utils/*.hpp"
   )
 
 add_library(
-  TUCANO_LIBRARY
-  OBJECT
+  TUCANO_LIBRARY OBJECT
   ${TUCANO_SOURCES}
   ${TUCANO_SOURCES_UTILS}
   )
