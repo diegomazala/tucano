@@ -261,6 +261,10 @@ public:
     
 	}
 
+	void setSpeed( const float& speed )
+	{
+		this->speed = speed;
+	}
 };
 
 }
