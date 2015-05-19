@@ -143,18 +143,18 @@ public:
         Eigen::Vector3f rotX = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitX();
         rotX.normalize();
 
-		// Z axis follows X axis rotation plus a rotation around new X axis
+        // rotate Z axis around Y axis, then rotate new Z axis around X new axis
         Eigen::Vector3f rotZ = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitZ();
         rotZ = Eigen::AngleAxisf(rotation_X_axis, rotX) * rotZ;
         rotZ.normalize();
 
-		// Z axis is restricted to X and Y to form an orthonormal system
+        // rotate Y axis around X new axis
 		Eigen::Vector3f rotY = Eigen::AngleAxisf(rotation_X_axis, rotX) * Eigen::Vector3f::UnitY();
 		rotY.normalize();
 
-        rotation_matrix.row(2) = rotZ;
-        rotation_matrix.row(1) = rotY;
         rotation_matrix.row(0) = rotX;
+        rotation_matrix.row(1) = rotY;
+        rotation_matrix.row(2) = rotZ;
 
 		view_matrix.rotate (rotation_matrix);
 		view_matrix.translate (default_translation);
