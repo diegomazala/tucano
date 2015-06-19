@@ -143,18 +143,18 @@ public:
         Eigen::Vector3f rotX = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitX();
         rotX.normalize();
 
-        // rotate Z axis around Y axis, then rotate new Z axis around X new axis
+		// Z axis follows X axis rotation plus a rotation around new X axis
         Eigen::Vector3f rotZ = Eigen::AngleAxisf(rotation_Y_axis, Eigen::Vector3f::UnitY()) * Eigen::Vector3f::UnitZ();
         rotZ = Eigen::AngleAxisf(rotation_X_axis, rotX) * rotZ;
         rotZ.normalize();
 
-        // rotate Y axis around X new axis
+		// Z axis is restricted to X and Y to form an orthonormal system
 		Eigen::Vector3f rotY = Eigen::AngleAxisf(rotation_X_axis, rotX) * Eigen::Vector3f::UnitY();
 		rotY.normalize();
 
-        rotation_matrix.row(0) = rotX;
-        rotation_matrix.row(1) = rotY;
         rotation_matrix.row(2) = rotZ;
+        rotation_matrix.row(1) = rotY;
+        rotation_matrix.row(0) = rotX;
 
 		view_matrix.rotate (rotation_matrix);
 		view_matrix.translate (default_translation);
@@ -261,11 +261,6 @@ public:
     
 	}
 
-	/**
-	 * @brief Changes the camera speed.
-	 * @param speed New camera speed.
-	 */
-	void setSpeed( const float& speed ) { this->speed = speed; }
 };
 
 }

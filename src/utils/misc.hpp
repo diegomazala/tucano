@@ -23,8 +23,14 @@
 #ifndef __MISC__
 #define __MISC__
 
-#include <GL/glew.h>
-#include <GL/glu.h>
+
+#include <QtGlobal>
+#if QT_VERSION >= 0x050400
+	#include <QOpenGLFunctions_4_3_Core>
+#else
+	#include <GL/glew.h>
+	#include <GL/glu.h>
+#endif
 
 #include <iostream>
 #include <string>
@@ -52,6 +58,8 @@ namespace Misc
  */
 inline void errorCheckFunc (std::string file, int line, std::string message = "")
 {
+#if QT_VERSION >= 0x050400
+#else
     //OpenGL Error Handling Function:
     GLenum ErrorCheckValue = glGetError();
     if (ErrorCheckValue != GL_NO_ERROR)
@@ -60,6 +68,7 @@ inline void errorCheckFunc (std::string file, int line, std::string message = ""
         std::cerr << message.c_str() << std::endl;
         exit(EXIT_FAILURE);
     }
+#endif
 }
 
 /**
@@ -67,7 +76,8 @@ inline void errorCheckFunc (std::string file, int line, std::string message = ""
  */
 inline void initGlew (void)
 {
-
+#if QT_VERSION >= 0x050400
+#else
     glewExperimental = true;
     GLenum glewInitResult = glewInit();
     if (GLEW_OK != glewInitResult)
@@ -80,7 +90,7 @@ inline void initGlew (void)
     errorCheckFunc(__FILE__, __LINE__);
     std::cout << "GLEW INFO: OpenGL Version: " << glGetString(GL_VERSION) << std::endl << std::endl;
     #endif
-
+#endif
 }
 
 }

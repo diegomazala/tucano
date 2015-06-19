@@ -19,8 +19,63 @@
  * You should have received a copy of the GNU General Public License
  * along with Tucano Library.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef __TUCANOBASE__
+#define __TUCANOBASE__
 
-#include <effect.hpp>
-#include <bufferobject.hpp>
-#include <framebuffer.hpp>
-#include <mesh.hpp>
+#include <iostream>
+
+
+#if QT_VERSION >= 0x050400
+#include <QOpenGLFunctions_4_3_Core>
+#else
+#include <GL/glew.h>
+#include <GL/glu.h>
+#endif
+
+#if QT_VERSION >= 0x050400
+class GLObject : protected QOpenGLFunctions_4_3_Core
+#else
+class GLObject
+#endif
+{
+public:
+	GLObject() :initialized(false){}
+	
+	void initGL()
+	{
+		if (initialized)
+			return;
+
+#if QT_VERSION >= 0x050400
+		initializeOpenGLFunctions();
+		initialized = true;
+
+		// get opengl info
+		std::cout
+			<< "OpenGl information: VENDOR:       " << (const char*)glGetString(GL_VENDOR) << std::endl
+			<< "                    RENDERDER:    " << (const char*)glGetString(GL_RENDERER) << std::endl
+			<< "                    VERSION:      " << (const char*)glGetString(GL_VERSION) << std::endl
+			<< "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+#else
+		glewExperimental = true;
+		GLenum glewInitResult = glewInit();
+		if (GLEW_OK != glewInitResult)
+		{
+			std::cerr << "Error: " << glewGetErrorString(glewInitResult) << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		initialized = true;
+
+#ifdef TUCANODEBUG
+		Misc::errorCheckFunc(__FILE__, __LINE__);
+		std::cout << "GLEW INFO: OpenGL Version: " << glGetString(GL_VERSION) << std::endl << std::endl;
+#endif
+#endif
+	}
+
+private:
+	bool initialized;
+};
+
+
+#endif // __TUCANOBASE__

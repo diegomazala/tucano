@@ -37,7 +37,7 @@ namespace Tucano
  * Some common attributes (coordinate, color, normal, texCoord) have custom loaders.
  * Otherwise, a generic attribute can be loaded.
  */
-class VertexAttribute
+class VertexAttribute : public GLObject
 {
 private:
     /// Attribute's name
@@ -57,12 +57,17 @@ private:
 
 public:
 
-    VertexAttribute() : name(""), size(0), element_size(0), location(-1), bufferID(0), type(GL_FLOAT), array_type(GL_ARRAY_BUFFER){}
+    VertexAttribute() : name(""), size(0), element_size(0), location(-1), bufferID(0), type(GL_FLOAT), array_type(GL_ARRAY_BUFFER)
+	{
+		initGL();
+	}
 
     VertexAttribute(string in_name, int in_num_elements, int in_element_size, GLenum in_type, GLenum in_array_type = GL_ARRAY_BUFFER) :
         name(in_name), size(in_num_elements), element_size(in_element_size), type(in_type), array_type (in_array_type)
     {
         location = -1;
+
+		initGL();
 
         // create new buffer for attribute if it is not yet set (ex copy constructor)
         glGenBuffers(1, &bufferID);
@@ -71,6 +76,8 @@ public:
     /// copy constructor
     VertexAttribute(const VertexAttribute& copy)
     {
+		initGL();
+
         this->name = copy.name;
         this->size = copy.size;
         this->element_size = copy.element_size;
@@ -200,7 +207,7 @@ public:
  * loader. When a mesh is generated. geometrical computations are performed. detecting the center of the mesh through the axis-aligned bounding box and computing normalizating scale factors.
  * The attribute locations are predefined in this class. being the location 0 used for Vertex Buffer. 1 for Normals Buffer. 2 for Color Buffer and 3 for TexCoord Buffer.
  **/
-class Mesh : public Model {
+class Mesh : public Model, public GLObject {
 
 public:
 

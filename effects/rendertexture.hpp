@@ -23,7 +23,10 @@
 #ifndef __RENDERTEXTURE__
 #define __RENDERTEXTURE__
 
-#include <tucano.hpp>
+#include "tucano.hpp"
+#include "effect.hpp"
+#include "texture.hpp"
+#include "mesh.hpp"
 
 using namespace std;
 
@@ -55,7 +58,9 @@ public:
      */
     virtual void initialize()
     {
+		initGL();
 		loadShader(shader, "rendertexture");
+		quad.initGL();
         quad.createQuad();
     }
 

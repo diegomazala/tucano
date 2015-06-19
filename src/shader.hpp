@@ -24,6 +24,7 @@
 #define __TUCANOSHADER__
 
 #include "utils/misc.hpp"
+#include "tucano.hpp"
 
 #include <fstream>
 #include <vector>
@@ -41,7 +42,7 @@ namespace Tucano
  * compute shaders. For convenience, it also stores a user defined name, making it easier to access the shaders from within the main program.
  * The shader's name is the same as the shaders filenames, without the extensions.
  */
-class Shader {
+class Shader : public GLObject{
 
 private:
 
@@ -330,6 +331,8 @@ public:
      */
     void initializeTF (int size, const char** varlist, GLenum buffer_mode = GL_INTERLEAVED_ATTRIBS)
     {
+		initGL(); 
+
         createShaders();
 
         if(!vertexShaderPath.empty())
@@ -367,6 +370,8 @@ public:
      */
     void initializeFromStrings (string vertex_code, string fragment_code, string geometry_code = "")
     {
+		initGL();
+
         //Create Shader Program.
         shaderProgram = glCreateProgram();
 
@@ -407,6 +412,8 @@ public:
      */
     void initialize (void)
     {
+		initGL();
+
         createShaders();
 
         if(!vertexShaderPath.empty())
@@ -865,7 +872,7 @@ public:
      * @param name Name of the uniform variable in shader.
      * @return The uniform location.
      */
-    GLint getUniformLocation (const GLchar* name) const
+    GLint getUniformLocation (const GLchar* name) 
     {
         return glGetUniformLocation(shaderProgram, name);
     }
@@ -875,7 +882,7 @@ public:
      * @param name Name of the attribute variable in the shader.
      * @return The attribute location, or -1 if the attribute was not found or has an invalid name.
      */
-    GLint getAttributeLocation (const GLchar* name) const
+    GLint getAttributeLocation (const GLchar* name) 
     {
         return glGetAttribLocation(shaderProgram, name);
     }

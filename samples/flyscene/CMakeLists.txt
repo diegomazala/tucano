@@ -19,7 +19,7 @@ add_executable(
 set_property(
   TARGET flyscene
   PROPERTY COMPILE_FLAGS
-  "-DTUCANOSHADERDIR=${TUCANO_EFFECTS_DIR}/shaders/ -Wall -g"
+  "-DTUCANOSHADERDIR=${TUCANO_EFFECTS_DIR}/shaders -Wall -g"
   )
 
 target_link_libraries(

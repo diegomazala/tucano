@@ -40,7 +40,7 @@ namespace Tucano
  * The Buffer Object class is responsible for buffer generation and storage.
  * A BO can be of many types: atomic, storage, transform feedback etc ..
  */
-template <class T> class BufferObject {
+template <class T> class BufferObject : GLObject{
 
 protected:
 

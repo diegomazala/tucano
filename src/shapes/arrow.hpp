@@ -110,6 +110,8 @@ public:
 	*/
 	Arrow()
 	{
+		initGL();
+
 		resetModelMatrix();
 		create(0.05, 1.0, 0.1, 0.15);
 		setColor(Eigen::Vector4f(0.0, 0.7, 0.7, 1.0));

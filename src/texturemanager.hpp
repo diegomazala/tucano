@@ -5,9 +5,7 @@
 #define texManager TextureManager::Instance()
 
 #include <set>
-#include <iostream>
 #include <vector>
-#include <GL/glew.h>
 
 
 using namespace std;
@@ -21,7 +19,7 @@ namespace Tucano
  * When a texture is binded, this singleton will search for the first free slot to allocate it.
  * This removes the burden of managing texture units inside the program.
  */
-class TextureManager {
+class TextureManager : public GLObject{
 
 
 
@@ -133,6 +131,7 @@ private:
 
 	///Default Constructor
 	TextureManager() {
+		initGL();
 		// get maximum number of texture units. and set all as not used
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 

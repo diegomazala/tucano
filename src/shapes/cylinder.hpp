@@ -102,6 +102,8 @@ public:
 	*/
 	Cylinder()
 	{
+		initGL();
+		
 		resetModelMatrix();
 		create(1.0, 2.0);
 

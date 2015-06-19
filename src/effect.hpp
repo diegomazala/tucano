@@ -40,7 +40,7 @@ namespace Tucano
  * By loading the Shaders trough the loadShader method, the effect class also mantains the list of Shaders
  * and can reload all shaders with a single call.
  */
-class Effect {
+class Effect : public GLObject{
 
 public:
 

@@ -24,6 +24,7 @@
 #define __CONE__
 
 #include "mesh.hpp"
+#include "camera.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 

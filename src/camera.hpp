@@ -47,9 +47,6 @@ protected:
     /// Viewport dimensions [minX, minY, width, height].
     Eigen::Vector4f viewport;
 
-    // A default view matrix for reseting view
-    Eigen::Affine3f default_view;
-
     /// Near plane used for projection matrix.
     float near_plane;
 
@@ -87,7 +84,7 @@ public:
      */
     void resetViewMatrix (void)
     {
-        view_matrix = default_view;
+        view_matrix = Eigen::Affine3f::Identity();
     }
 
     /**
@@ -355,7 +352,6 @@ public:
         far_plane = 100.0;
         fovy = 60.0;
 
-        default_view = Eigen::Affine3f::Identity();
         reset();
     }
 

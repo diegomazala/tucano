@@ -30,7 +30,6 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
-#include <GL/glew.h>
 
 namespace Tucano
 {
@@ -41,7 +40,7 @@ namespace Tucano
  * The Framebuffer class is responsible for framebuffer generation and storage.
  * It holds many shortcut methods to bind, draw to buffer, read buffer for debug, etc...
  */
-class Framebuffer {
+class Framebuffer : GLObject{
 
 protected:
 
@@ -808,7 +807,7 @@ public:
      * @return Numbre of attachments.
      */
     int getNumAttachments (void) {
-        return fboTextures.size();
+        return (int)fboTextures.size();
     }
 
     /**

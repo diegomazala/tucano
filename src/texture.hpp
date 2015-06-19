@@ -24,8 +24,6 @@
 #define __TEXTURE__
 
 #include "texturemanager.hpp"
-#include <iostream>
-#include <GL/glew.h>
 
 using namespace std;
 
@@ -36,7 +34,7 @@ namespace Tucano
  * @brief An OpenGL texture.
  * It can be a simple texture or an FBO texture.
  */
-class Texture {
+class Texture : public GLObject{
 private:
 
     /// ID handler to texture.
@@ -103,6 +101,8 @@ public:
      */
     GLuint create (GLenum type, GLenum int_format, int w, int h, GLenum fmt, GLenum pix_type, const GLvoid* data = NULL, int dpt = 256)
     {
+		initGL();
+
         tex_type = type;
         internal_format = int_format;
         width = w;

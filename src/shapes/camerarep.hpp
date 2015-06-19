@@ -88,7 +88,7 @@ public:
 	*/
 	CameraRep()
 	{
-
+		initGL();
 		resetModelMatrix();
 		createGeometry();
 

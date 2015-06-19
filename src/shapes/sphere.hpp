@@ -96,6 +96,8 @@ public:
 	*/
 	Sphere()
 	{
+		initGL();
+
 		resetModelMatrix();
 		createGeometry();
 
