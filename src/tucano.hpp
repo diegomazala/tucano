@@ -23,6 +23,7 @@
 #define __TUCANOBASE__
 
 #include <iostream>
+#include <utils/misc.hpp>
 
 
 #if QT_VERSION >= 0x050400
@@ -70,6 +71,22 @@ public:
 		Misc::errorCheckFunc(__FILE__, __LINE__);
 		std::cout << "GLEW INFO: OpenGL Version: " << glGetString(GL_VERSION) << std::endl << std::endl;
 #endif
+#endif
+	}
+
+
+	void errorCheckFunc(std::string file, int line, std::string message = "")
+	{
+#if QT_VERSION >= 0x050400
+#else
+		//OpenGL Error Handling Function:
+		GLenum ErrorCheckValue = glGetError();
+		if (ErrorCheckValue != GL_NO_ERROR)
+		{
+			std::cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << std::endl;
+			std::cerr << message.c_str() << std::endl;
+			exit(EXIT_FAILURE);
+		}
 #endif
 	}
 

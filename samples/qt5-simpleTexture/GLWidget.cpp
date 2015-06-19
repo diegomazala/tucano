@@ -24,7 +24,7 @@ GLWidget::~GLWidget()
 void GLWidget::cleanup()
 {
 	this->makeCurrent();
-	image_texture.destroy();
+	//delete image_texture;
 	this->doneCurrent();
 }
 
@@ -40,7 +40,7 @@ void GLWidget::initializeGL()
 	rendertexture.initialize();
 
 	//// initialize texture with given image
-	image.load(":/images/camelo.jpg");
+	QImage image(":/images/camelo.jpg");
 
 	for (int x = 0; x < image.width(); ++x)
 	{
@@ -53,7 +53,6 @@ void GLWidget::initializeGL()
 	}
 
 	image_texture.create(image.width(), image.height(), image.mirrored().bits());
-	
 }
 
 
@@ -62,36 +61,6 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-	int VIRTUAL_WIDTH = image.width();
-	int VIRTUAL_HEIGHT = image.height();
-	float ASPECT_RATIO = (float)VIRTUAL_WIDTH / (float)VIRTUAL_HEIGHT;
-	// calculate new viewport
-	float aspectRatio = (float)width() / (float)height();
-	float scale = 1.f;
-	float crop_x = 0.0f;
-	float crop_y = 0.0f;
-
-	if (aspectRatio > ASPECT_RATIO)
-	{
-		scale = (float)height() / (float)VIRTUAL_HEIGHT;
-		crop_x = (width() - VIRTUAL_WIDTH*scale) / 2.f;
-	}
-	else if (aspectRatio < ASPECT_RATIO)
-	{
-		scale = (float)width() / (float)VIRTUAL_WIDTH;
-		crop_y = (height() - VIRTUAL_HEIGHT*scale) / 2.f;
-	}
-	else
-	{
-		scale = (float)width() / (float)VIRTUAL_WIDTH;
-	}
-
-	float w = (float)VIRTUAL_WIDTH*scale;
-	float h = (float)VIRTUAL_HEIGHT*scale;
-	//viewport = new Rectangle(crop.x, crop.y, w, h);
-	std::cout << crop_x << ", " << crop_y << " : " << w << ", " << h << std::endl;
-	glViewport((int)crop_x, (int)crop_y, (int)w, (int)h);
-
 	makeCurrent();
 	
 	glClearColor(0.0, 0.2, 0.3, 0.0);

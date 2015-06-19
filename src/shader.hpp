@@ -23,7 +23,6 @@
 #ifndef __TUCANOSHADER__
 #define __TUCANOSHADER__
 
-#include "utils/misc.hpp"
 #include "tucano.hpp"
 
 #include <fstream>
@@ -358,7 +357,7 @@ public:
         linkProgram();
 
         #ifdef TUCANODEBUG
-        Misc::errorCheckFunc(__FILE__, __LINE__);
+        errorCheckFunc(__FILE__, __LINE__);
         #endif
     }
 
@@ -403,7 +402,7 @@ public:
         linkProgram();
 
         #ifdef TUCANODEBUG
-        Misc::errorCheckFunc(__FILE__, __LINE__);
+        errorCheckFunc(__FILE__, __LINE__);
         #endif
     }
 
@@ -436,7 +435,7 @@ public:
         linkProgram();
 
         #ifdef TUCANODEBUG
-        Misc::errorCheckFunc(__FILE__, __LINE__);
+        errorCheckFunc(__FILE__, __LINE__);
         #endif
     }
 
@@ -521,7 +520,7 @@ public:
         glAttachShader(shaderProgram, vertexShader);
 
         #ifdef TUCANODEBUG
-        Misc::errorCheckFunc(__FILE__, __LINE__, "error loading vertex shader code");
+        errorCheckFunc(__FILE__, __LINE__, "error loading vertex shader code");
         #endif
 
     }
@@ -596,7 +595,7 @@ public:
         glAttachShader(shaderProgram, geometryShader);
 
         #ifdef TUCANODEBUG
-        Misc::errorCheckFunc(__FILE__, __LINE__, "error loading geometry shader code");
+        errorCheckFunc(__FILE__, __LINE__, "error loading geometry shader code");
         #endif
 
     }
@@ -669,7 +668,7 @@ public:
         glAttachShader(shaderProgram, fragmentShader);
 
         #ifdef TUCANODEBUG
-        Misc::errorCheckFunc(__FILE__, __LINE__, "error loading fragment shader code");
+        errorCheckFunc(__FILE__, __LINE__, "error loading fragment shader code");
         #endif
 
     }
@@ -761,7 +760,7 @@ public:
             glAttachShader(shaderProgram, computeShaders[position]);
 
             #ifdef TUCANODEBUG
-            Misc::errorCheckFunc(__FILE__, __LINE__, "error loading compute shader code");
+            errorCheckFunc(__FILE__, __LINE__, "error loading compute shader code");
             #endif
 
             position++;
@@ -809,7 +808,7 @@ public:
         linkProgram();
 
         #ifdef TUCANODEBUG
-        Misc::errorCheckFunc(__FILE__, __LINE__);
+        errorCheckFunc(__FILE__, __LINE__);
         #endif
     }
 

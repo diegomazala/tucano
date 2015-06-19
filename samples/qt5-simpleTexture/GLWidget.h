@@ -3,7 +3,7 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <QImage>
+
 
 #include "rendertexture.hpp"
 
@@ -38,7 +38,6 @@ protected : // attributes
 	/// Texture to hold input image
 	Texture image_texture;
 
-	QImage image;
 };
 
 
