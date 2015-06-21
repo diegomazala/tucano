@@ -7,6 +7,7 @@ add_definitions(-DTUCANODEBUG)
 #add_subdirectory(simpleTexture)
 
 add_subdirectory(qt5-simpleTexture)
+add_subdirectory(glut-simpleTexture)
 
 option(SAMPLES_GLFW "GLFW Samples" OFF)
 

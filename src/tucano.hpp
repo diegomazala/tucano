@@ -26,14 +26,14 @@
 #include <utils/misc.hpp>
 
 
-#if QT_VERSION >= 0x050400
+#if FALSE //QT_VERSION >= 0x050400
 #include <QOpenGLFunctions_4_3_Core>
 #else
 #include <GL/glew.h>
 #include <GL/glu.h>
 #endif
 
-#if QT_VERSION >= 0x050400
+#if FALSE //QT_VERSION >= 0x050400
 class GLObject : protected QOpenGLFunctions_4_3_Core
 #else
 class GLObject
@@ -47,7 +47,7 @@ public:
 		if (initialized)
 			return;
 
-#if QT_VERSION >= 0x050400
+#if FALSE //QT_VERSION >= 0x050400
 		initializeOpenGLFunctions();
 		initialized = true;
 
@@ -68,7 +68,7 @@ public:
 		initialized = true;
 
 #ifdef TUCANODEBUG
-		Misc::errorCheckFunc(__FILE__, __LINE__);
+		errorCheckFunc(__FILE__, __LINE__);
 		std::cout << "GLEW INFO: OpenGL Version: " << glGetString(GL_VERSION) << std::endl << std::endl;
 #endif
 #endif
@@ -77,7 +77,7 @@ public:
 
 	void errorCheckFunc(std::string file, int line, std::string message = "")
 	{
-#if QT_VERSION >= 0x050400
+#if FALSE //QT_VERSION >= 0x050400
 #else
 		//OpenGL Error Handling Function:
 		GLenum ErrorCheckValue = glGetError();
