@@ -26,27 +26,43 @@ set(TUCANO_SAMPLES_DIR "${PROJECT_SOURCE_DIR}/samples")
 set(TUCANO_SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
 # Build options.
-option(DOC "build documentation" ON)
-option(SAMPLES "build samples" ON)
+option(QT5_SUPPORT "Compile using Qt5" ON)
+option(DOC "build documentation" OFF)
 
-find_package(GLEW REQUIRED)
-if(NOT GLEW_FOUND)
-  message(SEND_ERROR "GLEW not found on your system.")
-endif()
 
-find_package(OpenGL REQUIRED)
-if(NOT OPENGL_FOUND)
-  message(SEND_ERROR "OpenGL not found on your system.")
-endif()
+if (QT5_SUPPORT)
+	
+	find_package(Qt5OpenGL)
+	find_package(Qt5Widgets)
+	if (Qt5_POSITION_INDEPENDENT_CODE)
+		set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+	endif()
+	set(CMAKE_AUTOMOC ON)
+	set(CMAKE_INCLUDE_CURRENT_DIR ON)
+	include_directories(	
+		${Qt5Widgets_INCLUDE_DIRS}
+		${Qt5OpenGL_INCLUDE_DIRS}
+		)
+	
+else (QT5_SUPPORT)
 
-# Qt5.
-find_package(Qt5OpenGL)
-find_package(Qt5Widgets)
-if (Qt5_POSITION_INDEPENDENT_CODE)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif()
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+	find_package(GLEW REQUIRED)
+	if(NOT GLEW_FOUND)
+		message(SEND_ERROR "GLEW not found on your system.")
+	endif()
+
+	find_package(OpenGL REQUIRED)
+	if(NOT OPENGL_FOUND)
+	  message(SEND_ERROR "OpenGL not found on your system.")
+	endif()
+	
+	include_directories(
+		${GLEW_INCLUDE_DIRS}
+		${OPENGL_INCLUDE_DIR}
+		)
+	
+endif (QT5_SUPPORT)
+
 
 # Eigen 3.
 # pkg-config is used so we don't hard-code the location of eigen.
@@ -54,19 +70,14 @@ find_package(PkgConfig)
 if(NOT PKG_CONFIG_FOUND)
     set( EIGEN3_INCLUDE_DIRS "$ENV{EIGEN3_INCLUDE_DIR}" )
     if( NOT EIGEN3_INCLUDE_DIRS )
-    message( SEND_ERROR "pkg-config not found on your system. Please point the environment variable EI    GEN3_INCLUDE_DIR to the include directory of your Eigen3 installation.")
-endif()
+		message( SEND_ERROR "pkg-config not found on your system. Please point the environment variable EIGEN3_INCLUDE_DIR to the include directory of your Eigen3 installation.")
+	endif()
 else()
     pkg_check_modules(EIGEN3 REQUIRED eigen3)
 endif()
 
-
 include_directories(
   ${EIGEN3_INCLUDE_DIRS}
-  ${GLEW_INCLUDE_DIRS}
-  ${OPENGL_INCLUDE_DIR}
-  ${Qt5Widgets_INCLUDE_DIRS}
-  ${Qt5OpenGL_INCLUDE_DIRS}
   ${TUCANO_EFFECTS_DIR}
   ${TUCANO_SRC_DIR}
   )
@@ -81,11 +92,11 @@ file(
   "${TUCANO_SRC_DIR}/utils/*.hpp"
   )
 
-add_library(
-  TUCANO_LIBRARY OBJECT
-  ${TUCANO_SOURCES}
-  ${TUCANO_SOURCES_UTILS}
-  )
+#add_library(
+  #TUCANO_LIBRARY OBJECT
+  #${TUCANO_SOURCES}
+  #${TUCANO_SOURCES_UTILS}
+  #)
 
 install(
   FILES ${TUCANO_SOURCES}
@@ -101,8 +112,14 @@ if(DOC)
   add_subdirectory(${TUCANO_DOCUMENTATION_DIR})
 endif()
 
-if(SAMPLES)
+
+
+
+
+
+#option(SAMPLES "build samples" OFF)
+#if(SAMPLES)
   # Put executable / compiled files in the binary directory.
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TUCANO_BINARY_DIR})
   add_subdirectory(${TUCANO_SAMPLES_DIR})
-endif()
+#endif()

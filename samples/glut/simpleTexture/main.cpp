@@ -66,7 +66,7 @@ protected:
 		CreateTexture(fileImage.c_str());
 
 		// the default is /shaders from your running dir
-		string shaders_dir("../../../effects/shaders/");
+		string shaders_dir("../../effects/shaders/");
 
 		rendertexture.setShadersDir(shaders_dir);
 		rendertexture.initialize();
@@ -326,8 +326,8 @@ int main(int argc, char** argv)
 		if (argc > 1)
 			lWin.SetFileImage(argv[1]);
 		else
-			lWin.SetFileImage("../../../tucano.png");
-		lWin.Create("Simple Load Texture", GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
+			lWin.SetFileImage("../../tucano.png");
+		lWin.Create("glut-simpleTexture", GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
 
 		GlutApp::Run();
 	}

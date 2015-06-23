@@ -16,15 +16,20 @@ qt5_add_resources(RESOURCE_FILES ${RESOURCES})
 source_group ("Resource Files" FILES ${RESOURCES})
 
 
-include_directories (${CMAKE_SOURCE_DIR})
+source_group("Tucano" FILES ${TUCANO_SOURCES})
+#source_group("Tucano Utils" FILES ${TUCANO_SOURCES_UTILS})
 
+
+include_directories (${CMAKE_SOURCE_DIR})
 
 add_executable(
   ${TARGET_NAME}
   ${SOURCE_FILES}
   ${HEADER_FILES}
   ${RESOURCE_FILES}
-  $<TARGET_OBJECTS:TUCANO_LIBRARY>
+  ${TUCANO_SOURCES}
+#  ${TUCANO_SOURCES_UTILS}
+#  $<TARGET_OBJECTS:TUCANO_LIBRARY>
 )
 
 target_link_libraries (	

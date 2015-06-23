@@ -26,14 +26,14 @@
 #include <utils/misc.hpp>
 
 
-#if FALSE //QT_VERSION >= 0x050400
-#include <QOpenGLFunctions_4_3_Core>
+#if QT_VERSION >= 0x050400
+	#include <QOpenGLFunctions_4_3_Core>
 #else
-#include <GL/glew.h>
-#include <GL/glu.h>
+	#include <GL/glew.h>
+	#include <GL/glu.h>
 #endif
 
-#if FALSE //QT_VERSION >= 0x050400
+#if QT_VERSION >= 0x050400
 class GLObject : protected QOpenGLFunctions_4_3_Core
 #else
 class GLObject
@@ -47,7 +47,7 @@ public:
 		if (initialized)
 			return;
 
-#if FALSE //QT_VERSION >= 0x050400
+#if QT_VERSION >= 0x050400
 		initializeOpenGLFunctions();
 		initialized = true;
 
@@ -77,7 +77,7 @@ public:
 
 	void errorCheckFunc(std::string file, int line, std::string message = "")
 	{
-#if FALSE //QT_VERSION >= 0x050400
+#if QT_VERSION >= 0x050400
 #else
 		//OpenGL Error Handling Function:
 		GLenum ErrorCheckValue = glGetError();

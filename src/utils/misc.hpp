@@ -24,16 +24,18 @@
 #define __MISC__
 
 
-#include <QtGlobal>
+
 #if QT_VERSION >= 0x050400
+	#include <QtGlobal>
 	#include <QOpenGLFunctions_4_3_Core>
 #else
 	#include <GL/glew.h>
 	#include <GL/glu.h>
 #endif
 
-//#include <iostream>
-//#include <string>
+
+#include <iostream>
+#include <string>
 //#include <cstdlib>
 
 //#define stringify( x ) stringify_literal( x )

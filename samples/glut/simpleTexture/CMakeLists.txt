@@ -10,17 +10,11 @@ set  (SOURCE_FILES		main.cpp
 set  (HEADER_FILES		GlutApp.h
 						GlutWindow.h)
 
+source_group("Tucano" FILES ${TUCANO_SOURCES})
+#source_group("Tucano Utils" FILES ${TUCANO_SOURCES_UTILS})
 
 
-#######################################################################
-############################# SETUP GLUT ##############################
-find_package(GLUT REQUIRED)
-include_directories	(${GLUT_INCLUDE_DIR})
-if (NOT EXISTS ${GLUT_LIBRARY_DIR})
-	get_filename_component(GLUT_LIBRARY_DIR ${GLUT_LIBRARY} PATH [CACHE])
-endif()
-link_directories(${GLUT_LIBRARY_DIR})
-#######################################################################
+						
 
 #######################################################################
 ########################## SETUP FREE_IMAGE ###########################
@@ -36,6 +30,8 @@ add_executable(
   ${TARGET_NAME}
   ${SOURCE_FILES}
   ${HEADER_FILES}
+  ${TUCANO_SOURCES}
+  #${TUCANO_SOURCES_UTILS}
   #$<TARGET_OBJECTS:TUCANO_LIBRARY>
 )
 

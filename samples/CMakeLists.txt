@@ -6,11 +6,30 @@ add_definitions(-DTUCANODEBUG)
 #add_subdirectory(rendering)
 #add_subdirectory(simpleTexture)
 
-add_subdirectory(qt5-simpleTexture)
-add_subdirectory(glut-simpleTexture)
 
-option(SAMPLES_GLFW "GLFW Samples" OFF)
 
-if (${SAMPLES_GLFW})
-	add_subdirectory(flyscene)
-endif()
+
+if (QT5_SUPPORT)
+
+	option(QT5_SAMPLES "Build Qt5 samples" ON)
+	if (QT5_SAMPLES)
+		add_subdirectory(qt5)
+	endif (QT5_SAMPLES)
+	
+else (QT5_SUPPORT)
+
+	option(GLUT_SAMPLES "Glut Samples" ON)
+	if (GLUT_SAMPLES)
+		add_subdirectory(glut)
+	endif(GLUT_SAMPLES)
+	
+	option(GLFW_SAMPLES "GLFW Samples" OFF)
+	if (GLFW_SAMPLES)
+		add_subdirectory(flyscene)
+	endif(GLFW_SAMPLES)
+	
+endif(QT5_SUPPORT)
+
+
+
+

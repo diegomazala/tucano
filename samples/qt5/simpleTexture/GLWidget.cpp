@@ -34,7 +34,7 @@ void GLWidget::initializeGL()
 	this->initializeOpenGLFunctions();
 
 	// the default is /shaders from your running dir
-	string shaders_dir("../../../effects/shaders/");
+	string shaders_dir("../../effects/shaders/");
 
 	rendertexture.setShadersDir(shaders_dir);
 	rendertexture.initialize();
