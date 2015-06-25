@@ -10,6 +10,7 @@
 
 #include <freeglut.h>
 #include <list>
+#include "GlutApp.h"
 
 
 class GlutWindow

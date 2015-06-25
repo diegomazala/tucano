@@ -11,6 +11,17 @@ link_directories(${GLUT_LIBRARY_DIR})
 #######################################################################
 
 
+#######################################################################
+######################### SETUP GLUT_COMMON ###########################
+set (GLUT_COMMON_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/glutCommon)
+set (GLUT_COMMON_SOURCE 
+		${GLUT_COMMON_DIR}/GlutApp.h 
+		${GLUT_COMMON_DIR}/GlutWindow.cpp 
+		${GLUT_COMMON_DIR}/GlutWindow.h)
+include_directories	(${GLUT_COMMON_DIR})	
+#######################################################################
+
 
 # Tip: you can comment out the examples you don't want to compile.
 add_subdirectory(simpleTexture)
+
