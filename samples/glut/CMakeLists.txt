@@ -21,6 +21,7 @@ set (GLUT_COMMON_SOURCE
 include_directories	(${GLUT_COMMON_DIR})	
 #######################################################################
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TUCANO_BINARY_DIR}/glut)
 
 # Tip: you can comment out the examples you don't want to compile.
 add_subdirectory(simpleTexture)

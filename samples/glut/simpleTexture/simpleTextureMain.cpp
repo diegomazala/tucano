@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 		if (argc > 1)
 			lWin.SetFileImage(argv[1]);
 		else
-			lWin.SetFileImage("../../tucano.png");
+			lWin.SetFileImage("../../../tucano.png");
 		lWin.Create("glut-simpleTexture", GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
 
 		GlutApp::Run();

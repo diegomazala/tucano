@@ -27,15 +27,16 @@ void NormalVectorWindow::OnInit(void)
 
 	float width = this->Width();
 	float height = this->Height();
-
+	
+	string shaders_dir("../../../effects/shaders/");
 	// initialize the shader effect
-	phong.setShadersDir("../../effects/shaders/");
+	phong.setShadersDir(shaders_dir);
 	phong.initialize();
 
-	normal.setShadersDir("../../effects/shaders/");
+	normal.setShadersDir(shaders_dir);
 	normal.initialize();
 
-	normalVector.setShadersDir("../../effects/shaders/");
+	normalVector.setShadersDir(shaders_dir);
 	normalVector.initialize();
 	
 
@@ -45,7 +46,7 @@ void NormalVectorWindow::OnInit(void)
 
 	light = new Tucano::Camera();
 	
-	MeshImporter::loadObjFile(&mesh, "../../samples/models/toy.obj");
+	MeshImporter::loadObjFile(&mesh, "../../../samples/models/toy.obj");
 
 	mesh.normalizeModelMatrix();
 
