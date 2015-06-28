@@ -64,17 +64,17 @@ public:
      * @param mesh Given mesh
      * @param cameraTrackball Given camera trackball     
      */
-    virtual void render (Tucano::Mesh& mesh, const Tucano::Trackball& cameraTrackball)
+	virtual void render(Tucano::Mesh& mesh, const Tucano::Camera& camera)
     {
-        Eigen::Vector4f viewport = cameraTrackball.getViewport();
+        Eigen::Vector4f viewport = camera.getViewport();
         glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
         normalmap_shader.bind();
 
         // sets all uniform variables for the phong shader
-        normalmap_shader.setUniform("projectionMatrix", cameraTrackball.getProjectionMatrix());
+        normalmap_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
         normalmap_shader.setUniform("modelMatrix", mesh.getModelMatrix());
-        normalmap_shader.setUniform("viewMatrix", cameraTrackball.getViewMatrix());
+        normalmap_shader.setUniform("viewMatrix", camera.getViewMatrix());
 
         mesh.setAttributeLocation(normalmap_shader);
 
