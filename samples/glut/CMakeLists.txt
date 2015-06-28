@@ -24,4 +24,5 @@ include_directories	(${GLUT_COMMON_DIR})
 
 # Tip: you can comment out the examples you don't want to compile.
 add_subdirectory(simpleTexture)
+add_subdirectory(normalVector)
 
