@@ -36,36 +36,37 @@
 #if QT_VERSION >= 0x050400
 class GLObject : protected QOpenGLFunctions_4_3_Core
 #else
+static bool glewInitialized = false;
 class GLObject
 #endif
 {
 public:
-	GLObject() :initialized(false){}
+	GLObject(){}
 	
 	void initGL()
 	{
-		if (initialized)
-			return;
-
 #if QT_VERSION >= 0x050400
 		initializeOpenGLFunctions();
-		initialized = true;
 
+#ifdef TUCANODEBUG
 		// get opengl info
 		std::cout
 			<< "OpenGl information: VENDOR:       " << (const char*)glGetString(GL_VENDOR) << std::endl
-			<< "                    RENDERDER:    " << (const char*)glGetString(GL_RENDERER) << std::endl
+			<< "                    RENDERER:     " << (const char*)glGetString(GL_RENDERER) << std::endl
 			<< "                    VERSION:      " << (const char*)glGetString(GL_VERSION) << std::endl
 			<< "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+#endif
 #else
-		glewExperimental = true;
+		if (glewInitialized)
+			return;
+
 		GLenum glewInitResult = glewInit();
 		if (GLEW_OK != glewInitResult)
 		{
 			std::cerr << "Error: " << glewGetErrorString(glewInitResult) << std::endl;
 			exit(EXIT_FAILURE);
 		}
-		initialized = true;
+		glewInitialized = true;
 
 #ifdef TUCANODEBUG
 		errorCheckFunc(__FILE__, __LINE__);
@@ -89,9 +90,6 @@ public:
 		}
 #endif
 	}
-
-private:
-	bool initialized;
 };
 
 
