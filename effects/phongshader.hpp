@@ -24,6 +24,8 @@
 #define __PHONG__
 
 #include <tucano.hpp>
+#include <effect.hpp>
+#include <mesh.hpp>
 #include <camera.hpp>
 
 using namespace Tucano;
