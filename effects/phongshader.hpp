@@ -67,6 +67,7 @@ public:
      */
     virtual void initialize (void)
     {
+		initGL();
         // searches in default shader directory (/shaders) for shader files phongShader.(vert,frag,geom,comp)
         loadShader(phong_shader, "phongshader") ;
     }
