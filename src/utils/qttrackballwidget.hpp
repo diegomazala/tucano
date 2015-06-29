@@ -23,7 +23,14 @@
 #ifndef __QTTRACKBALLWIDGET__
 #define __QTTRACKBALLWIDGET__
 
-#include <GL/glew.h>
+#include <qglobal.h>
+#if QT_VERSION >= 0x050400
+	#include <QOpenGLWidget>
+#else
+	#include <GL/glew.h>
+	#include <QGLWidget>
+#endif
+
 
 #include "objimporter.hpp"
 #include "plyimporter.hpp"
@@ -31,38 +38,23 @@
 #include <tucano.hpp>
 #include <utils/trackball.hpp>
 
-#include <QGLWidget>
 #include <QMouseEvent>
 #include <QFileDialog>
 
-using namespace std;
 
 namespace Tucano
 {
-
-/**
- * @brief This class is just to make sure that GLEW is
- * initialized before anything else, so the constructor of
- * this class is called before the QtTrackballWidget
- * constructor.
- */
-class QtGlewInitializer : public QGLWidget
-{
-public:
-    QtGlewInitializer (QWidget* parent) : QGLWidget(parent)
-    {
-        makeCurrent();
-        Misc::initGlew();
-    }
-
-};
 
 /**
  * @brief A widget with a trackball iteration for a single mesh and a single light source.
  * Extends QGLWidget class to include common methods for using ShaderLib
  * this widget already has a default camera and light trackball and associated mouse methods
  */
-class QtTrackballWidget : public QtGlewInitializer
+#if QT_VERSION >= 0x050400
+class QtTrackballWidget : public QOpenGLWidget, public GLObject
+#else
+class QtTrackballWidget : public QGLWidget, public GLObject
+#endif
 {
     Q_OBJECT
 
@@ -72,10 +64,10 @@ protected:
     Mesh mesh;
 
     /// Trackball for manipulating the camera.
-    Trackball camera;
+    Trackball* camera;
 
     /// Trackball for manipulating the light position.
-    Trackball light_trackball;
+    Trackball* light_trackball;
 
 public:
 
@@ -83,12 +75,20 @@ public:
      * @brief Default constructor.
      * @param parent Parent widget.
      */
-    explicit QtTrackballWidget(QWidget *parent) : QtGlewInitializer(parent) {}
+#if QT_VERSION >= 0x050400
+	explicit QtTrackballWidget(QWidget *parent) : QOpenGLWidget(parent), GLObject() {}
+#else
+	explicit QtTrackballWidget(QWidget *parent) : QGLWidget(parent), GLObject() {}
+#endif
 
     /**
      * @brief Default destructor.
      */
-    ~QtTrackballWidget () {}
+    ~QtTrackballWidget () 
+	{
+		delete camera;
+		delete light_trackball;
+	}
 
     /**
      * @brief Initializes openGL and GLEW.
@@ -97,10 +97,14 @@ public:
     {
         makeCurrent();
 
+		initGL();
+				
+#if QT_VERSION < 0x050400
         #ifdef TUCANODEBUG
         QGLFormat glCurrentFormat = this->format();
-        cout << "QT GL version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << endl;
+        std::cout << "QT GL version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << std::endl;
         #endif
+#endif
     }
 
     /**
@@ -108,10 +112,14 @@ public:
      */
     virtual void resizeGL (void)
     {
-        camera.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
-        camera.setPerspectiveMatrix(camera.getFovy(), (float)this->width()/(float)this->height(), 0.1f, 100.0f);
-        light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
-        updateGL();
+        camera->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        camera->setPerspectiveMatrix(camera->getFovy(), (float)this->width()/(float)this->height(), 0.1f, 100.0f);
+        light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -119,14 +127,21 @@ public:
      */
     void initialize (void)
     {
-        camera.setPerspectiveMatrix(60.0, (float)this->width()/(float)this->height(), 0.1f, 100.0f);
-        camera.setRenderFlag(true);
-        camera.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+		camera = new Trackball();
+		light_trackball = new Trackball();
 
-        light_trackball.setRenderFlag(false);
-        light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        camera->setPerspectiveMatrix(60.0, (float)this->width()/(float)this->height(), 0.1f, 100.0f);
+		camera->setRenderFlag(true);
+		camera->setViewport(Eigen::Vector2f((float)this->width(), (float)this->height()));
 
+		light_trackball->setRenderFlag(false);
+		light_trackball->setViewport(Eigen::Vector2f((float)this->width(), (float)this->height()));
+
+#if QT_VERSION >= 0x050400
+		update();
+#else
         updateGL();
+#endif
     }
 
     /**
@@ -177,7 +192,11 @@ protected:
             }
         }
         event->ignore();
-        updateGL();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -194,21 +213,25 @@ protected:
         {
             if (event->button() == Qt::LeftButton)
             {
-                camera.translateCamera(screen_pos);
+				camera->translateCamera(screen_pos);
             }
         }
         else
         {
             if (event->button() == Qt::LeftButton)
             {
-                camera.rotateCamera(screen_pos);
+				camera->rotateCamera(screen_pos);
             }
             if (event->button() == Qt::RightButton)
             {
-                light_trackball.rotateCamera(screen_pos);
+				light_trackball->rotateCamera(screen_pos);
             }
         }
-        updateGL ();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -222,22 +245,25 @@ protected:
         Eigen::Vector2f screen_pos (event->x(), event->y());
         if (event->modifiers() & Qt::ShiftModifier && event->buttons() & Qt::LeftButton)
         {
-            camera.translateCamera(screen_pos);
+			camera->translateCamera(screen_pos);
         }
         else
         {
             if (event->buttons() & Qt::LeftButton)
             {
-                camera.rotateCamera(screen_pos);
+				camera->rotateCamera(screen_pos);
             }
             if (event->buttons() & Qt::RightButton)
             {
-                light_trackball.rotateCamera(screen_pos);
+				light_trackball->rotateCamera(screen_pos);
             }
         }
 
-        updateGL ();
-
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -250,15 +276,19 @@ protected:
     {
         if (event->button() == Qt::LeftButton)
         {
-            camera.endTranslation();
-            camera.endRotation();
+			camera->endTranslation();
+			camera->endRotation();
         }
         if (event->button() == Qt::RightButton)
         {
-            light_trackball.endRotation();
+			light_trackball->endRotation();
         }
 
-        updateGL ();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -275,21 +305,25 @@ protected:
 
         if (event->modifiers() & Qt::ShiftModifier) // change FOV
         {
-            camera.incrementFov(pos);
+			camera->incrementFov(pos);
         }
         else // change ZOOM
         {
             if( (pos > 0) )
             {
-                camera.increaseZoom(1.05);
+				camera->increaseZoom(1.05);
             }
 
             else if(pos < 0)
             {
-                camera.increaseZoom(1.0/1.05);
+				camera->increaseZoom(1.0 / 1.05);
             }
         }
-        updateGL ();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
 signals:

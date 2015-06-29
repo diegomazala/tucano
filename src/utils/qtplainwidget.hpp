@@ -23,15 +23,19 @@
 #ifndef __QTPLAINWIDGET__
 #define __QTPLAINWIDGET__
 
+#include <qglobal.h>
+#if QT_VERSION >= 0x050400
+#include <QOpenGLWidget>
+#else
 #include <GL/glew.h>
-
 #include <QGLWidget>
+#endif
+
 #include <QMouseEvent>
 #include <iostream>
 
 #include <tucano.hpp>
 
-using namespace std;
 
 namespace Tucano
 {
@@ -42,7 +46,11 @@ namespace Tucano
  * Extends QGLWidget class to include common methods for using ShaderLib
  * This widget is empty, only has initialization methods, such as GLEW.
  */
-class QtPlainWidget : public QGLWidget
+#if QT_VERSION >= 0x050400
+class QtPlainWidget : public QOpenGLWidget, public GLObject
+#else
+class QtPlainWidget : public QGLWidget, public GLObject
+#endif
 {
     Q_OBJECT
 
@@ -50,9 +58,11 @@ protected:
 
 public:
 
-    explicit QtPlainWidget(QWidget *parent) : QGLWidget(parent)
-    {
-    }
+#if QT_VERSION >= 0x050400
+	explicit QtPlainWidget(QWidget *parent) : QOpenGLWidget(parent) {}
+#else
+	explicit QtPlainWidget(QWidget *parent) : QGLWidget(parent) {}
+#endif
 
     virtual ~QtPlainWidget()
     {
@@ -65,13 +75,15 @@ public:
     {
         makeCurrent();
 
-        #ifdef TUCANODEBUG
-        QGLFormat glCurrentFormat = this->format();
-        cout << "set version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << endl;
-        cout << "set profile : " << glCurrentFormat.profile() << endl;
-        #endif
+		initGL();
 
-        Misc::initGlew();
+#if QT_VERSION < 0x050400
+#ifdef TUCANODEBUG
+		QGLFormat glCurrentFormat = this->format();
+		std::cout << "set version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << std::endl;
+		std::cout << "set profile : " << glCurrentFormat.profile() << std::endl;
+#endif
+#endif
 
     }
 
@@ -80,7 +92,11 @@ public:
      */
     virtual void resizeGL (void)
     {
-        updateGL();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
 
@@ -93,7 +109,11 @@ protected:
     void keyPressEvent (QKeyEvent * event)
     {
         event->ignore();
-        updateGL();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
 

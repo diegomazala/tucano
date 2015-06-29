@@ -74,8 +74,8 @@ const string trackball_vertex_code = "\n"
  * lower left corner of screen, to (1,1) being the higher right corner. This means the coordinate system is centered in screen
  * and normalized. Also, the view matrix is by default translated by the vector [0,0,-2], in order to remove the camera from the center of the world.
  **/
-class Trackball : public Tucano::Camera {
-
+class Trackball : public Tucano::Camera, public GLObject 
+{
 
 private:
 
@@ -320,6 +320,8 @@ public:
 
         drawTrackball = true;
         radius = 0.8f;
+
+		initGL();
 
         initOpenGLMatrices();
         initializeBuffers();

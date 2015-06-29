@@ -23,7 +23,13 @@
 #ifndef __QTFLYCAMERAWIDGET__
 #define __QTFLYCAMERAWIDGET__
 
-#include <GL/glew.h>
+#include <qglobal.h>
+#if QT_VERSION >= 0x050400
+	#include <QOpenGLWidget>
+#else
+	#include <GL/glew.h>
+	#include <QGLWidget>
+#endif
 
 #include "objimporter.hpp"
 #include "plyimporter.hpp"
@@ -32,38 +38,24 @@
 #include <utils/flycamera.hpp>
 #include <utils/trackball.hpp>
 
-#include <QGLWidget>
 #include <QMouseEvent>
 #include <QFileDialog>
 
-using namespace std;
 
 namespace Tucano
 {
 
-/**
- * @brief This class is just to make sure that GLEW is
- * initialized before anything else, so the constructor of
- * this class is called before the QtFlycameraWidget
- * constructor.
- */
-class QtGlewFlycameraInitializer : public QGLWidget
-{
-public:
-    QtGlewFlycameraInitializer (QWidget* parent) : QGLWidget(parent)
-    {
-        makeCurrent();
-        Misc::initGlew();
-    }
-
-};
 
 /**
  * @brief A widget with a trackball iteration for a single mesh and a single light source.
  * Extends QGLWidget class to include common methods for using ShaderLib
  * this widget already has a default camera and light trackball and associated mouse methods
  */
-class QtFlycameraWidget : public QtGlewFlycameraInitializer
+#if QT_VERSION >= 0x050400
+class QtFlycameraWidget : public QOpenGLWidget, public GLObject
+#else
+class QtFlycameraWidget : public QGLWidget, public GLObject
+#endif
 {
     Q_OBJECT
 
@@ -84,7 +76,11 @@ public:
      * @brief Default constructor.
      * @param parent Parent widget.
      */
-    explicit QtFlycameraWidget(QWidget *parent) : QtGlewFlycameraInitializer(parent) {}
+#if QT_VERSION >= 0x050400
+	explicit QtFlycameraWidget(QWidget *parent) : QOpenGLWidget(parent) {}
+#else
+	explicit QtFlycameraWidget(QWidget *parent) : QGLWidget(parent) {}
+#endif
 
     /**
      * @brief Default destructor.
@@ -98,10 +94,14 @@ public:
     {
         makeCurrent();
 
-        #ifdef TUCANODEBUG
-        QGLFormat glCurrentFormat = this->format();
-        cout << "QT GL version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << endl;
-        #endif
+		initGL();
+
+#if QT_VERSION < 0x050400
+#ifdef TUCANODEBUG
+		QGLFormat glCurrentFormat = this->format();
+		std::cout << "QT GL version : " << glCurrentFormat.majorVersion() << " , " << glCurrentFormat.minorVersion() << std::endl;
+#endif
+#endif
     }
 
     /**
@@ -112,7 +112,11 @@ public:
         camera.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
         camera.setPerspectiveMatrix(camera.getFovy(), (float)this->width()/(float)this->height(), 0.1f, 100.0f);
         light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
-        updateGL();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -129,7 +133,11 @@ public:
         light_trackball.setRenderFlag(false);
         light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
-        updateGL();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -197,7 +205,11 @@ protected:
 		camera.updateViewMatrix();
 	
         event->ignore();
-        updateGL();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -219,7 +231,11 @@ protected:
 		{
 			light_trackball.rotateCamera(screen_pos);
 		}
-        updateGL ();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
     /**
@@ -241,7 +257,11 @@ protected:
 			light_trackball.rotateCamera(screen_pos);
 		}
 
-        updateGL ();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
 
     }
 
@@ -258,7 +278,11 @@ protected:
             light_trackball.endRotation();
         }
 
-        updateGL ();
+#if QT_VERSION >= 0x050400
+		update();
+#else
+		updateGL();
+#endif
     }
 
 signals:
