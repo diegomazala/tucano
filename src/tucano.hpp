@@ -23,6 +23,7 @@
 #define __TUCANOBASE__
 
 #include <iostream>
+#include <sstream>
 #include <utils/misc.hpp>
 
 
@@ -48,14 +49,6 @@ public:
 #if QT_VERSION >= 0x050400
 		initializeOpenGLFunctions();
 
-#ifdef TUCANODEBUG
-		// get opengl info
-		std::cout
-			<< "OpenGl information: VENDOR:       " << (const char*)glGetString(GL_VENDOR) << std::endl
-			<< "                    RENDERER:     " << (const char*)glGetString(GL_RENDERER) << std::endl
-			<< "                    VERSION:      " << (const char*)glGetString(GL_VERSION) << std::endl
-			<< "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-#endif
 #else
 		if (glewInitialized)
 			return;
@@ -89,6 +82,24 @@ public:
 			exit(EXIT_FAILURE);
 		}
 #endif
+	}
+
+	std::string infoGL()
+	{
+		std::stringstream info;
+
+#if QT_VERSION >= 0x050400
+		
+		info<< "OpenGl information: VENDOR:       " << (const char*)glGetString(GL_VENDOR) << std::endl
+			<< "                    RENDERER:     " << (const char*)glGetString(GL_RENDERER) << std::endl
+			<< "                    VERSION:      " << (const char*)glGetString(GL_VERSION) << std::endl
+			<< "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+#else
+		std::stringstream info;
+		info<<"GLEW INFO: OpenGL Version: "
+			<< glGetString(GL_VERSION) << std::endl;
+#endif
+		return info.str();
 	}
 };
 
