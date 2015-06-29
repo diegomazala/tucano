@@ -162,6 +162,7 @@ public:
         }
 
 		mesh.reset();
+		mesh.initGL();
 
         if (extension.compare("ply") == 0)
         {
