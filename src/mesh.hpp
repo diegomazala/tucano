@@ -764,6 +764,7 @@ public:
      */
     void createParallelepiped(float x, float y, float z)
     {
+		initGL();
 
         numberOfVertices = 32;
         numberOfElements = 36;
@@ -822,6 +823,8 @@ public:
      */
     void createQuad (void)
     {
+		initGL();
+
         vector<Eigen::Vector4f> vert;
         vector<Eigen::Vector2f> texCoord;
         vector<GLuint> elementsVertices;

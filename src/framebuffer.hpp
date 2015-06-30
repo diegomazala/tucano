@@ -127,6 +127,8 @@ public:
      */
     void create (int w, int h, int num_attachs = 1)
     {
+		initGL();
+
         size << w, h;
         int max_attachs;
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_attachs);

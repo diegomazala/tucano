@@ -24,7 +24,6 @@
 
 #include <iostream>
 #include <sstream>
-#include <utils/misc.hpp>
 
 
 #if QT_VERSION >= 0x050400
