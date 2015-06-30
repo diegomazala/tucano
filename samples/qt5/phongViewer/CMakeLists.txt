@@ -11,7 +11,7 @@ set (SOURCE_FILES
 	
 set (HEADER_FILES	
 					mainwindow.h
-					glWidget.hpp
+					glWidget.h
 	)
 
 set (FORM_FILES		mainwindow.ui 

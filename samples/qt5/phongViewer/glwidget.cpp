@@ -1,4 +1,4 @@
-#include "glwidget.hpp"
+#include "glwidget.h"
 #include <QDebug>
 
 void GLWidget::initializeGL (void)

@@ -6,32 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>441</width>
-    <height>485</height>
+    <width>518</width>
+    <height>402</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="GLWidget" name="glwidget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>10</y>
-      <width>400</width>
-      <height>400</height>
-     </rect>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="GLWidget" name="glwidget"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>441</width>
-     <height>25</height>
+     <width>518</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -60,9 +55,8 @@
  <customwidgets>
   <customwidget>
    <class>GLWidget</class>
-   <extends>QWidget</extends>
-   <header>glwidget.hpp</header>
-   <container>1</container>
+   <extends>QOpenGLWidget</extends>
+   <header>glwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
