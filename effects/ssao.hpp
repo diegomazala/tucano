@@ -23,7 +23,11 @@
 #ifndef __SSAO__
 #define __SSAO__
 
-#include "tucano.hpp"
+#include <tucano.hpp>
+#include <effect.hpp>
+#include <mesh.hpp>
+#include <camera.hpp>
+#include <framebuffer.hpp>
 #include "utils/trackball.hpp"
 #include <math.h>
 
@@ -155,10 +159,11 @@ public:
      */
     virtual void initialize (void)
     {
+		initGL();
         initializeShaders();
         generateKernel();
         generateNoiseTexture();
-        Misc::errorCheckFunc(__FILE__, __LINE__);
+        errorCheckFunc(__FILE__, __LINE__);
 
         fbo = new Framebuffer();
 

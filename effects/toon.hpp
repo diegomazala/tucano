@@ -73,6 +73,7 @@ public:
      */
     virtual void initialize (void)
 	{
+		initGL();
 		loadShader(toon_shader, "toonshader");
 	}
 
