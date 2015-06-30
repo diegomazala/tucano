@@ -1,43 +1,40 @@
 ﻿
 #include "GLWidget.h"
 #include <QKeyEvent>
-#include <QTimer>
+#include <QDir>
 
 
 
 GLWidget::GLWidget(QWidget *parent)
-	: QOpenGLWidget(parent)
+	: QOpenGLWidget(parent), GLObject()
 {
-	// loop call update
-	QTimer *timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-	timer->start(33);
 }
 
 
 GLWidget::~GLWidget()
 {
-	cleanup();
-}
-
-
-void GLWidget::cleanup()
-{
 	this->makeCurrent();
-	//delete image_texture;
+	delete image_texture;
+	delete rendertexture;
 	this->doneCurrent();
 }
 
 
 void GLWidget::initializeGL()
-{
-	this->initializeOpenGLFunctions();
+{	
+	initGL();
 
-	// the default is /shaders from your running dir
-	string shaders_dir("../../../effects/shaders/");
 
-	rendertexture.setShadersDir(shaders_dir);
-	rendertexture.initialize();
+	// look for shader dir 
+	QDir dir;
+	std::string shader_dir("effects/shaders/");
+	for (int i = 0; i < 5; ++i)
+		if (!dir.exists(shader_dir.c_str()))
+			shader_dir.insert(0, "../");
+
+	rendertexture = new Effects::RenderTexture();
+	rendertexture->setShadersDir(shader_dir);
+	rendertexture->initialize();
 
 	//// initialize texture with given image
 	QImage image(":/images/camelo.jpg");
@@ -52,7 +49,8 @@ void GLWidget::initializeGL()
 		}
 	}
 
-	image_texture.create(image.width(), image.height(), image.mirrored().bits());
+	image_texture = new Texture();
+	image_texture->create(image.width(), image.height(), image.mirrored().bits());
 }
 
 
@@ -69,16 +67,10 @@ void GLWidget::paintGL()
 	// renders the given image, not that we are setting a fixed viewport that follows the widgets size
 	// so it may not be scaled correctly with the image's size (just to keep the example simple)
 	Eigen::Vector2i viewport(this->width(), this->height());
-	rendertexture.renderTexture(image_texture, viewport);
+	rendertexture->renderTexture(*image_texture, viewport);
 }
 
 
-
-void GLWidget::resizeGL(int w, int h)
-{
-	QOpenGLFunctions *f = context()->functions();
-	f->glViewport(0, 0, this->width(), this->height());
-}
 
 
 

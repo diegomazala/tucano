@@ -1,15 +1,14 @@
 #ifndef __GL_WIDGET_H__
 #define __GL_WIDGET_H__
 
+
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
-
-
+#include <tucano.hpp>
 #include "rendertexture.hpp"
 
 class QKeyEvent;
 
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class GLWidget : public QOpenGLWidget, protected GLObject
 {
 	Q_OBJECT
 
@@ -20,23 +19,20 @@ public:
 	QSize minimumSizeHint() const Q_DECL_OVERRIDE{ return QSize(50, 50); };
 	QSize sizeHint() const Q_DECL_OVERRIDE{ return QSize(1024, 578); };
 
-public slots:
-	virtual void cleanup();
 
 protected:	// methods
 
 	virtual void initializeGL() Q_DECL_OVERRIDE;
 	virtual void paintGL() Q_DECL_OVERRIDE;
-	virtual void resizeGL(int width, int height) Q_DECL_OVERRIDE;
 	void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 protected : // attributes
 
 	/// Render image effect (simply renders a texture)
-	Effects::RenderTexture rendertexture;
+	Effects::RenderTexture* rendertexture;
 
 	/// Texture to hold input image
-	Texture image_texture;
+	Texture* image_texture;
 
 };
 
