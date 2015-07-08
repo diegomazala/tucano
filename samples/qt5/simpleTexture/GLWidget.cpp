@@ -14,6 +14,7 @@ GLWidget::GLWidget(QWidget *parent)
 GLWidget::~GLWidget()
 {
 	this->makeCurrent();
+	image_texture->destroy();
 	delete image_texture;
 	delete rendertexture;
 	this->doneCurrent();
@@ -39,18 +40,8 @@ void GLWidget::initializeGL()
 	//// initialize texture with given image
 	QImage image(":/images/camelo.jpg");
 
-	for (int x = 0; x < image.width(); ++x)
-	{
-		for (int y = 0; y < image.height(); ++y)
-		{
-			QRgb orig = image.pixel(x, y);
-			QRgb inv = qRgb(qBlue(orig), qGreen(orig), qRed(orig));
-			image.setPixel(x, y, inv);
-		}
-	}
-
 	image_texture = new Texture();
-	image_texture->create(image.width(), image.height(), image.mirrored().bits());
+	image_texture->create(GL_TEXTURE_2D, GL_RGBA32F, image.width(), image.height(), GL_BGRA, GL_UNSIGNED_BYTE, image.mirrored().bits());
 }
 
 
