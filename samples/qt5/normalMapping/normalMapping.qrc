@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+   <file>../../images/wall-diffuse-map.jpg</file>
+   <file>../../images/wall-normal-map.jpg</file>
+   <file>../../images/wall-specular-map.jpg</file>
+</qresource>
+</RCC>
