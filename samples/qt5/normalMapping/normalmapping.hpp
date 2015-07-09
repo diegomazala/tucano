@@ -116,14 +116,10 @@ public:
 		//normal_mapping_shader.setUniform("modelMatrix", mesh.getModelMatrix());
 		normal_mapping_shader.setUniform("viewMatrix", camera.getViewMatrix());
 		normal_mapping_shader.setUniform("lightViewMatrix", lightTrackball.getViewMatrix());
-		//normal_mapping_shader.setUniform("lightPositionWorldSpace", lightTrackball.getTranslationMatrix());
-		Eigen::Vector3f lightPos = lightTrackball.getTranslationMatrix();  //Eigen::Vector3f(0, 0, 4);
-		normal_mapping_shader.setUniform("lightPositionWorldSpace", lightPos.x(), lightPos.y(), -lightPos.z());
 		normal_mapping_shader.setUniform("lightIntensity", lightIntensity);
 
 
 		Eigen::Matrix4f modelMatrix = Eigen::Matrix4f::Identity();
-		modelMatrix.col(3).head<3>() << 0.0f, -1.0f, 0.0f;
 		Eigen::Matrix4f modelViewMatrix = camera.getViewMatrix() * modelMatrix;
 		Eigen::Matrix3f modelView3x3Matrix; // = Eigen::Matrix3f::Identity();	// modelViewMatrix 3x3
 		modelView3x3Matrix.col(0).head<3>() = modelViewMatrix.col(0).head<3>();

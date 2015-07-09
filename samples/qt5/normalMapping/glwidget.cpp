@@ -82,9 +82,9 @@ GLWidget::~GLWidget()
 void GLWidget::loadTextures()
 {
 	// initialize texture with given image
-	QImage image_diffuse(":/images/wall-diffuse-map.jpg");
-	QImage image_normal(":/images/wall-normal-map.jpg");
-	QImage image_specular(":/images/wall-specular-map.jpg");
+	QImage image_diffuse(":/images/lcg-diffuse-map.png");
+	QImage image_normal(":/images/lcg-normal-map.png");
+	QImage image_specular(":/images/lcg-specular-map.png");
 
 	TextureManager::Instance();
 
@@ -115,7 +115,7 @@ void GLWidget::initializeGL (void)
 
 	// look for mesh file
 	QFile file;
-	std::string mesh_file("samples/models/cylinder.obj");
+	std::string mesh_file("samples/models/cube.obj");
 	for (int i = 0; i < 5; ++i)
 		if (!file.exists(mesh_file.c_str()))
 			mesh_file.insert(0, "../");
@@ -136,7 +136,7 @@ void GLWidget::initializeGL (void)
     
 
 	if (!bumpMesh.loadOBJ(mesh_file.c_str()))
-		std::cerr << "<Error> Could not load obj file";
+		std::cerr << "<Error> Could not load obj file" << std::endl;
 	else
 		bumpMesh.initBuffers();
 
