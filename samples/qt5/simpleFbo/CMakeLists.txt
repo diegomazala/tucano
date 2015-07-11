@@ -5,13 +5,13 @@ get_filename_component(TARGET_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 set (SOURCE_FILES	
 					mainwindow.cpp
-					glWidget.cpp 
+					glwidget.cpp 
 					main.cpp 
 	)
 	
 set (HEADER_FILES	
 					mainwindow.h
-					glWidget.h
+					glwidget.h
 	)
 
 set (FORM_FILES		mainwindow.ui 
