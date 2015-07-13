@@ -38,5 +38,10 @@ void MainWindow::keyPressEvent(QKeyEvent *ke)
 		ui->glwidget->decreaseLightIntensity();
 	}
 
+	if (key == Qt::Key_W)
+	{
+		ui->glwidget->setWireframe(!ui->glwidget->wireframe());
+	}
+
     ke->accept();
 }

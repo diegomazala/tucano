@@ -32,6 +32,9 @@ public:
 	void increaseLightIntensity() { normalMapping.increaseLightIntensity(); };
 	void decreaseLightIntensity() { normalMapping.decreaseLightIntensity(); };
 
+	void setWireframe(bool enabled);
+	bool wireframe() {return wireframeEnabled;};
+
 private:
 
 	void loadTextures();
@@ -70,7 +73,7 @@ private:
 	GLuint tangentbuffer;
 	GLuint bitangentbuffer;
 	GLuint elementbuffer;
-
+	GLboolean wireframeEnabled;
 };
 
 #endif // GLWIDGET
