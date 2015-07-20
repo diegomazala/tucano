@@ -94,9 +94,9 @@ void GLWidget::initializeGL (void)
 	loadTextures();
 
 	// initialize the shader effect
-	normalMapping.setShadersDir(shader_dir);
-	normalMapping.initialize();
-	normalMapping.setTextures(*diffuse_map, *normal_map, *specular_map, *height_map);
+	parallaxMapping.setShadersDir(shader_dir);
+	parallaxMapping.initialize();
+	parallaxMapping.setTextures(*diffuse_map, *normal_map, *specular_map, *height_map);
     
 
 	if (!bumpMesh.loadOBJ(mesh_file.c_str()))
@@ -122,10 +122,10 @@ void GLWidget::paintGL (void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	bumpMesh.bind();
-	normalMapping.bind(mesh, *camera, *light_trackball);
+	parallaxMapping.bind(mesh, *camera, *light_trackball);
 	glPolygonMode(GL_FRONT_AND_BACK, wireframeEnabled ? GL_LINE : GL_FILL);
 	bumpMesh.draw();
-	normalMapping.unbind();
+	parallaxMapping.unbind();
 	bumpMesh.unbind();
 
 	camera->render();
@@ -137,48 +137,48 @@ void GLWidget::paintGL (void)
 
 void GLWidget::onDiffuseMapEnabled(bool enabled)
 {
-	normalMapping.enableDiffuseTexture(enabled);
+	parallaxMapping.enableDiffuseTexture(enabled);
 	update();
 }
 
 
 void GLWidget::onNormalMapEnabled(bool enabled)
 {
-	normalMapping.enableNormalTexture(enabled);
+	parallaxMapping.enableNormalTexture(enabled);
 	update();
 }
 
 
 void GLWidget::onSpecularMapEnabled(bool enabled)
 {
-	normalMapping.enableSpecularTexture(enabled);
+	parallaxMapping.enableSpecularTexture(enabled);
 	update();
 }
 
 
 void GLWidget::onParallaxMapEnabled(bool enabled)
 {
-	normalMapping.enableParallax(enabled);
+	parallaxMapping.enableParallax(enabled);
 	update();
 }
 
 
 void GLWidget::onParallaxScaleChanged(double value)
 {
-	normalMapping.setScale((float)value);
+	parallaxMapping.setScale((float)value);
 	update();
 }
 
 
 void GLWidget::onParallaxBiasChanged(double value)
 {
-	normalMapping.setBias((float)value);
+	parallaxMapping.setBias((float)value);
 	update();
 }
 
 
 void GLWidget::onLightIntensityChanged(int value)
 {
-	normalMapping.setLightIntensity((float)value / 25.0f);
+	parallaxMapping.setLightIntensity((float)value / 25.0f);
 	update();
 }

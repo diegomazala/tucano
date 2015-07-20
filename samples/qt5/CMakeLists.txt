@@ -7,7 +7,7 @@ add_subdirectory(simpleTexture)
 add_subdirectory(simpleFbo)
 add_subdirectory(phongViewer)
 add_subdirectory(rendering)
-add_subdirectory(normalMapping)
+add_subdirectory(parallaxMapping)
 
 
 

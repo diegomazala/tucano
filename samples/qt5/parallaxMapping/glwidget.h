@@ -3,7 +3,7 @@
 
 #include <utils/qttrackballwidget.hpp>
 #include <phongshader.hpp>
-#include <normalmapping.hpp>
+#include <parallaxmapping.hpp>
 #include <texture.hpp>
 #include <bumpmesh.hpp>
 
@@ -58,7 +58,7 @@ private:
 	Tucano::Texture* height_map;
 
 	/// A simple normal mapping shader for rendering meshes
-	Effects::NormalMapping normalMapping;
+	Effects::ParallaxMapping parallaxMapping;
 
 	Tucano::BumpMesh bumpMesh;
 

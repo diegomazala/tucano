@@ -37,7 +37,7 @@ namespace Effects
 /**
  * @brief Renders a mesh using a Normal Mapping shader.
  */
-class NormalMapping : public Effect
+class ParallaxMapping : public Effect
 {
 
 private:
@@ -72,7 +72,7 @@ public:
     /**
      * @brief Default constructor.
      */
-	NormalMapping(void)
+	ParallaxMapping(void)
     {
 		default_color << 0.12, 0.1, 0.1, 1.0;
 		lightIntensity = 2.0f;
@@ -87,7 +87,7 @@ public:
     /**
      * @brief Default destructor
      */
-	virtual ~NormalMapping(void) {}
+	virtual ~ParallaxMapping(void) {}
 
     /**
      * @brief Load and initialize shaders
@@ -95,8 +95,8 @@ public:
     virtual void initialize (void)
     {
 		initGL();
-        // searches in default shader directory (/shaders) for shader files normalMappingShader.(vert,frag,geom,comp)
-        loadShader(normal_mapping_shader, "normalmapping") ;
+        // searches in default shader directory (/shaders) for shader files ParallaxMappingShader.(vert,frag,geom,comp)
+        loadShader(normal_mapping_shader, "parallaxmapping") ;
     }
 
 	void enableDiffuseTexture(bool enabled)

@@ -12,7 +12,7 @@ set (SOURCE_FILES
 set (HEADER_FILES	
 					mainwindow.h
 					glwidget.h
-					normalmapping.hpp
+					parallaxmapping.hpp
 					tbn.h
 					bumpmesh.hpp
 	)
@@ -21,7 +21,7 @@ set (FORM_FILES		mainwindow.ui
 	)
 
 
-set	 (RESOURCES    normalMapping.qrc
+set	 (RESOURCES    parallaxMapping.qrc
 	)
 
 qt5_add_resources(RESOURCE_FILES ${RESOURCES})
