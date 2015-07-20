@@ -29,11 +29,17 @@ public:
     virtual void paintGL();
 
 	
-	void increaseLightIntensity() { normalMapping.increaseLightIntensity(); };
-	void decreaseLightIntensity() { normalMapping.decreaseLightIntensity(); };
-
 	void setWireframe(bool enabled);
 	bool wireframe() {return wireframeEnabled;};
+
+public slots:
+	void onDiffuseMapEnabled(bool enabled);
+	void onNormalMapEnabled(bool enabled);
+	void onSpecularMapEnabled(bool enabled);
+	void onParallaxMapEnabled(bool enabled);
+	void onParallaxScaleChanged(double value);
+	void onParallaxBiasChanged(double value);
+	void onLightIntensityChanged(int value);
 
 private:
 
@@ -47,6 +53,9 @@ private:
 
 	/// Texture to hold specular texture
 	Tucano::Texture* specular_map;
+
+	/// Texture to hold specular texture
+	Tucano::Texture* height_map;
 
 	/// A simple normal mapping shader for rendering meshes
 	Effects::NormalMapping normalMapping;

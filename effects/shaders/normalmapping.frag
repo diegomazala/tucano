@@ -14,22 +14,56 @@ out vec3 color;
 uniform sampler2D in_Texture_Diffuse;
 uniform sampler2D in_Texture_Normal;
 uniform sampler2D in_Texture_Specular;
+uniform sampler2D in_Texture_Height;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 uniform mat3 MV3x3;
 uniform mat4 lightViewMatrix;
 uniform float lightIntensity;
 
+uniform bool diffuseTextureEnabled = true;
+//uniform bool normalTextureEnabled = true;
+uniform bool specularTextureEnabled = true;
+uniform bool parallaxTextureEnabled = true;
+uniform float parallaxScale = 0.05f;
+uniform float parallaxBias = -0.04f;
+
+
+
 void main()
 {
+	vec2 newTexCoord;
+
 	// Light emission properties
 	vec3 lightColor = vec3(1, 1, 1);
 
+
+	if (parallaxTextureEnabled)
+	{
+		float height = texture2D(in_Texture_Height, texCoord).r;
+
+		vec3 v = normalize(eyeDirectionTangentSpace);
+		height = height * parallaxScale + parallaxBias;
+		newTexCoord = texCoord + (height * v.xy);
+	}
+	else
+	{
+		newTexCoord = texCoord.st;
+	}
+
 	// Material properties
-	vec3 diffuseColor = texture2D(in_Texture_Diffuse, texCoord).rgb;
+	vec3 diffuseColor = vec3(0.5f, 0.5f, 0.5f);
+	if (diffuseTextureEnabled)
+		diffuseColor = texture2D(in_Texture_Diffuse, newTexCoord).rgb;
+
 	vec3 ambientColor = vec3(0.1, 0.1, 0.1) * diffuseColor;
-	vec3 specularColor = texture2D(in_Texture_Specular, texCoord).rgb * 0.3;
-	vec3 texNormalTangentSpace = normalize(texture2D(in_Texture_Normal, texCoord).rgb*2.0 - 1.0);
+
+	vec3 specularColor = vec3(0.5f, 0.5f, 0.5f);
+	if (specularTextureEnabled)
+		specularColor = texture2D(in_Texture_Specular, newTexCoord).rgb * 0.3;
+
+	//vec3 texNormalTangentSpace = normalize(texture2D(in_Texture_Normal, texCoord).rgb*2.0 - 1.0);
+	vec3 texNormalTangentSpace = normalize(texture2D(in_Texture_Normal, newTexCoord).rgb*2.0 - 1.0);
 
 	// Normal of the computed fragment, in camera space
 	vec3 n = texNormalTangentSpace;
@@ -56,5 +90,4 @@ void main()
 		ambientColor +
 		diffuseColor * lightColor * lightIntensity * cosTheta +
 		specularColor * lightColor * lightIntensity * pow(cosAlpha, 5);
-
 }

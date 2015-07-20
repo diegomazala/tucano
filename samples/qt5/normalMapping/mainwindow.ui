@@ -14,9 +14,157 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="GLWidget" name="glwidget"/>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="maximumSize">
+       <size>
+        <width>211</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Settings</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QCheckBox" name="diffuseMapCheckBox">
+         <property name="text">
+          <string>Diffuse Map</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="normalMapCheckBox">
+         <property name="text">
+          <string>Normal Map</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="specularMapCheckBox">
+         <property name="text">
+          <string>Specular Map</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="parallaxMapGroupBox">
+         <property name="title">
+          <string>Parallax Map</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="scaleLabel">
+            <property name="text">
+             <string>Scale</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="scaleSpinBox">
+            <property name="decimals">
+             <number>2</number>
+            </property>
+            <property name="minimum">
+             <double>-10.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>10.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.050000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="biasLabel">
+            <property name="text">
+             <string>Bias</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="biasSpinBox">
+            <property name="decimals">
+             <number>2</number>
+            </property>
+            <property name="minimum">
+             <double>-10.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>10.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>-0.040000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Light</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QLabel" name="lightIntensityLabel">
+            <property name="text">
+             <string>Intensity</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="lightIntensitySlider">
+            <property name="value">
+             <number>50</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>319</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -57,8 +205,130 @@
    <class>GLWidget</class>
    <extends>QOpenGLWidget</extends>
    <header>glwidget.h</header>
+   <slots>
+    <slot>onDiffuseMapEnabled(bool)</slot>
+    <slot>onNormalMapEnabled(bool)</slot>
+    <slot>onSpecularMapEnabled(bool)</slot>
+    <slot>onParallaxMapEnabled(bool)</slot>
+    <slot>onParallaxScaleChanged(double)</slot>
+    <slot>onParallaxBiasChanged(double)</slot>
+    <slot>onLightIntensityChanged(int)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>diffuseMapCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onDiffuseMapEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1163</x>
+     <y>88</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>normalMapCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onNormalMapEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1163</x>
+     <y>115</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>specularMapCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onSpecularMapEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1163</x>
+     <y>142</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>parallaxMapGroupBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onParallaxMapEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1163</x>
+     <y>205</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scaleSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onParallaxScaleChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1205</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>biasSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onParallaxBiasChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1205</x>
+     <y>227</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lightIntensitySlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onLightIntensityChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1163</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>530</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

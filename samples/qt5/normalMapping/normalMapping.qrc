@@ -3,5 +3,10 @@
   <file>../../images/lcg-diffuse-map.png</file>
   <file>../../images/lcg-normal-map.png</file>
   <file>../../images/lcg-specular-map.png</file>
+  <file>../../images/lcg-height-map.png</file>
+  <file>../../images/bricks-diffuse-map.jpg</file>
+  <file>../../images/bricks-normal-map.jpg</file>
+  <file>../../images/bricks-specular-map.jpg</file>
+  <file>../../images/bricks-height-map.jpg</file>
 </qresource>
 </RCC>

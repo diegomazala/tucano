@@ -57,7 +57,16 @@ private:
 	/// Texture to hold specular texture
 	Tucano::Texture* specular_map;
 
+	/// Texture to hold height map texture
+	Tucano::Texture* height_map;
+
 	float lightIntensity;
+	bool diffuseTextureEnabled;
+	bool normalTextureEnabled;
+	bool specularTextureEnabled;
+	float parallaxTextureEnabled;
+	float scale;
+	float bias;
 public:
 
     /**
@@ -67,6 +76,12 @@ public:
     {
 		default_color << 0.12, 0.1, 0.1, 1.0;
 		lightIntensity = 2.0f;
+		diffuseTextureEnabled = true;
+		normalTextureEnabled = true;
+		specularTextureEnabled = true;
+		parallaxTextureEnabled = true;
+		scale = 0.05f;
+		bias = -0.04f;
     }
 
     /**
@@ -84,16 +99,53 @@ public:
         loadShader(normal_mapping_shader, "normalmapping") ;
     }
 
+	void enableDiffuseTexture(bool enabled)
+	{
+		diffuseTextureEnabled = enabled;
+	}
+
+	void enableNormalTexture(bool enabled)
+	{
+		normalTextureEnabled = enabled;
+	}
+
+	void enableSpecularTexture(bool enabled)
+	{
+		specularTextureEnabled = enabled;
+	}
+
+	void enableParallax(bool enabled)
+	{
+		parallaxTextureEnabled = enabled;
+	}
+
+	void setLightIntensity(float value)
+	{
+		lightIntensity = value;
+	}
+
+	void setScale(float _scale)
+	{
+		scale = _scale;
+	}
+
+	void setBias(float _bias)
+	{
+		bias = _bias;
+	}
+
 	/**
 	* @brief Sets the three textures used in the effect
 	*/
 	void setTextures(Tucano::Texture& diffuseMap,
 					Tucano::Texture& normalMap,
-					Tucano::Texture& specularMap)
+					Tucano::Texture& specularMap,
+					Tucano::Texture& heightMap)
 	{
 		diffuse_map = &diffuseMap;
 		normal_map = &normalMap;
 		specular_map = &specularMap;
+		height_map = &heightMap;
 	}
 
 
@@ -110,6 +162,7 @@ public:
 		normal_mapping_shader.setUniform("in_Texture_Diffuse", diffuse_map->bind());
 		normal_mapping_shader.setUniform("in_Texture_Normal", normal_map->bind());
 		normal_mapping_shader.setUniform("in_Texture_Specular", specular_map->bind());
+		normal_mapping_shader.setUniform("in_Texture_Height", height_map->bind());
 
 
 		normal_mapping_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
@@ -117,6 +170,13 @@ public:
 		normal_mapping_shader.setUniform("viewMatrix", camera.getViewMatrix());
 		normal_mapping_shader.setUniform("lightViewMatrix", lightTrackball.getViewMatrix());
 		normal_mapping_shader.setUniform("lightIntensity", lightIntensity);
+
+		normal_mapping_shader.setUniform("diffuseTextureEnabled", diffuseTextureEnabled);
+		//normal_mapping_shader.setUniform("normalTextureEnabled", normalTextureEnabled);
+		normal_mapping_shader.setUniform("specularTextureEnabled", specularTextureEnabled);
+		normal_mapping_shader.setUniform("parallaxTextureEnabled", parallaxTextureEnabled);
+		normal_mapping_shader.setUniform("parallaxScale", scale);
+		normal_mapping_shader.setUniform("parallaxBias", bias);
 
 
 		Eigen::Matrix4f modelMatrix = Eigen::Matrix4f::Identity();
@@ -137,10 +197,9 @@ public:
 		diffuse_map->unbind();
 		normal_map->unbind();
 		specular_map->unbind();
+		height_map->unbind();
 	}
 
-	void increaseLightIntensity() { lightIntensity+=0.5f; };
-	void decreaseLightIntensity() { lightIntensity-=0.5f; };
 
 };
 

@@ -17,6 +17,8 @@ GLWidget::~GLWidget()
 	delete normal_map;
 	specular_map->destroy();
 	delete specular_map;
+	height_map->destroy();
+	delete height_map;
 	bumpMesh.cleanupGL();
 	doneCurrent();
 }
@@ -25,9 +27,18 @@ GLWidget::~GLWidget()
 void GLWidget::loadTextures()
 {
 	// initialize texture with given image
+#if 0
 	QImage image_diffuse(":/images/lcg-diffuse-map.png");
 	QImage image_normal(":/images/lcg-normal-map.png");
 	QImage image_specular(":/images/lcg-specular-map.png");
+	QImage image_height(":/images/lcg-height-map.png");
+#else
+	QImage image_diffuse(":/images/bricks-diffuse-map.jpg");
+	QImage image_normal(":/images/bricks-normal-map.jpg");
+	QImage image_specular(":/images/bricks-specular-map.jpg");
+	QImage image_height(":/images/bricks-height-map.jpg");
+#endif
+	
 
 	TextureManager::Instance();
 
@@ -48,6 +59,12 @@ void GLWidget::loadTextures()
 	specular_map->bind();
 	specular_map->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 	specular_map->unbind();
+
+	height_map = new Texture();
+	height_map->create(GL_TEXTURE_2D, GL_RGBA, image_height.width(), image_height.height(), GL_BGRA, GL_UNSIGNED_BYTE, image_height.mirrored().bits());
+	height_map->bind();
+	height_map->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	height_map->unbind();
 }
 
 void GLWidget::setWireframe(bool enabled)
@@ -79,7 +96,7 @@ void GLWidget::initializeGL (void)
 	// initialize the shader effect
 	normalMapping.setShadersDir(shader_dir);
 	normalMapping.initialize();
-	normalMapping.setTextures(*diffuse_map, *normal_map, *specular_map);
+	normalMapping.setTextures(*diffuse_map, *normal_map, *specular_map, *height_map);
     
 
 	if (!bumpMesh.loadOBJ(mesh_file.c_str()))
@@ -118,3 +135,50 @@ void GLWidget::paintGL (void)
 
 
 
+void GLWidget::onDiffuseMapEnabled(bool enabled)
+{
+	normalMapping.enableDiffuseTexture(enabled);
+	update();
+}
+
+
+void GLWidget::onNormalMapEnabled(bool enabled)
+{
+	normalMapping.enableNormalTexture(enabled);
+	update();
+}
+
+
+void GLWidget::onSpecularMapEnabled(bool enabled)
+{
+	normalMapping.enableSpecularTexture(enabled);
+	update();
+}
+
+
+void GLWidget::onParallaxMapEnabled(bool enabled)
+{
+	normalMapping.enableParallax(enabled);
+	update();
+}
+
+
+void GLWidget::onParallaxScaleChanged(double value)
+{
+	normalMapping.setScale((float)value);
+	update();
+}
+
+
+void GLWidget::onParallaxBiasChanged(double value)
+{
+	normalMapping.setBias((float)value);
+	update();
+}
+
+
+void GLWidget::onLightIntensityChanged(int value)
+{
+	normalMapping.setLightIntensity((float)value / 25.0f);
+	update();
+}
