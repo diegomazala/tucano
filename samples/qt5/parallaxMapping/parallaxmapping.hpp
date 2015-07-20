@@ -172,7 +172,7 @@ public:
 		normal_mapping_shader.setUniform("lightIntensity", lightIntensity);
 
 		normal_mapping_shader.setUniform("diffuseTextureEnabled", diffuseTextureEnabled);
-		//normal_mapping_shader.setUniform("normalTextureEnabled", normalTextureEnabled);
+		normal_mapping_shader.setUniform("normalTextureEnabled", normalTextureEnabled);
 		normal_mapping_shader.setUniform("specularTextureEnabled", specularTextureEnabled);
 		normal_mapping_shader.setUniform("parallaxTextureEnabled", parallaxTextureEnabled);
 		normal_mapping_shader.setUniform("parallaxScale", scale);

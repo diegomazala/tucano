@@ -4,21 +4,25 @@
 
 
 
-GLWidget::GLWidget(QWidget *parent) : Tucano::QtTrackballWidget(parent), wireframeEnabled(false)
+GLWidget::GLWidget(QWidget *parent) : Tucano::QtTrackballWidget(parent), wireframeEnabled(false), currentMap(0)
 {
 }
 
 GLWidget::~GLWidget() 
 {
 	makeCurrent();
-	diffuse_map->destroy();
-	delete diffuse_map;
-	normal_map->destroy();
-	delete normal_map;
-	specular_map->destroy();
-	delete specular_map;
-	height_map->destroy();
-	delete height_map;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		diffuse_map[i]->destroy();
+		delete diffuse_map[i];
+		normal_map[i]->destroy();
+		delete normal_map[i];
+		specular_map[i]->destroy();
+		delete specular_map[i];
+		height_map[i]->destroy();
+		delete height_map[i];
+	}
 	bumpMesh.cleanupGL();
 	doneCurrent();
 }
@@ -27,50 +31,60 @@ GLWidget::~GLWidget()
 void GLWidget::loadTextures()
 {
 	// initialize texture with given image
-#if 0
-	QImage image_diffuse(":/images/lcg-diffuse-map.png");
-	QImage image_normal(":/images/lcg-normal-map.png");
-	QImage image_specular(":/images/lcg-specular-map.png");
-	QImage image_height(":/images/lcg-height-map.png");
-#else
-	QImage image_diffuse(":/images/bricks-diffuse-map.jpg");
-	QImage image_normal(":/images/bricks-normal-map.jpg");
-	QImage image_specular(":/images/bricks-specular-map.jpg");
-	QImage image_height(":/images/bricks-height-map.jpg");
-#endif
-	
+	QImage image_diffuse[3];
+	QImage image_normal[3];
+	QImage image_specular[3];
+	QImage image_height[3];
+
+	image_diffuse[0].load(":/images/bricks-diffuse-map.jpg");
+	image_normal[0].load(":/images/bricks-normal-map.jpg");
+	image_specular[0].load(":/images/bricks-specular-map.jpg");
+	image_height[0].load(":/images/bricks-height-map.jpg");
+
+	image_diffuse[1].load(":/images/lcg-diffuse-map.png");
+	image_normal[1].load(":/images/lcg-normal-map.png");
+	image_specular[1].load(":/images/lcg-specular-map.png");
+	image_height[1].load(":/images/lcg-height-map.png");
+
+	image_diffuse[2].load(":/images/shapes-diffuse-map.png");
+	image_normal[2].load(":/images/shapes-normal-map.png");
+	image_specular[2].load(":/images/shapes-specular-map.png");
+	image_height[2].load(":/images/shapes-height-map.png");
+
 
 	TextureManager::Instance();
 
-	diffuse_map = new Texture();
-	diffuse_map->create(GL_TEXTURE_2D, GL_RGBA, image_diffuse.width(), image_diffuse.height(), GL_BGRA, GL_UNSIGNED_BYTE, image_diffuse.mirrored().bits());
-	diffuse_map->bind();
-	diffuse_map->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-	diffuse_map->unbind();
 
-	normal_map = new Texture();
-	normal_map->create(GL_TEXTURE_2D, GL_RGBA, image_normal.width(), image_normal.height(), GL_BGRA, GL_UNSIGNED_BYTE, image_normal.mirrored().bits());
-	normal_map->bind();
-	normal_map->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-	normal_map->unbind();
 
-	specular_map = new Texture();
-	specular_map->create(GL_TEXTURE_2D, GL_RGBA, image_specular.width(), image_specular.height(), GL_BGRA, GL_UNSIGNED_BYTE, image_specular.mirrored().bits());
-	specular_map->bind();
-	specular_map->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-	specular_map->unbind();
+	for(int i = 0; i < 3; ++i)
+	{
+		diffuse_map[i] = new Texture();
+		diffuse_map[i]->create(GL_TEXTURE_2D, GL_RGBA, image_diffuse[i].width(), image_diffuse[i].height(), GL_BGRA, GL_UNSIGNED_BYTE, image_diffuse[i].mirrored().bits());
+		diffuse_map[i]->bind();
+		diffuse_map[i]->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+		diffuse_map[i]->unbind();
 
-	height_map = new Texture();
-	height_map->create(GL_TEXTURE_2D, GL_RGBA, image_height.width(), image_height.height(), GL_BGRA, GL_UNSIGNED_BYTE, image_height.mirrored().bits());
-	height_map->bind();
-	height_map->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-	height_map->unbind();
+		normal_map[i] = new Texture();
+		normal_map[i]->create(GL_TEXTURE_2D, GL_RGBA, image_normal[i].width(), image_normal[i].height(), GL_BGRA, GL_UNSIGNED_BYTE, image_normal[i].mirrored().bits());
+		normal_map[i]->bind();
+		normal_map[i]->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+		normal_map[i]->unbind();
+
+		specular_map[i] = new Texture();
+		specular_map[i]->create(GL_TEXTURE_2D, GL_RGBA, image_specular[i].width(), image_specular[i].height(), GL_BGRA, GL_UNSIGNED_BYTE, image_specular[i].mirrored().bits());
+		specular_map[i]->bind();
+		specular_map[i]->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+		specular_map[i]->unbind();
+
+		height_map[i] = new Texture();
+		height_map[i]->create(GL_TEXTURE_2D, GL_RGBA, image_height[i].width(), image_height[i].height(), GL_BGRA, GL_UNSIGNED_BYTE, image_height[i].mirrored().bits());
+		height_map[i]->bind();
+		height_map[i]->setTexParametersMipMap(4, 0, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+		height_map[i]->unbind();
+	}
 }
 
-void GLWidget::setWireframe(bool enabled)
-{
-	wireframeEnabled = enabled;
-}
+
 
 void GLWidget::initializeGL (void)
 {
@@ -96,7 +110,7 @@ void GLWidget::initializeGL (void)
 	// initialize the shader effect
 	parallaxMapping.setShadersDir(shader_dir);
 	parallaxMapping.initialize();
-	parallaxMapping.setTextures(*diffuse_map, *normal_map, *specular_map, *height_map);
+	parallaxMapping.setTextures(*diffuse_map[currentMap], *normal_map[currentMap], *specular_map[currentMap], *height_map[currentMap]);
     
 
 	if (!bumpMesh.loadOBJ(mesh_file.c_str()))
@@ -132,7 +146,43 @@ void GLWidget::paintGL (void)
 
 }
 
+void GLWidget::onWireframeToggled(bool toggled)
+{
+	wireframeEnabled = toggled;
+	update();
+}
 
+void GLWidget::onImageBricksToggled(bool toggled)
+{
+	if (toggled)
+	{
+		currentMap = 0;
+		parallaxMapping.setTextures(*diffuse_map[currentMap], *normal_map[currentMap], *specular_map[currentMap], *height_map[currentMap]);
+		update();
+	}
+}
+
+
+void GLWidget::onImageLCGToggled(bool toggled)
+{
+	if (toggled)
+	{
+		currentMap = 1;
+		parallaxMapping.setTextures(*diffuse_map[currentMap], *normal_map[currentMap], *specular_map[currentMap], *height_map[currentMap]);
+		update();
+	}
+}
+
+
+void GLWidget::onImageShapesToggled(bool toggled)
+{
+	if (toggled)
+	{
+		currentMap = 2;
+		parallaxMapping.setTextures(*diffuse_map[currentMap], *normal_map[currentMap], *specular_map[currentMap], *height_map[currentMap]);
+		update();
+	}
+}
 
 
 void GLWidget::onDiffuseMapEnabled(bool enabled)

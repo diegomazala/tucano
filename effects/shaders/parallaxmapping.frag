@@ -1,6 +1,7 @@
 #version 330 core
 
 // Interpolated values from the vertex shaders
+in vec3 normalCoord;
 in vec2 texCoord;
 in vec3 positionWorldSpace;
 
@@ -22,7 +23,7 @@ uniform mat4 lightViewMatrix;
 uniform float lightIntensity;
 
 uniform bool diffuseTextureEnabled = true;
-//uniform bool normalTextureEnabled = true;
+uniform bool normalTextureEnabled = false;
 uniform bool specularTextureEnabled = true;
 uniform bool parallaxTextureEnabled = true;
 uniform float parallaxScale = 0.05f;
@@ -32,7 +33,7 @@ uniform float parallaxBias = -0.04f;
 
 void main()
 {
-	vec2 newTexCoord;
+	vec2 newTexCoord = texCoord
 
 	// Light emission properties
 	vec3 lightColor = vec3(1, 1, 1);
@@ -46,10 +47,7 @@ void main()
 		height = height * parallaxScale + parallaxBias;
 		newTexCoord = texCoord + (height * v.xy);
 	}
-	else
-	{
-		newTexCoord = texCoord.st;
-	}
+	
 
 	// Material properties
 	vec3 diffuseColor = vec3(0.5f, 0.5f, 0.5f);
@@ -66,7 +64,10 @@ void main()
 	vec3 texNormalTangentSpace = normalize(texture2D(in_Texture_Normal, newTexCoord).rgb*2.0 - 1.0);
 
 	// Normal of the computed fragment, in camera space
-	vec3 n = texNormalTangentSpace;
+	//vec3 n = texNormalTangentSpace;
+	vec3 n = normalCoord;
+	if (normalTextureEnabled)
+		n = texNormalTangentSpace;
 	// Direction of the light (from the fragment to the light)
 	vec3 l = normalize(lightDirectionTangentSpace);
 	// Cosine of the angle between the normal and the light direction, 

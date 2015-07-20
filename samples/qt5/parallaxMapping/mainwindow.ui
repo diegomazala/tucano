@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
+    <width>1137</width>
     <height>720</height>
    </rect>
   </property>
@@ -29,7 +29,47 @@
       <property name="title">
        <string>Settings</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QCheckBox" name="wireFrameCheckBox">
+         <property name="text">
+          <string>Wireframe</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Images</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QRadioButton" name="imageBricksRadioButton">
+            <property name="text">
+             <string>Bricks</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="imageLCGRadioButton">
+            <property name="text">
+             <string>LCG</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="imageShapesRadioButton">
+            <property name="text">
+             <string>Shapes</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <widget class="QCheckBox" name="diffuseMapCheckBox">
          <property name="text">
@@ -173,8 +213,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1280</width>
-     <height>26</height>
+     <width>1137</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -213,6 +253,10 @@
     <slot>onParallaxScaleChanged(double)</slot>
     <slot>onParallaxBiasChanged(double)</slot>
     <slot>onLightIntensityChanged(int)</slot>
+    <slot>onImageLCGToggled(bool)</slot>
+    <slot>onImageBricksToggled(bool)</slot>
+    <slot>onImageShapesToggled(bool)</slot>
+    <slot>onWireframeToggled(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -327,6 +371,70 @@
     <hint type="destinationlabel">
      <x>530</x>
      <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>imageLCGRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onImageLCGToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1022</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>459</x>
+     <y>366</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>imageBricksRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onImageBricksToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1022</x>
+     <y>96</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>459</x>
+     <y>366</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>imageShapesRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onImageShapesToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1022</x>
+     <y>142</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>459</x>
+     <y>366</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>wireFrameCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onWireframeToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1022</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>459</x>
+     <y>366</y>
     </hint>
    </hints>
   </connection>

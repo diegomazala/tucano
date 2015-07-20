@@ -28,11 +28,12 @@ public:
      **/
     virtual void paintGL();
 
-	
-	void setWireframe(bool enabled);
-	bool wireframe() {return wireframeEnabled;};
 
 public slots:
+	void onWireframeToggled(bool toggled);
+	void onImageBricksToggled(bool toggled);
+	void onImageLCGToggled(bool toggled);
+	void onImageShapesToggled(bool toggled);
 	void onDiffuseMapEnabled(bool enabled);
 	void onNormalMapEnabled(bool enabled);
 	void onSpecularMapEnabled(bool enabled);
@@ -46,16 +47,16 @@ private:
 	void loadTextures();
 
 	/// Texture to hold diffuse texture
-	Tucano::Texture* diffuse_map;
+	Tucano::Texture* diffuse_map[3];
 
 	/// Texture to hold normal texture
-	Tucano::Texture* normal_map;
+	Tucano::Texture* normal_map[3];
 
 	/// Texture to hold specular texture
-	Tucano::Texture* specular_map;
+	Tucano::Texture* specular_map[3];
 
 	/// Texture to hold specular texture
-	Tucano::Texture* height_map;
+	Tucano::Texture* height_map[3];
 
 	/// A simple normal mapping shader for rendering meshes
 	Effects::ParallaxMapping parallaxMapping;
@@ -83,6 +84,7 @@ private:
 	GLuint bitangentbuffer;
 	GLuint elementbuffer;
 	GLboolean wireframeEnabled;
+	int currentMap;
 };
 
 #endif // GLWIDGET

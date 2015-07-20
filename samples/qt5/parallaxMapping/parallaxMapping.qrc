@@ -8,5 +8,9 @@
   <file>../../images/bricks-normal-map.jpg</file>
   <file>../../images/bricks-specular-map.jpg</file>
   <file>../../images/bricks-height-map.jpg</file>
+  <file>../../images/shapes-diffuse-map.png</file>
+  <file>../../images/shapes-normal-map.png</file>
+  <file>../../images/shapes-specular-map.png</file>
+  <file>../../images/shapes-height-map.png</file>
 </qresource>
 </RCC>

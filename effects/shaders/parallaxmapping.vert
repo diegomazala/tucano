@@ -8,6 +8,7 @@ layout(location = 3) in vec3 in_Tangent;
 layout(location = 4) in vec3 in_Bitangent;
 
 // Output data ; will be interpolated for each fragment.
+out vec3 normalCoord;
 out vec2 texCoord;
 out vec3 positionWorldSpace;
 out vec3 eyeDirectionCameraSpace;
@@ -44,6 +45,9 @@ void main()
 
 	// UV of the vertex. No special space for this one.
 	texCoord = in_TexCoord;
+
+	// Normal of the vertex. No special space for this one.
+	normalCoord = in_Normal;
 
 	// model to camera = ModelView
 	vec3 vertexTangentCameraSpace = MV3x3 * in_Tangent;
