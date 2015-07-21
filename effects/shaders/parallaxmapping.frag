@@ -33,7 +33,7 @@ uniform float parallaxBias = -0.04f;
 
 void main()
 {
-	vec2 newTexCoord = texCoord
+	vec2 newTexCoord = texCoord;
 
 	// Light emission properties
 	vec3 lightColor = vec3(1, 1, 1);
