@@ -22,85 +22,109 @@
 #ifndef __TUCANOBASE__
 #define __TUCANOBASE__
 
+#include "config.h"
+
 #include <iostream>
 #include <sstream>
 
 
+
 #if QT_VERSION >= 0x050400
-	#include <QOpenGLFunctions_4_3_Core>
+
+	#if OPENGL_MAJOR_VERSION == 3 && OPENGL_MINOR_VERSION == 3
+		#include <QOpenGLFunctions_3_3_Core>
+		class GLObject : protected QOpenGLFunctions_3_3_Core
+	#elif OPENGL_MAJOR_VERSION == 4 && OPENGL_MINOR_VERSION == 0
+		#include <QOpenGLFunctions_4_0_Core>
+		class GLObject : protected QOpenGLFunctions_4_0_Core
+	#elif OPENGL_MAJOR_VERSION == 4 && OPENGL_MINOR_VERSION == 1
+		#include <QOpenGLFunctions_4_1_Core>
+		class GLObject : protected QOpenGLFunctions_4_1_Core
+	#elif OPENGL_MAJOR_VERSION == 4 && OPENGL_MINOR_VERSION == 2
+		#include <QOpenGLFunctions_4_2_Core>
+		class GLObject : protected QOpenGLFunctions_4_2_Core
+	#elif OPENGL_MAJOR_VERSION == 4 && OPENGL_MINOR_VERSION == 3
+		#include <QOpenGLFunctions_4_3_Core>
+		class GLObject : protected QOpenGLFunctions_4_3_Core
+	#elif OPENGL_MAJOR_VERSION == 4 && OPENGL_MINOR_VERSION == 4
+		#include <QOpenGLFunctions_4_4_Core>
+		class GLObject : protected QOpenGLFunctions_4_4_Core
+	#else
+		#include <QOpenGLFunctions_4_5_Core>
+		class GLObject : protected QOpenGLFunctions_4_5_Core
+	#endif	// OPENGL_MAJOR_VERSION == ? && OPENGL_MINOR_VERSION == ?
+
 #else
+
 	#include <GL/glew.h>
 	#include <GL/glu.h>
-#endif
+	static bool glewInitialized = false;
 
-#if QT_VERSION >= 0x050400
-class GLObject : protected QOpenGLFunctions_4_3_Core
-#else
-static bool glewInitialized = false;
-class GLObject
+	class GLObject
+
 #endif
-{
-public:
-	GLObject(){}
+	{
+	public:
+		GLObject(){}
 	
-	void initGL()
-	{
-#if QT_VERSION >= 0x050400
-		initializeOpenGLFunctions();
-
-#else
-		if (glewInitialized)
-			return;
-
-		GLenum glewInitResult = glewInit();
-		if (GLEW_OK != glewInitResult)
+		void initGL()
 		{
-			std::cerr << "Error: " << glewGetErrorString(glewInitResult) << std::endl;
-			exit(EXIT_FAILURE);
+	#if QT_VERSION >= 0x050400
+			initializeOpenGLFunctions();
+
+	#else
+			if (glewInitialized)
+				return;
+
+			GLenum glewInitResult = glewInit();
+			if (GLEW_OK != glewInitResult)
+			{
+				std::cerr << "Error: " << glewGetErrorString(glewInitResult) << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			glewInitialized = true;
+
+	#ifdef TUCANODEBUG
+			errorCheckFunc(__FILE__, __LINE__);
+			std::cout << "GLEW INFO: OpenGL Version: " << glGetString(GL_VERSION) << std::endl << std::endl;
+	#endif
+	#endif
 		}
-		glewInitialized = true;
-
-#ifdef TUCANODEBUG
-		errorCheckFunc(__FILE__, __LINE__);
-		std::cout << "GLEW INFO: OpenGL Version: " << glGetString(GL_VERSION) << std::endl << std::endl;
-#endif
-#endif
-	}
 
 
-	void errorCheckFunc(std::string file, int line, std::string message = "")
-	{
-#if QT_VERSION >= 0x050400
-#else
-		//OpenGL Error Handling Function:
-		GLenum ErrorCheckValue = glGetError();
-		if (ErrorCheckValue != GL_NO_ERROR)
+		void errorCheckFunc(std::string file, int line, std::string message = "")
 		{
-			std::cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << std::endl;
-			std::cerr << message.c_str() << std::endl;
-			exit(EXIT_FAILURE);
+	#if QT_VERSION >= 0x050400
+	#else
+			//OpenGL Error Handling Function:
+			GLenum ErrorCheckValue = glGetError();
+			if (ErrorCheckValue != GL_NO_ERROR)
+			{
+				std::cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << std::endl;
+				std::cerr << message.c_str() << std::endl;
+				exit(EXIT_FAILURE);
+			}
+	#endif
 		}
-#endif
-	}
 
-	std::string infoGL()
-	{
-		std::stringstream info;
+		std::string infoGL()
+		{
+			std::stringstream info;
 
-#if QT_VERSION >= 0x050400
+	#if QT_VERSION >= 0x050400
 		
-		info<< "OpenGl information: VENDOR:       " << (const char*)glGetString(GL_VENDOR) << std::endl
-			<< "                    RENDERER:     " << (const char*)glGetString(GL_RENDERER) << std::endl
-			<< "                    VERSION:      " << (const char*)glGetString(GL_VERSION) << std::endl
-			<< "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-#else
-		std::stringstream info;
-		info<<"GLEW INFO: OpenGL Version: "
-			<< glGetString(GL_VERSION) << std::endl;
-#endif
-		return info.str();
-	}
-};
+			info<< "OpenGl information: VENDOR:       " << (const char*)glGetString(GL_VENDOR) << std::endl
+				<< "                    RENDERER:     " << (const char*)glGetString(GL_RENDERER) << std::endl
+				<< "                    VERSION:      " << (const char*)glGetString(GL_VERSION) << std::endl
+				<< "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+	#else
+			std::stringstream info;
+			info<<"GLEW INFO: OpenGL Version: "
+				<< glGetString(GL_VERSION) << std::endl;
+	#endif
+			return info.str();
+		}
+	};
 
 
 #endif // __TUCANOBASE__

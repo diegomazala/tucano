@@ -23,15 +23,7 @@
 #ifndef __MISC__
 #define __MISC__
 
-
-
-#if QT_VERSION >= 0x050400
-	#include <QtGlobal>
-	#include <QOpenGLFunctions_4_3_Core>
-#else
-	#include <GL/glew.h>
-	#include <GL/glu.h>
-#endif
+#include <tucano.hpp>
 
 
 #include <iostream>

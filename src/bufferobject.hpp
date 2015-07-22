@@ -23,13 +23,14 @@
 #ifndef __BUFFEROBJECT__
 #define __BUFFEROBJECT__
 
+
+#include "tucano.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
 #include <limits>
-#include <GL/glew.h>
 
 namespace Tucano
 {

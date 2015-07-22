@@ -25,12 +25,15 @@ set(TUCANO_EFFECTS_DIR "${PROJECT_SOURCE_DIR}/effects")
 set(TUCANO_SAMPLES_DIR "${PROJECT_SOURCE_DIR}/samples")
 set(TUCANO_SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
+set(OPENGL_MAJOR_VERSION 4 CACHE STRING "Opengl version required. Example: 4")
+set(OPENGL_MINOR_VERSION 3 CACHE STRING "Opengl version required. Example: 3")
+
 # Build options.
-option(QT5_SUPPORT "Compile using Qt5" ON)
+option(SUPPORT_QT_GREATHER_OR_EQUAL_TO_5_4_0 "Compile using Qt version equa or greather than 5.4" ON)
 option(DOC "build documentation" OFF)
 
 
-if (QT5_SUPPORT)
+if (SUPPORT_QT_GREATHER_OR_EQUAL_TO_5_4_0 )
 	
 	find_package(Qt5OpenGL)
 	find_package(Qt5Widgets)
@@ -44,7 +47,9 @@ if (QT5_SUPPORT)
 		${Qt5OpenGL_INCLUDE_DIRS}
 		)
 	
-else (QT5_SUPPORT)
+	set(USE_QT_GRATHER_OR_EQUAL_TO_5_4_0 1)
+		
+else (SUPPORT_QT_GREATHER_OR_EQUAL_TO_5_4_0 )
 
 	find_package(GLEW REQUIRED)
 	if(NOT GLEW_FOUND)
@@ -61,8 +66,12 @@ else (QT5_SUPPORT)
 		${OPENGL_INCLUDE_DIR}
 		)
 	
-endif (QT5_SUPPORT)
+	set(USE_QT_GRATHER_OR_EQUAL_TO_5_4_0 0)
+	
+endif (SUPPORT_QT_GREATHER_OR_EQUAL_TO_5_4_0 )
 
+
+configure_file(config.h.in ${TUCANO_SRC_DIR}/config.h)
 
 # Eigen 3.
 # pkg-config is used so we don't hard-code the location of eigen.
