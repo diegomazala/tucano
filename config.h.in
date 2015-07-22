@@ -1,0 +1,53 @@
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
+
+//
+// These values are automatically set according their cmake variables.
+//
+#define USE_QT_GRATHER_OR_EQUAL_TO_5_4_0 ${USE_QT_GRATHER_OR_EQUAL_TO_5_4_0}
+#define OPENGL_MAJOR_VERSION ${OPENGL_MAJOR_VERSION}
+#define OPENGL_MINOR_VERSION ${OPENGL_MINOR_VERSION}
+
+
+#if USE_QT_GRATHER_OR_EQUAL_TO_5_4_0
+	
+	#include <QtGlobal>
+
+	#if OPENGL_MAJOR_VERSION == 4
+		
+		#if OPENGL_MINOR_VERSION == 0
+			#define QT_OPENGL_CONTEXT_FUNCTIONS "QOpenGLFunctions_4_0_Core"
+			#include <QOpenGLFunctions_4_0_Core>
+		#elif OPENGL_MINOR_VERSION == 1
+			#define QT_OPENGL_CONTEXT_FUNCTIONS "QOpenGLFunctions_4_1_Core"
+			#include <QOpenGLFunctions_4_1_Core>
+		#elif OPENGL_MINOR_VERSION == 2
+			#define QT_OPENGL_CONTEXT_FUNCTIONS "QOpenGLFunctions_4_2_Core"
+			#include <QOpenGLFunctions_4_2_Core>
+		#elif OPENGL_MINOR_VERSION == 3
+			#define QT_OPENGL_CONTEXT_FUNCTIONS "QOpenGLFunctions_4_3_Core"
+			#include <QOpenGLFunctions_4_3_Core>
+		#elif OPENGL_MINOR_VERSION == 4
+			#define QT_OPENGL_CONTEXT_FUNCTIONS "QOpenGLFunctions_4_4_Core"
+			#include <QOpenGLFunctions_4_4_Core>
+		#else 
+			#define QT_OPENGL_CONTEXT_FUNCTIONS "QOpenGLFunctions_4_5_Core"
+			#include <QOpenGLFunctions_4_5_Core>
+		#endif	// OPENGL_MINOR_VERSION
+
+	#elif OPENGL_MAJOR_VERSION == 3
+
+		#define QT_OPENGL_CONTEXT_FUNCTIONS "QOpenGLFunctions_3_3_Core"
+		#include <QOpenGLFunctions_3_3_Core>
+
+	#else
+	
+		#define QT_OPENGL_CONTEXT_FUNCTIONS "QOpenGLFunctions_4_3_Core"
+		#include <QOpenGLFunctions_4_3_Core>
+	
+	#endif		// OPENGL_MAJOR_VERSION
+
+#endif		// USE_QT_GRATHER_OR_EQUAL_TO_5_4_0
+
+
+#endif // __CONFIG_H__
