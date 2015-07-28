@@ -63,26 +63,7 @@ private:
 
 	Tucano::BumpMesh bumpMesh;
 
-	GLuint VertexArrayID;
-	
-	std::vector<Eigen::Vector3f> vertices;
-	std::vector<Eigen::Vector2f> uvs;
-	std::vector<Eigen::Vector3f> normals;
-	std::vector<Eigen::Vector3f> tangents;
-	std::vector<Eigen::Vector3f> bitangents;
-	std::vector<unsigned short> indices;
-	std::vector<Eigen::Vector3f> indexed_vertices;
-	std::vector<Eigen::Vector2f> indexed_uvs;
-	std::vector<Eigen::Vector3f> indexed_normals;
-	std::vector<Eigen::Vector3f> indexed_tangents;
-	std::vector<Eigen::Vector3f> indexed_bitangents;
 
-	GLuint vertexbuffer;
-	GLuint uvbuffer;
-	GLuint normalbuffer;
-	GLuint tangentbuffer;
-	GLuint bitangentbuffer;
-	GLuint elementbuffer;
 	GLboolean wireframeEnabled;
 	int currentMap;
 };
