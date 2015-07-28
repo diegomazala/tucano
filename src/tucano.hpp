@@ -118,7 +118,6 @@
 				<< "                    VERSION:      " << (const char*)glGetString(GL_VERSION) << std::endl
 				<< "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 	#else
-			std::stringstream info;
 			info<<"GLEW INFO: OpenGL Version: "
 				<< glGetString(GL_VERSION) << std::endl;
 	#endif
