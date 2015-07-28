@@ -9,14 +9,14 @@ add_definitions(-DTUCANODEBUG)
 
 
 
-if (QT5_SUPPORT)
+if (SUPPORT_QT_GREATHER_OR_EQUAL_TO_5_4_0 )
 
 	option(QT5_SAMPLES "Build Qt5 samples" ON)
 	if (QT5_SAMPLES)
 		add_subdirectory(qt5)
 	endif (QT5_SAMPLES)
 	
-else (QT5_SUPPORT)
+else (SUPPORT_QT_GREATHER_OR_EQUAL_TO_5_4_0 )
 
 	option(GLUT_SAMPLES "Glut Samples" ON)
 	if (GLUT_SAMPLES)
@@ -28,7 +28,7 @@ else (QT5_SUPPORT)
 		add_subdirectory(flyscene)
 	endif(GLFW_SAMPLES)
 	
-endif(QT5_SUPPORT)
+endif(SUPPORT_QT_GREATHER_OR_EQUAL_TO_5_4_0 )
 
 
 
