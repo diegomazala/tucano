@@ -35,7 +35,6 @@ protected:
 private:
 	// A simple phong shader for rendering meshes
 	Effects::Phong phong;
-	Effects::NormalMap normal;
 	Effects::NormalVector normalVector;
 
 	// Light represented as a camera

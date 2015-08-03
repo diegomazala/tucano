@@ -33,8 +33,6 @@ void NormalVectorWindow::OnInit(void)
 	phong.setShadersDir(shaders_dir);
 	phong.initialize();
 
-	normal.setShadersDir(shaders_dir);
-	normal.initialize();
 
 	normalVector.setShadersDir(shaders_dir);
 	normalVector.initialize();
