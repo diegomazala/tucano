@@ -741,6 +741,12 @@ public:
         glDrawElements(GL_TRIANGLES, numberOfElements, GL_UNSIGNED_INT, (GLvoid*)0);
     }
 
+	virtual void renderPatches(void)
+	{
+		glPatchParameteri(GL_PATCH_VERTICES, 3);
+		glDrawElements(GL_PATCHES, numberOfElements, GL_UNSIGNED_INT, (GLvoid*)0);
+	}
+
     /**
      * @brief Render the mesh triangles.
      * The method binds the buffers, calls the method to render triangles, and then unbinds all buffers.
