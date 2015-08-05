@@ -54,6 +54,12 @@ private:
     /// Stores the path to the geometry shader file.
     string geometryShaderPath;
 
+	/// Stores the path to the tesselation control shader file.
+	string tesselationCtrlShaderPath;
+
+	/// Stores the path to the tesselation control shader file.
+	string tesselationEvalShaderPath;
+
     /// Stores the path to the fragment shader file.
     string fragmentShaderPath;
 
@@ -81,6 +87,12 @@ private:
     /// Geometry Shader identification.
     GLuint geometryShader;
 
+	/// Tesselation Control Shader identification.
+	GLuint tesselationCtrlShader;
+
+	/// Tesselation Evaluation Shader identification.
+	GLuint tesselationEvalShader;
+
     /// Fragment Shader identification.
     GLuint fragmentShader;
 
@@ -102,6 +114,8 @@ public:
     {
         shaderName = name;
         vertexShader = 0; fragmentShader = 0; geometryShader = 0; shaderProgram = 0; computeShaders = vector<GLuint>();
+		tesselationEvalShader = 0; 
+		tesselationCtrlShader = 0;
     }
 
     /**
@@ -115,6 +129,8 @@ public:
         computeShaderPaths = compute_shader_paths;
 
         vertexShader = 0; fragmentShader = 0; geometryShader = 0; shaderProgram = 0; computeShaders = vector<GLuint>();
+		tesselationEvalShader = 0;
+		tesselationCtrlShader = 0;
     }
 
     /**
@@ -190,6 +206,24 @@ public:
     }
 
 
+	/**
+	* @brief Returns a handle to the tesselation control shader.
+	* @return Return the Tesselation Control Shader identification handle.
+	*/
+	GLuint getTesselationControlShader(void)
+	{
+		return tesselationCtrlShader;
+	}
+
+	/**
+	* @brief Returns a handle to the tesselation evaluation shader.
+	* @return Return the Tesselation Evalution Shader identification handle.
+	*/
+	GLuint getTesselationEvaluationShader(void)
+	{
+		return tesselationEvalShader;
+	}
+
 public:
 
 
@@ -202,13 +236,17 @@ public:
      * @param fragment_shader_path String giving the path to the external file containing the fragment shader.
      * @param geometry_shader_path String giving the path to the external file containing the geometry shader.
      */
-    Shader (string name, string vertex_shader_path, string fragment_shader_path, string geometry_shader_path = "")
+	Shader(string name, string vertex_shader_path, string fragment_shader_path, string geometry_shader_path = "", string tesselation_ctrl_shader_path = "", string tesselation_eval_shader_path = "")
     {
         shaderName = name;
         vertexShaderPath = vertex_shader_path;
+		tesselationCtrlShaderPath = geometry_shader_path;
+		tesselationEvalShaderPath = geometry_shader_path;
         geometryShaderPath = geometry_shader_path;
         fragmentShaderPath = fragment_shader_path;
         vertexShader = 0;
+		tesselationEvalShader = 0;
+		tesselationCtrlShader = 0;
         fragmentShader = 0;
         geometryShader = 0;
         shaderProgram = 0;
@@ -238,6 +276,24 @@ public:
             found = true;
         }
 
+		//Tesselation Control:
+		string tsc_name = shader_dir + name + ".tesc";
+		ifstream tess_ctrl_file(tsc_name.c_str());
+		if (tess_ctrl_file.good())
+		{
+			tesselationCtrlShaderPath = tsc_name;
+			found = true;
+		}
+
+		//Tesselation Evaluation:
+		string tse_name = shader_dir + name + ".tese";
+		ifstream tess_eval_file(tse_name.c_str());
+		if (tess_eval_file.good())
+		{
+			tesselationEvalShaderPath = tse_name;
+			found = true;
+		}
+
         //Geometry:
         string gs_name = shader_dir + name + ".geom";
         ifstream geom_file(gs_name.c_str());
@@ -265,6 +321,8 @@ public:
             found = true;
         }
 
+		
+
         // if no shader was found, emit an warning
         if (!found)
         {
@@ -274,6 +332,8 @@ public:
         vertexShader = 0;
         fragmentShader = 0;
         geometryShader = 0;
+		tesselationCtrlShader = 0;
+		tesselationEvalShader = 0;
         shaderProgram = 0;
         computeShaders = vector<GLuint>();
 
@@ -304,7 +364,7 @@ public:
         glGetProgramiv(shaderProgram, GL_LINK_STATUS, &result);
         if (result != GL_TRUE)
         {
-            cerr << "Error linking program : " << shaderName << endl;
+			cout << "[Error]    Linking program failed: " << shaderName << endl;
             GLchar errorLog[1024] = {0};
             glGetProgramInfoLog(shaderProgram, 1024, NULL, errorLog);
             fprintf(stdout, "%s", &errorLog[0]);
@@ -313,7 +373,7 @@ public:
         #ifdef TUCANODEBUG
         else
         {
-            cout << " Linked program with no errors : " << shaderName << endl << endl;
+			cout << "[Ok]       Linked program successfully : " << shaderName << endl << endl;
         }
         #endif
     }
@@ -418,10 +478,26 @@ public:
         if(!vertexShaderPath.empty())
         {
             readVertexCode();
+
+			// geom shader needs a vertex shader
+			if (!tesselationCtrlShaderPath.empty())
+			{
+				readTesselationCtrlCode();
+			}
+
+			// geom shader needs a vertex shader
+			if (!tesselationEvalShaderPath.empty())
+			{
+				readTesselationEvalCode();
+			}
+
             // geom shader needs a vertex shader
-            if(!geometryShaderPath.empty()) {
+            if(!geometryShaderPath.empty()) 
+			{
                 readGeometryCode();
             }
+
+			
         }
         if(!fragmentShaderPath.empty())
         {
@@ -448,16 +524,25 @@ public:
         //Create Shader Program.
         shaderProgram = glCreateProgram();
 
-        if(!fragmentShaderPath.empty())
-        {
-            //Create Fragment Shader.
-            fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        }
 
         if(!vertexShaderPath.empty())
         {
             //Create Vertex Shader.
             vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+			// vertex shader is mandatory when using tesselation control shader
+			if (!tesselationCtrlShaderPath.empty())
+			{
+				//Create Tesselation Control Shader.
+				tesselationCtrlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+			}
+
+			// vertex shader is mandatory when using tesselation evaluation shader
+			if (!tesselationEvalShaderPath.empty())
+			{
+				//Create Tesselation Evaluation Shader.
+				tesselationEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+			}
 
             // vertex shader is mandatory when using geom shader
             if(!geometryShaderPath.empty())
@@ -465,7 +550,14 @@ public:
                 //Create Geometry Shader.
                 geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
             }
+						
         }
+
+		if (!fragmentShaderPath.empty())
+		{
+			//Create Fragment Shader.
+			fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		}
 
         if(computeShaderPaths.size() > 0)
         {
@@ -496,7 +588,7 @@ public:
         if (result != GL_TRUE)
         {
             // if an error is found, print the log (even if not in debug mode)
-            cerr << "Erro compiling vertex shader: " << vertexShaderPath << endl;
+			cerr << "[Error]    Compiling vertex shader: " << vertexShaderPath << endl;
             glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infoLogLength);
             char * vertexShaderErrorMessage = new char[infoLogLength];
             glGetShaderInfoLog(vertexShader, infoLogLength, NULL, &vertexShaderErrorMessage[0]);
@@ -508,11 +600,11 @@ public:
         {
             if (vertexShaderPath.empty())
             {
-                cout << "Compiled vertex shader from string without errors : " << shaderName.c_str() << endl;
+				cout << "[Ok]       Compiled vertex shader from string successfully : " << shaderName.c_str() << endl;
             }
             else
             {
-                cout << "Compiled vertex shader without errors : " << vertexShaderPath << endl;
+				cout << "[Ok]       Compiled vertex shader from string successfully : " << vertexShaderPath << endl;
             }
         }
         #endif
@@ -546,11 +638,165 @@ public:
         }
         else
         {
-            cout << "warning: no vertex shader file found : " << vertexShaderPath << endl;
+			cerr << "[Warning]  Vertex shader shader not found : " << vertexShaderPath << endl;
         }
 
         setVertexShader(vertexShaderCode);
     }
+
+
+	/**
+	* @brief Loads tesselation control code into shader program.
+	* @param tesselationCtrlShaderCode String containing tesselation control code.
+	*/
+	void setTesselationCtrlShader(string &tesselationCtrlShaderCode)
+	{
+		GLint result = GL_FALSE;
+		int infoLogLength;
+
+		char const * tessCtrlSourcePointer = tesselationCtrlShaderCode.c_str();
+		glShaderSource(tesselationCtrlShader, 1, &tessCtrlSourcePointer, NULL);
+		glCompileShader(tesselationCtrlShader);
+
+		// Check Geometry Shader
+		glGetShaderiv(tesselationCtrlShader, GL_COMPILE_STATUS, &result);
+		if (result != GL_TRUE)
+		{
+			// if an error is found, print the log (even if not in debug mode)
+			cerr << "[Error]    Compiling tesselation control shader: " << tesselationCtrlShaderPath << endl;
+			glGetShaderiv(tesselationCtrlShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+			char * tessCtrlShaderErrorMessage = new char[infoLogLength];
+			glGetShaderInfoLog(tesselationCtrlShader, infoLogLength, NULL, &tessCtrlShaderErrorMessage[0]);
+			fprintf(stdout, "\n%s", &tessCtrlShaderErrorMessage[0]);
+			delete[] tessCtrlShaderErrorMessage;
+		}
+#ifdef TUCANODEBUG
+		else
+		{
+			if (tesselationCtrlShaderPath.empty())
+			{
+				cout << "[Ok]       Compiled tesselation control shader from string successfully : " << shaderName.c_str() << endl;
+			}
+			else
+			{
+				cout << "[Ok]       Compiled tesselation control shader successfully : " << tesselationCtrlShaderPath << endl;
+			}
+		}
+#endif
+
+		glAttachShader(shaderProgram, tesselationCtrlShader);
+
+#ifdef TUCANODEBUG
+		errorCheckFunc(__FILE__, __LINE__, "error loading tesselation control shader code");
+#endif
+
+	}
+
+
+	/**
+	* @brief Reads the external file containing the tesselation control shader and loads it into the shader program.
+	*/
+	void readTesselationCtrlCode(void)
+	{
+		// Read the Geometry Shader code from the file
+		string tesselationCtrlShaderCode;
+
+		ifstream tessCtrlShaderStream(tesselationCtrlShaderPath.c_str(), std::ios::in);
+
+		if (tessCtrlShaderStream.is_open())
+		{
+			string line = "";
+			while (getline(tessCtrlShaderStream, line))
+			{
+				tesselationCtrlShaderCode += "\n" + line;
+			}
+			tessCtrlShaderStream.close();
+		}
+		else
+		{
+			cerr << "[Warning]  Tesselation control shader not found : " << tesselationCtrlShaderPath << endl;
+		}
+
+		setTesselationCtrlShader(tesselationCtrlShaderCode);
+	}
+
+
+
+	/**
+	* @brief Loads tesselation evaluation code into shader program.
+	* @param tesselationEvalShaderCode String containing tesselation evaluation code.
+	*/
+	void setTesselationEvalShader(string &tesselationEvalShaderCode)
+	{
+		GLint result = GL_FALSE;
+		int infoLogLength;
+
+		char const * tessEvalSourcePointer = tesselationEvalShaderCode.c_str();
+		glShaderSource(tesselationEvalShader, 1, &tessEvalSourcePointer, NULL);
+		glCompileShader(tesselationEvalShader);
+
+		// Check Geometry Shader
+		glGetShaderiv(tesselationEvalShader, GL_COMPILE_STATUS, &result);
+		if (result != GL_TRUE)
+		{
+			// if an error is found, print the log (even if not in debug mode)
+			cerr << "[Error]    Compiling tesselation evaluation shader: " << tesselationEvalShaderPath << endl;
+			glGetShaderiv(tesselationEvalShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+			char * tessEvalShaderErrorMessage = new char[infoLogLength];
+			glGetShaderInfoLog(tesselationEvalShader, infoLogLength, NULL, &tessEvalShaderErrorMessage[0]);
+			fprintf(stdout, "\n%s", &tessEvalShaderErrorMessage[0]);
+			delete[] tessEvalShaderErrorMessage;
+		}
+#ifdef TUCANODEBUG
+		else
+		{
+			if (tesselationEvalShaderPath.empty())
+			{
+				cout << "[Ok]       Compiled tesselation evaluation shader from string successfully : " << shaderName.c_str() << endl;
+			}
+			else
+			{
+				cout << "[Ok]       Compiled tesselation evaluation shader successfully : " << tesselationEvalShaderPath << endl;
+			}
+		}
+#endif
+
+		glAttachShader(shaderProgram, tesselationEvalShader);
+
+#ifdef TUCANODEBUG
+		errorCheckFunc(__FILE__, __LINE__, "error loading tesselation evaluation shader code");
+#endif
+
+	}
+
+
+	/**
+	* @brief Reads the external file containing the tesselation evaluation shader and loads it into the shader program.
+	*/
+	void readTesselationEvalCode(void)
+	{
+		// Read the Geometry Shader code from the file
+		string tesselationEvalShaderCode;
+
+		ifstream tessEvalShaderStream(tesselationEvalShaderPath.c_str(), std::ios::in);
+
+		if (tessEvalShaderStream.is_open())
+		{
+			string line = "";
+			while (getline(tessEvalShaderStream, line))
+			{
+				tesselationEvalShaderCode += "\n" + line;
+			}
+			tessEvalShaderStream.close();
+		}
+		else
+		{
+			cerr << "[Warning]  Tesselation evaluation shader shader not found : " << tesselationEvalShaderPath << endl;
+		}
+
+		setTesselationEvalShader(tesselationEvalShaderCode);
+	}
+
 
 
     /**
@@ -571,7 +817,7 @@ public:
         if (result != GL_TRUE)
         {
             // if an error is found, print the log (even if not in debug mode)
-            cerr << "Erro compiling geometry shader: " << geometryShaderPath << endl;
+			cerr << "[Error]    Compiling geometry shader: " << geometryShaderPath << endl;
             glGetShaderiv(geometryShader, GL_INFO_LOG_LENGTH, &infoLogLength);
             char * geometryShaderErrorMessage = new char[infoLogLength];
             glGetShaderInfoLog(geometryShader, infoLogLength, NULL, &geometryShaderErrorMessage[0]);
@@ -582,13 +828,13 @@ public:
         else
         {
             if (geometryShaderPath.empty())
-            {
-                cout << "Compiled geometry shader from string without errors : " << shaderName.c_str() << endl;
-            }
-            else
-            {
-                cout << "Compiled geometry shader without errors : " << geometryShaderPath << endl;
-            }
+			{
+				cout << "[Ok]       Compiled geometry shader from string successfully : " << shaderName.c_str() << endl;
+			}
+			else
+			{
+				cout << "[Ok]       Compiled geometry shader from string successfully : " << geometryShaderPath << endl;
+			}
         }
         #endif
 
@@ -621,7 +867,7 @@ public:
         }
         else
         {
-            cerr << "warning: no geom shader found : " << geometryShaderPath << endl;
+			cerr << "[Warning]  Geometry shader shader not found : " << geometryShaderPath << endl;
         }
 
         setGeometryShader(geometryShaderCode);
@@ -644,7 +890,7 @@ public:
         glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
         if (result != GL_TRUE)
         {
-            cerr << "Erro compiling fragment shader: " << fragmentShaderPath << endl;
+			cerr << "[Error]    Compiling fragment shader: " << fragmentShaderPath << endl;
             glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &infoLogLength);
             char * fragmentShaderErrorMessage = new char[infoLogLength];
             glGetShaderInfoLog(fragmentShader, infoLogLength, NULL, &fragmentShaderErrorMessage[0]);
@@ -655,13 +901,13 @@ public:
         else
         {
             if (fragmentShaderPath.empty())
-            {
-                cout << "Compiled fragment shader from string without errors : " << shaderName.c_str() << endl;
-            }
-            else
-            {
-                cout << "Compiled fragment shader without errors : " << fragmentShaderPath << endl;
-            }
+			{
+				cout << "[Ok]       Compiled fragment shader from string successfully : " << shaderName.c_str() << endl;
+			}
+			else
+			{
+				cout << "[Ok]       Compiled fragment shader from string successfully : " << fragmentShaderPath << endl;
+			}
         }
         #endif
 
@@ -692,7 +938,7 @@ public:
         }
         else
         {
-            cerr << "warning: no fragment shader found : " << fragmentShaderPath << endl;
+			cerr << "[Warning]  Fragment shader shader not found : " << fragmentShaderPath << endl;
         }
 
         setFragmentShader(fragmentShaderCode);
@@ -786,6 +1032,16 @@ public:
             glDetachShader(shaderProgram, vertexShader);
             readVertexCode();
         }
+		if (tesselationCtrlShader != 0)
+		{
+			glDetachShader(shaderProgram, tesselationCtrlShader);
+			readTesselationCtrlCode();
+		}
+		if (tesselationEvalShader != 0)
+		{
+			glDetachShader(shaderProgram, tesselationEvalShader);
+			readTesselationEvalCode();
+		}
         if(geometryShader != 0)
         {
             glDetachShader(shaderProgram, geometryShader);
@@ -836,8 +1092,14 @@ public:
     void deleteShaders (void)
     {
         glDetachShader(shaderProgram, fragmentShader);
+		glDetachShader(shaderProgram, geometryShader);
+		glDetachShader(shaderProgram, tesselationEvalShader);
+		glDetachShader(shaderProgram, tesselationCtrlShader);
         glDetachShader(shaderProgram, vertexShader);
-        glDeleteShader(fragmentShader);
+		glDeleteShader(fragmentShader);
+		glDeleteShader(geometryShader);
+		glDeleteShader(tesselationEvalShader);
+		glDeleteShader(tesselationCtrlShader);
         glDeleteShader(vertexShader);
         glDeleteProgram(shaderProgram);
     }
