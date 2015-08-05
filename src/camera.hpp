@@ -460,6 +460,31 @@ public:
         return proj;
     }
 
+
+	void lookAt(Eigen::Vector3f const & eye, Eigen::Vector3f const & center, Eigen::Vector3f const & up)
+	{
+		Eigen::Vector3f f = (center - eye).normalized();
+		Eigen::Vector3f u = up.normalized();
+		Eigen::Vector3f s = f.cross(u).normalized();
+		u = s.cross(f);
+
+		Eigen::Matrix3f rot_mat;
+		rot_mat << s.x(), s.y(), s.z(),
+			u.x(), u.y(), u.z(),
+			-f.x(), -f.y(), -f.z();
+
+		view_matrix.setIdentity();
+		view_matrix.translate(Eigen::Vector3f(-s.dot(eye), -u.dot(eye), f.dot(eye)));
+		view_matrix.rotate(Eigen::Quaternion<float>(rot_mat));
+
+		/*Eigen::Matrix4f res;
+		res << s.x(), s.y(), s.z(), -s.dot(eye),
+			u.x(), u.y(), u.z(), -u.dot(eye),
+			-f.x(), -f.y(), -f.z(), f.dot(eye),
+			0, 0, 0, 1;*/
+	}
+
+
     /**
      * @brief Increases the fov of the perspective matrix by a given increment.
      * @param inc Given increment to increase fov
