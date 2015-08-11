@@ -20,11 +20,10 @@
  * along with Tucano Library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CONE__
-#define __CONE__
+#ifndef __ICOSAHEDRON__
+#define __ICOSAHEDRON__
 
 #include "mesh.hpp"
-#include "camera.hpp"
 #include <Eigen/Dense>
 #include <cmath>
 
@@ -34,8 +33,8 @@ namespace Tucano
 namespace Shapes
 {
 
-/// Default fragment shader for rendering cone 
-const string cone_fragment_code = "\n"
+/// Default fragment shader for rendering sphere
+const string icosahedron_fragment_code = "\n"
         "#version 430\n"
         "in vec4 color;\n"
 		"in vec3 normal;\n"
@@ -55,8 +54,8 @@ const string cone_fragment_code = "\n"
 		"	out_Color = vec4(ambientLight.xyz + diffuseLight.xyz + specularLight.xyz,1.0);\n"
         "}\n";
 
-/// Default vertex shader for rendering cone 
-const string cone_vertex_code = "\n"
+/// Default vertex shader for rendering sphere
+const string icosahedron_vertex_code = "\n"
         "#version 430\n"
 		"layout(location=0) in vec4 in_Position;\n"
         "out vec4 color;\n"
@@ -78,48 +77,48 @@ const string cone_vertex_code = "\n"
 
 
 /**
- * @brief A simple cone shape
+ * @brief A simple sphere shape
  **/
-class Cone : public Tucano::Mesh {
+class Icosahedron : public Tucano::Mesh {
 
 private:
 
-	/// Shader to render cone 
-	Tucano::Shader cone_shader;
+	// Shader to render sphere
+	Tucano::Shader shader;
 
-	/// Cone color
+	// Icosahedron color
 	Eigen::Vector4f color;
-
-	/// Cone cone_height
-	float cone_height;
-
-	/// Cone cone_radius
-	float cone_radius;
 
 public:
 
 	/**
 	* @brief Default Constructor
 	*/
-	Cone()
+	Icosahedron()
 	{
-		resetModelMatrix();
-		create(0.1, 0.5);
-
-		color << 0.0, 0.48, 1.0, 1.0;
-
-		cone_shader.setShaderName("coneShader");
-		cone_shader.initializeFromStrings(cone_vertex_code, cone_fragment_code);
-
 	}
 
     ///Default destructor.
-    ~Cone() 
+    ~Icosahedron() 
 	{}
+
+	void initGL()
+	{
+		Mesh::initGL();
+
+		resetModelMatrix();
+		createGeometry();
+
+		color << 1.0, 0.48, 0.16, 1.0;
+
+		//		shader.setShaderName("sphereShader");
+		//		shader.initializeFromStrings(icosahedron_vertex_code, icosahedron_fragment_code);
+
+	}
 
 
 	/**
-	* @brief Sets the cone color
+	* @brief Sets the sphere color
 	* @param c New color
 	*/
 	void setColor (const Eigen::Vector4f &c)
@@ -128,22 +127,25 @@ public:
 	}
 
 	/**
-	* @brief Render cone
+	* @brief Render sphere
 	*/
 	void render (const Tucano::Camera& camera, const Tucano::Camera& light)
 	{
 		Eigen::Vector4f viewport = camera.getViewport();
 		glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-		cone_shader.bind();
+		shader.bind();
 
-       	cone_shader.setUniform("modelMatrix", model_matrix);
-		cone_shader.setUniform("viewMatrix", camera.getViewMatrix());
-       	cone_shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
-		cone_shader.setUniform("lightViewMatrix", light.getViewMatrix());
-       	cone_shader.setUniform("in_Color", color);
+       	shader.setUniform("modelMatrix", model_matrix);
+		shader.setUniform("viewMatrix", camera.getViewMatrix());
+       	shader.setUniform("projectionMatrix", camera.getProjectionMatrix());
+		shader.setUniform("lightViewMatrix", light.getViewMatrix());
+       	shader.setUniform("in_Color", color);
 
- 		this->setAttributeLocation(&cone_shader);
+		vector <string> attribs;
+		shader.getActiveAttributes(attribs);
+
+ 		this->setAttributeLocation(&shader);
 
 		glEnable(GL_DEPTH_TEST);
 		this->bindBuffers();
@@ -151,7 +153,7 @@ public:
 		this->unbindBuffers();
 		glDisable(GL_DEPTH_TEST);
 
-       	cone_shader.unbind();
+       	shader.unbind();
 
 		#ifdef TUCANODEBUG
 		errorCheckFunc(__FILE__, __LINE__);
@@ -159,106 +161,55 @@ public:
 		
 	}
 
-	/**
-	* @brief Create cone with given parameters
-	* @param r Radius
-	* @param h Height
-	* @param s Number of subdivisions
-	*/
-	void create (float r, float h, int s = 32)
-	{
-		cone_radius = r;
-		cone_height = h;
-		createGeometry(s);
-	}
-
-	/**
-	* @brief Returns cone cone_height
-	*/
-	float getHeight (void)
-	{
-		return cone_height;
-	}
-
-	/**
-	* @brief Returns cone cone_radius 
-	*/
-	float getRadius (void)
-	{
-		return cone_radius;
-	}
-
-
 private:
 
 
-	/**
-	* @brief Define cone geometry
-	*
-	* Cone is created by creating one disk (cap) and a vertex, and generating triangles
-	* between them 
-	*
-	* @param subdivisions Number of subdivisons for cap and body
-	*/
-	void createGeometry (int subdivisions)
+	void createGeometry()
 	{
-		reset();
-
 		vector< Eigen::Vector4f > vert;
-		vector< Eigen::Vector3f > norm;
-		vector< GLuint > faces;
+		vert.push_back(Eigen::Vector4f(0.000f, 0.000f, 1.000f, 1.0f));
+		vert.push_back(Eigen::Vector4f(0.894f, 0.000f, 0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(0.276f, 0.851f, 0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(-0.724f, 0.526f, 0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(-0.724f, -0.526f, 0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(0.276f, -0.851f, 0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(0.724f, 0.526f, -0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(-0.276f, 0.851f, -0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(-0.894f, 0.000f, -0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(-0.276f, -0.851f, -0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(0.724f, -0.526f, -0.447f, 1.0f));
+		vert.push_back(Eigen::Vector4f(0.000f, 0.000f, -1.000f, 1.0f));
 
-		float x, y, theta;
-		// create vertices for body
-		for (int i = 0; i < subdivisions; ++i)
-		{
-			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta)*cone_radius;
-			y = cos(theta)*cone_radius;
-			vert.push_back(Eigen::Vector4f(x, y, 0.0, 1.0));
-			norm.push_back(Eigen::Vector3f(x, y, 0.0));
-		}
 
-		// apex vertex
-		vert.push_back(Eigen::Vector4f(0.0, 0.0, cone_height, 1.0));
-		norm.push_back(Eigen::Vector3f(0.0, 0.0, 1.0));
+		vector< GLuint > faces = {
+			2, 1, 0,
+			3, 2, 0,
+			4, 3, 0,
+			5, 4, 0,
+			1, 5, 0,
 
-		// create a face with every two vertices and apex
-		for (int i = 0; i < subdivisions; ++i)
-		{
-			faces.push_back(i);
-			faces.push_back((i+1)%(subdivisions));
-			faces.push_back(vert.size()-1);
-		}
+			11, 6, 7,
+			11, 7, 8,
+			11, 8, 9,
+			11, 9, 10,
+			11, 10, 6,
 
-		// create cap
-		vert.push_back(Eigen::Vector4f(0.0, 0.0, 0.0, 1.0));
-		norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
-		int center_index = vert.size()-1;
-		int offset = vert.size();
-		for (int i = 0; i < subdivisions; ++i)
-		{
-			theta = 2.0*M_PI*i/(float)subdivisions;
-			x = sin(theta)*cone_radius;
-			y = cos(theta)*cone_radius;
-			vert.push_back(Eigen::Vector4f(x, y, 0.0, 1.0));
-			norm.push_back(Eigen::Vector3f(0.0, 0.0, -1.0));
-		}
+			1, 2, 6,
+			2, 3, 7,
+			3, 4, 8,
+			4, 5, 9,
+			5, 1, 10,
 
-		for (int i = 0; i < subdivisions; ++i)
-		{
-			faces.push_back(i+offset);
-			faces.push_back((i+1)%(subdivisions) + offset);
-			faces.push_back(center_index);
-		}
-
+			2, 7, 6,
+			3, 8, 7,
+			4, 9, 8,
+			5, 10, 9,
+			1, 6, 10 };
 
 		loadVertices(vert);
-		loadNormals(norm);
 		loadIndices(faces);
 
 		setDefaultAttribLocations();
-		
 	}
 
 };

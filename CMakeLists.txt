@@ -22,8 +22,10 @@ project(tucano C CXX)
 set(TUCANO_BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
 set(TUCANO_DOCUMENTATION_DIR "${PROJECT_SOURCE_DIR}/doc")
 set(TUCANO_EFFECTS_DIR "${PROJECT_SOURCE_DIR}/effects")
+set(TUCANO_SHADERS_DIR "${PROJECT_SOURCE_DIR}/effects/shaders")
 set(TUCANO_SAMPLES_DIR "${PROJECT_SOURCE_DIR}/samples")
 set(TUCANO_SRC_DIR "${PROJECT_SOURCE_DIR}/src")
+
 
 set(OPENGL_MAJOR_VERSION 4 CACHE STRING "Opengl version required. Example: 4")
 set(OPENGL_MINOR_VERSION 3 CACHE STRING "Opengl version required. Example: 3")
@@ -99,6 +101,15 @@ file(
 file(
   GLOB TUCANO_SOURCES_UTILS
   "${TUCANO_SRC_DIR}/utils/*.hpp"
+  )
+
+file(
+  GLOB TUCANO_SOURCES_SHADERS
+  "${TUCANO_SHADERS_DIR}/*.vert"
+  "${TUCANO_SHADERS_DIR}/*.tesc"
+  "${TUCANO_SHADERS_DIR}/*.tese"
+  "${TUCANO_SHADERS_DIR}/*.geom"
+  "${TUCANO_SHADERS_DIR}/*.frag"
   )
 
 #add_library(

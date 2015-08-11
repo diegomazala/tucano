@@ -24,7 +24,7 @@
 #define __NORMALVECTOR__
 
 #include <tucano.hpp>
-
+#include <effect.hpp>
 
 using namespace Tucano;
 
@@ -55,6 +55,7 @@ public:
      */
     virtual void initialize (void)
     {
+		initGL();
         // searches in default shader directory (/shaders) for shader files NormalVector.(vert,frag,geom,comp)
          loadShader(normalvec_shader, "normalvector");
     }

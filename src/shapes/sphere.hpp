@@ -152,7 +152,7 @@ public:
        	sphere_shader.unbind();
 
 		#ifdef TUCANODEBUG
-		Misc::errorCheckFunc(__FILE__, __LINE__);
+		errorCheckFunc(__FILE__, __LINE__);
 		#endif
 		
 	}

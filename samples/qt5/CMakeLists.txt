@@ -8,6 +8,7 @@ add_subdirectory(simpleFbo)
 add_subdirectory(phongViewer)
 add_subdirectory(rendering)
 add_subdirectory(parallaxMapping)
+add_subdirectory(simpleTesselation)
 
 
 
