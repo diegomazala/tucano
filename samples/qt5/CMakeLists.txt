@@ -9,6 +9,7 @@ add_subdirectory(phongViewer)
 add_subdirectory(rendering)
 add_subdirectory(parallaxMapping)
 add_subdirectory(simpleTesselation)
+add_subdirectory(terrainTesselation)
 
 
 

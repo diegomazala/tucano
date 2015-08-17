@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+  <file>../../images/lcg-height-map.png</file>
+  <file>../../images/bricks-height-map.jpg</file>
+  <file>../../images/shapes-height-map.png</file>
+  <file>../../images/black_gray_white.png</file>
+  <file>../../images/rio_de_janeiro-height-map.png</file>
+  <file>../../images/terrain-height-map.png</file>
+</qresource>
+</RCC>
