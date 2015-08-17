@@ -112,11 +112,12 @@ file(
   "${TUCANO_SHADERS_DIR}/*.frag"
   )
 
-#add_library(
-  #TUCANO_LIBRARY OBJECT
-  #${TUCANO_SOURCES}
-  #${TUCANO_SOURCES_UTILS}
-  #)
+add_library(
+  TUCANO_LIBRARY 
+#OBJECT
+  ${TUCANO_SOURCES}
+  ${TUCANO_SOURCES_UTILS}
+  )
 
 install(
   FILES ${TUCANO_SOURCES}
@@ -131,7 +132,6 @@ install(
 if(DOC)
   add_subdirectory(${TUCANO_DOCUMENTATION_DIR})
 endif()
-
 
 
 
