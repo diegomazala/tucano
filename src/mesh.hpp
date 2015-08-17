@@ -741,9 +741,9 @@ public:
         glDrawElements(GL_TRIANGLES, numberOfElements, GL_UNSIGNED_INT, (GLvoid*)0);
     }
 
-	virtual void renderPatches(void)
+	virtual void renderPatches(int patch_vert_count)
 	{
-		glPatchParameteri(GL_PATCH_VERTICES, 3);
+		glPatchParameteri(GL_PATCH_VERTICES, patch_vert_count);
 		glDrawElements(GL_PATCHES, numberOfElements, GL_UNSIGNED_INT, (GLvoid*)0);
 	}
 
