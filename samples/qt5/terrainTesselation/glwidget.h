@@ -1,13 +1,13 @@
 #ifndef __GLWIDGET__
 #define __GLWIDGET__
 
-#include <utils/qttrackballwidget.hpp>
+#include <utils/qtflycamerawidget.hpp>
 #include <shader.hpp>
 #include <texture.hpp>
 #include <TerrainMesh.hpp>
 
 
-class GLWidget : public Tucano::QtTrackballWidget
+class GLWidget : public Tucano::QtFlycameraWidget
 {
     Q_OBJECT
 
@@ -29,7 +29,6 @@ public:
 
 
 public slots:
-	void onGizmoToggled(bool toggled);
 	void onWireframeToggled(bool toggled);
 	void onUpdateMeshButtonPressed();
 	void onImageRioDeJaneiroToggled(bool toggled);
@@ -40,6 +39,10 @@ public slots:
 	void onDepthLevelChanged(int value);
 	void onTessInnerChanged(int value);
 	void onTessOuterChanged(int value);
+	void onMinTessLevelChanged(int value);
+	void onMaxTessLevelChanged(int value);
+	void onMinDepthChanged(int value);
+	void onMaxDepthChanged(int value);
 
 private:
 
@@ -52,7 +55,6 @@ private:
 
 	Tucano::TerrainMesh terrainMesh;
 
-	GLboolean gizmoEnabled;
 	GLboolean wireframeEnabled;
 	int currentMap;
 
@@ -62,6 +64,10 @@ private:
 	int terrainWidth;
 	int terrainHeight;
 
+	float minTessLevel;
+	float maxTessLevel;
+	float minDepth;
+	float maxDepth;
 };
 
 #endif // GLWIDGET

@@ -3,13 +3,19 @@
 #include <texturemanager.hpp>
 
 
-GLWidget::GLWidget(QWidget *parent) : Tucano::QtTrackballWidget(parent), 
-		gizmoEnabled(false), 
+GLWidget::GLWidget(QWidget *parent) : 
+		Tucano::QtFlycameraWidget(parent),
 		wireframeEnabled(true), 
 		currentMap(0), 
 		tessInnerLevel(1.0f), 
 		tessOuterLevel(1.0f), 
-		depthLevel(0.5f)
+		depthLevel(0.5f),
+		terrainWidth(6),
+		terrainHeight(6),
+		minTessLevel(1),
+		maxTessLevel(64),
+		minDepth(1),
+		maxDepth(2)
 {
 }
 
@@ -68,10 +74,10 @@ void GLWidget::initializeGL (void)
 #endif
 
 	//terrainMesh.createQuad();
-	terrainMesh.create(2, 2, true);
+	terrainMesh.create(terrainWidth, terrainHeight, true);
 	//terrainMesh.normalizeModelMatrix();
 
-	Tucano::QtTrackballWidget::initialize();
+	Tucano::QtFlycameraWidget::initialize();
 	camera->setPerspectiveMatrix(60.0, (float)this->width() / (float)this->height(), 0.1f, 100.0f);
 	
 	glClearColor(0.1f, 0.15f, 0.1f, 0.0f);		// background color
@@ -112,6 +118,12 @@ void GLWidget::paintGL (void)
 	shader.setUniform("tessLevelOuter", tessOuterLevel);
 	shader.setUniform("depthLevel", depthLevel);
 
+	shader.setUniform("MinTessLevel", minTessLevel);
+	shader.setUniform("MaxTessLevel", maxTessLevel);
+	shader.setUniform("MinDepth", minDepth);
+	shader.setUniform("MaxDepth", maxDepth);
+
+
 	terrainMesh.setAttributeLocation(shader);
 
 	glEnable(GL_DEPTH_TEST);
@@ -121,16 +133,8 @@ void GLWidget::paintGL (void)
 	
 	if (height_map[currentMap] != nullptr)
 		height_map[currentMap]->unbind();
-
-	if (gizmoEnabled)
-		camera->render();
 }
 
-void GLWidget::onGizmoToggled(bool toggled)
-{
-	gizmoEnabled = toggled;
-	update();
-}
 
 
 void GLWidget::onWireframeToggled(bool toggled)
@@ -209,6 +213,31 @@ void GLWidget::onTessInnerChanged(int value)
 void GLWidget::onTessOuterChanged(int value)
 {
 	tessOuterLevel = value;
+	update();
+}
+
+
+void GLWidget::onMinTessLevelChanged(int value)
+{
+	minTessLevel = value;
+	update();
+}
+
+void GLWidget::onMaxTessLevelChanged(int value)
+{
+	maxTessLevel = value;
+	update();
+}
+
+void GLWidget::onMinDepthChanged(int value)
+{
+	minDepth = value;
+	update();
+}
+
+void GLWidget::onMaxDepthChanged(int value)
+{
+	maxDepth = value;
 	update();
 }
 

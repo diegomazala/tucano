@@ -12,6 +12,7 @@ in TC_OUT
     vec3 position;
 	vec3 normal;
 	vec2 uv;
+	float depth;
 } te_in[]; 
 
 
@@ -20,6 +21,7 @@ out TE_OUT
     vec3 position;
 	vec3 normal;
 	vec2 uv;
+	float depth;
 } te_out; 
 
 
@@ -43,21 +45,17 @@ void main()
 					(gl_TessCoord.y * te_in[1].normal) +
 					(gl_TessCoord.z * te_in[2].normal);
 	te_out.normal = teNormal;
-	//te_out.normal = vec3(modelViewMatrix * vec4(teNormal,0.0)).xyz;
+	te_out.normal = vec3(modelViewMatrix * vec4(teNormal,0.0)).xyz;
 
-
-	vec3 n0 =	(gl_TessCoord.x * te_in[0].normal);
-	vec3 n1 =	(gl_TessCoord.y * te_in[1].normal);
-	vec3 n2 = 	(gl_TessCoord.z * te_in[2].normal);
-
-	vec3 A = n2 - n0;
-    vec3 B = n1 - n0;
-    te_out.normal = normalMatrix * normalize(cross(A, B));
 
 	vec2 teUV =	(gl_TessCoord.x * te_in[0].uv) +
 				(gl_TessCoord.y * te_in[1].uv) +
 				(gl_TessCoord.z * te_in[2].uv);
 	te_out.uv = teUV;
+
+	te_out.depth =	(gl_TessCoord.x * te_in[0].depth) +
+					(gl_TessCoord.y * te_in[1].depth) +
+					(gl_TessCoord.z * te_in[2].depth);
 
 
 	float height = texture(in_HeightMap, te_out.uv).r;

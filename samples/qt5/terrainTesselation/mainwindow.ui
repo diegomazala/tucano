@@ -31,13 +31,6 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QCheckBox" name="gizmoCheckBox">
-         <property name="text">
-          <string>Gizmo</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QCheckBox" name="wireFrameCheckBox">
          <property name="text">
           <string>Wireframe</string>
@@ -99,6 +92,9 @@
               <property name="maximum">
                <number>1024</number>
               </property>
+              <property name="value">
+               <number>6</number>
+              </property>
              </widget>
             </item>
             <item>
@@ -108,6 +104,9 @@
               </property>
               <property name="maximum">
                <number>1024</number>
+              </property>
+              <property name="value">
+               <number>6</number>
               </property>
              </widget>
             </item>
@@ -125,6 +124,9 @@
        </item>
        <item>
         <widget class="QGroupBox" name="tesselationGroupBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="title">
           <string>Tesselation</string>
          </property>
@@ -222,6 +224,83 @@
         </widget>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="minMaxTessLevelLabel">
+           <property name="text">
+            <string>Min Max Tess Level</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="minTessLevelSpinBox">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>64</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="maxTessLevelSpinBox">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>64</number>
+           </property>
+           <property name="value">
+            <number>64</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="minMaxDepthLabel">
+           <property name="text">
+            <string>Min Max Depth</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="minDepthSpinBox">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1024</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="maxDepthSpinBox">
+           <property name="minimum">
+            <number>2</number>
+           </property>
+           <property name="maximum">
+            <number>1024</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>2</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -284,11 +363,14 @@
     <slot>onWireframeToggled(bool)</slot>
     <slot>onTessInnerChanged(int)</slot>
     <slot>onTessOuterChanged(int)</slot>
-    <slot>onGizmoToggled(bool)</slot>
     <slot>onLightToggled(bool)</slot>
     <slot>onUpdateMeshButtonPressed()</slot>
     <slot>onWidthMeshChanged(int)</slot>
     <slot>onHeightMeshChanged(int)</slot>
+    <slot>onMinTessLevelChanged(int)</slot>
+    <slot>onMaxTessLevelChanged(int)</slot>
+    <slot>onMinDepthChanged(int)</slot>
+    <slot>onMaxDepthChanged(int)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -439,22 +521,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>gizmoCheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>glwidget</receiver>
-   <slot>onGizmoToggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>990</x>
-     <y>73</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>443</x>
-     <y>370</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>updateMeshButton</sender>
    <signal>clicked()</signal>
    <receiver>glwidget</receiver>
@@ -495,6 +561,70 @@
     <hint type="sourcelabel">
      <x>1034</x>
      <y>269</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>370</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>minTessLevelSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onMinTessLevelChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>941</x>
+     <y>485</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>370</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>maxTessLevelSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onMaxTessLevelChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1039</x>
+     <y>485</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>370</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>minDepthSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onMinDepthChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>941</x>
+     <y>513</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>370</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>maxDepthSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onMaxDepthChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1039</x>
+     <y>513</y>
     </hint>
     <hint type="destinationlabel">
      <x>443</x>
