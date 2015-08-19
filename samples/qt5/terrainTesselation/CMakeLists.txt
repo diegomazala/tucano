@@ -19,6 +19,7 @@ set (SHADER_FILES
 					${TUCANO_SHADERS_DIR}/terrain.vert
 					${TUCANO_SHADERS_DIR}/terrain.tesc
 					${TUCANO_SHADERS_DIR}/terrain.tese
+					${TUCANO_SHADERS_DIR}/terrain.geom
 					${TUCANO_SHADERS_DIR}/terrain.frag
 	)
 

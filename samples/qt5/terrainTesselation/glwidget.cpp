@@ -56,24 +56,12 @@ void GLWidget::initializeGL (void)
 	for (int i = 0; i < 5; ++i)
 		if (!dir.exists(shader_dir.c_str()))
 			shader_dir.insert(0, "../");
-	
 
 	loadTextures();
-
    
 	shader.load("terrain", shader_dir);
 	shader.initialize();
 
-#if 0
-	if (!terrainMesh.loadOBJ(mesh_file.c_str()))
-		std::cerr << "<Error> Could not load obj file" << std::endl;
-	else
-		terrainMesh.initBuffers();
-#else
-	//terrainMesh.create(10, 10);
-#endif
-
-	//terrainMesh.createQuad();
 	terrainMesh.create(terrainWidth, terrainHeight, true);
 	//terrainMesh.normalizeModelMatrix();
 
@@ -92,8 +80,6 @@ void GLWidget::paintGL (void)
 
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	glPolygonMode(GL_FRONT_AND_BACK, wireframeEnabled ? GL_LINE : GL_FILL);
 	
 
 	Eigen::Vector4f viewport = camera->getViewport();
@@ -122,7 +108,7 @@ void GLWidget::paintGL (void)
 	shader.setUniform("MaxTessLevel", maxTessLevel);
 	shader.setUniform("MinDepth", minDepth);
 	shader.setUniform("MaxDepth", maxDepth);
-
+	shader.setUniform("wireframeEnabled", wireframeEnabled);
 
 	terrainMesh.setAttributeLocation(shader);
 
