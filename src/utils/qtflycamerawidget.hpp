@@ -65,10 +65,10 @@ protected:
     Mesh mesh;
 
     /// Flycamera.
-    Flycamera camera;
+    Flycamera *camera;
 
     /// Trackball for manipulating the light position.
-    Trackball light_trackball;
+    Trackball *light_trackball;
 
 public:
 
@@ -85,7 +85,11 @@ public:
     /**
      * @brief Default destructor.
      */
-    ~QtFlycameraWidget () {}
+    ~QtFlycameraWidget () 
+	{
+		delete camera;
+		delete light_trackball;
+	}
 
     /**
      * @brief Initializes openGL and GLEW.
@@ -109,9 +113,9 @@ public:
      */
     virtual void resizeGL (void)
     {
-        camera.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
-        camera.setPerspectiveMatrix(camera.getFovy(), (float)this->width()/(float)this->height(), 0.1f, 100.0f);
-        light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        camera->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        camera->setPerspectiveMatrix(camera->getFovy(), (float)this->width()/(float)this->height(), 0.1f, 100.0f);
+        light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 #if QT_VERSION >= 0x050400
 		update();
 #else
@@ -124,14 +128,17 @@ public:
      */
     void initialize (void)
     {
+		camera = new Flycamera();
+		light_trackball = new Trackball();
+
         Eigen::Vector2i size;
         size << this->width(), this->height();
 
-        camera.setPerspectiveMatrix(60.0, (float)this->width()/(float)this->height(), 0.1f, 100.0f);
-        camera.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        camera->setPerspectiveMatrix(60.0, (float)this->width()/(float)this->height(), 0.1f, 100.0f);
+        camera->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
-        light_trackball.setRenderFlag(false);
-        light_trackball.setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
+        light_trackball->setRenderFlag(false);
+        light_trackball->setViewport(Eigen::Vector2f ((float)this->width(), (float)this->height()));
 
 #if QT_VERSION >= 0x050400
 		update();
@@ -158,6 +165,7 @@ public:
         }
 
 		mesh.reset();
+		mesh.initGL();
 
         if (extension.compare("ply") == 0)
         {
@@ -188,21 +196,21 @@ protected:
             }
         }
         if (event->key() == Qt::Key_R)
-			camera.reset();
+			camera->reset();
         if (event->key() == Qt::Key_A)
-			camera.strideLeft();
+			camera->strideLeft();
         if (event->key() == Qt::Key_D)
-			camera.strideRight();
+			camera->strideRight();
         if (event->key() == Qt::Key_S)
-			camera.moveBack();
+			camera->moveBack();
         if (event->key() == Qt::Key_W)
-			camera.moveForward();
+			camera->moveForward();
         if (event->key() == Qt::Key_C)
-			camera.moveDown();
+			camera->moveDown();
         if (event->key() == Qt::Key_E)
-			camera.moveUp();	
+			camera->moveUp();
 
-		camera.updateViewMatrix();
+		camera->updateViewMatrix();
 	
         event->ignore();
 #if QT_VERSION >= 0x050400
@@ -224,12 +232,12 @@ protected:
         Eigen::Vector2f screen_pos (event->x(), event->y());
 		if (event->button() == Qt::LeftButton)
 		{
-			camera.startRotation(screen_pos);
-			camera.updateViewMatrix();
+			camera->startRotation(screen_pos);
+			camera->updateViewMatrix();
 		}
 		if (event->button() == Qt::RightButton)
 		{
-			light_trackball.rotateCamera(screen_pos);
+			light_trackball->rotateCamera(screen_pos);
 		}
 #if QT_VERSION >= 0x050400
 		update();
@@ -249,12 +257,12 @@ protected:
         Eigen::Vector2f screen_pos (event->x(), event->y());
 		if (event->buttons() & Qt::LeftButton)
 		{
-			camera.rotate(screen_pos);
-			camera.updateViewMatrix();
+			camera->rotate(screen_pos);
+			camera->updateViewMatrix();
 		}
 		if (event->buttons() & Qt::RightButton)
 		{
-			light_trackball.rotateCamera(screen_pos);
+			light_trackball->rotateCamera(screen_pos);
 		}
 
 #if QT_VERSION >= 0x050400
@@ -275,7 +283,7 @@ protected:
     {
         if (event->button() == Qt::RightButton)
         {
-            light_trackball.endRotation();
+			light_trackball->endRotation();
         }
 
 #if QT_VERSION >= 0x050400
