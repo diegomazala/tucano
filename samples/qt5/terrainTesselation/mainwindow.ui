@@ -41,6 +41,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="normalsCheckBox">
+         <property name="text">
+          <string>Normals</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
           <string>Images</string>
@@ -125,7 +135,7 @@
        <item>
         <widget class="QGroupBox" name="tesselationGroupBox">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="title">
           <string>Tesselation</string>
@@ -294,7 +304,7 @@
             <number>1</number>
            </property>
            <property name="value">
-            <number>2</number>
+            <number>3</number>
            </property>
           </widget>
          </item>
@@ -371,6 +381,7 @@
     <slot>onMaxTessLevelChanged(int)</slot>
     <slot>onMinDepthChanged(int)</slot>
     <slot>onMaxDepthChanged(int)</slot>
+    <slot>onNormalsToggled(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -625,6 +636,22 @@
     <hint type="sourcelabel">
      <x>1039</x>
      <y>513</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>370</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>normalsCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>onNormalsToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>990</x>
+     <y>96</y>
     </hint>
     <hint type="destinationlabel">
      <x>443</x>

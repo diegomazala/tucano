@@ -735,10 +735,10 @@ public:
      * @brief Call the draw method for rendering triangles.
      * This method requires that a index buffer has been created.
      */
-    virtual void renderElements (void) 
+	virtual void renderElements(GLenum gl_element = GL_TRIANGLES)
     {
 
-        glDrawElements(GL_TRIANGLES, numberOfElements, GL_UNSIGNED_INT, (GLvoid*)0);
+		glDrawElements(gl_element, numberOfElements, GL_UNSIGNED_INT, (GLvoid*)0);
     }
 
 	virtual void renderPatches(int patch_vert_count)

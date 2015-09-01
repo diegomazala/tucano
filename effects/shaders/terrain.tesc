@@ -2,7 +2,7 @@
 
 
 
-layout (vertices = 3) out;
+layout (vertices = 4) out;
 
 
 in VS_OUT
@@ -35,6 +35,7 @@ uniform mat4 modelViewMatrix;
 
 void main()
 {
+
 	// position in camera coordinates
 	vec4 p = modelViewMatrix * gl_in[gl_InvocationID].gl_Position;
 
@@ -46,14 +47,17 @@ void main()
 
     if (gl_InvocationID == 0)
 	{
-  //      gl_TessLevelInner[0] = tessLevelInner;
-  //      gl_TessLevelOuter[0] = tessLevelOuter;
-  //      gl_TessLevelOuter[1] = tessLevelOuter;
+        //gl_TessLevelInner[0] = tessLevelInner;
+        //gl_TessLevelOuter[0] = tessLevelOuter;
+        //gl_TessLevelOuter[1] = tessLevelOuter;
 		//gl_TessLevelOuter[2] = tessLevelOuter;
+		
 		gl_TessLevelInner[0] = tessLevel;
+		gl_TessLevelInner[1] = tessLevel;
 		gl_TessLevelOuter[0] = tessLevel;
 		gl_TessLevelOuter[1] = tessLevel;
 		gl_TessLevelOuter[2] = tessLevel;
+		gl_TessLevelOuter[3] = tessLevel;
 	}
 
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
@@ -62,5 +66,6 @@ void main()
 	tc_out[gl_InvocationID].normal = tc_in[gl_InvocationID].normal;
 	tc_out[gl_InvocationID].uv = tc_in[gl_InvocationID].uv;
 	tc_out[gl_InvocationID].depth = depth;
+
 }
 

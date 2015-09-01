@@ -30,6 +30,7 @@ public:
 
 public slots:
 	void onWireframeToggled(bool toggled);
+	void onNormalsToggled(bool toggled);
 	void onUpdateMeshButtonPressed();
 	void onImageRioDeJaneiroToggled(bool toggled);
 	void onImageLCGToggled(bool toggled);
@@ -56,6 +57,7 @@ private:
 	Tucano::TerrainMesh terrainMesh;
 
 	GLboolean wireframeEnabled;
+	GLboolean showNormals;
 	int currentMap;
 
 	float tessInnerLevel;

@@ -26,7 +26,6 @@
 #include <mesh.hpp>
 #include <shader.hpp>
 
-using namespace std;
 
 namespace Tucano
 {
@@ -37,10 +36,17 @@ class TerrainMesh : public Mesh
 
 public:
 
+	enum PolygonType
+	{
+		POINTS = 1,
+		TRIANGLES = 3,
+		QUADS = 4
+	};
+
     /**
    * @brief Default Constructor.
    */
-	TerrainMesh(void) : Mesh()
+	TerrainMesh(TerrainMesh::PolygonType polygon_type) : Mesh(), polygonType(polygon_type)
     {
        
     }
@@ -51,26 +57,11 @@ public:
     {
     }
 
-
-	//void render(void)
-	//{
-	//	bindBuffers();
-	//	//if (numberOfElements == 0)
-	//	//	renderPoints();
-	//	//else
-	//	//	renderElements();
-	//	glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
-	//	unbindBuffers();
-	//}
-
 	void render(void)
 	{
 		bindBuffers();
-#if 1
-		renderPatches(3);
-#else
-		renderElements();
-#endif
+		renderPatches((int)polygonType);
+		//renderElements(GL_QUADS);
 		unbindBuffers();
 	}
 
@@ -111,19 +102,36 @@ public:
 			}
 		}
 
-		for (int j = 0; j < depth - 1; j++)
-		{
-			for (int i = 0; i < width - 1; i++)
-			{
-				// face 1
-				indices.push_back(j * width + i);
-				indices.push_back(j * width + i + width);
-				indices.push_back(j * width + i + 1);
 
-				// face 2
-				indices.push_back(j * width + i + width);
-				indices.push_back(j * width + i + width + 1);
-				indices.push_back(j * width + i + 1);
+		if (polygonType == PolygonType::TRIANGLES)
+		{
+			for (int j = 0; j < depth - 1; j++)
+			{
+				for (int i = 0; i < width - 1; i++)
+				{
+					// face 1
+					indices.push_back(j * width + i);
+					indices.push_back(j * width + i + width);
+					indices.push_back(j * width + i + 1);
+
+					// face 2
+					indices.push_back(j * width + i + width);
+					indices.push_back(j * width + i + width + 1);
+					indices.push_back(j * width + i + 1);
+				}
+			}
+		}
+		else	// PolygonType == QUADS
+		{
+			for (int j = 0; j < depth - 1; j++)
+			{
+				for (int i = 0; i < width - 1; i++)
+				{
+					indices.push_back(j * width + i);
+					indices.push_back(j * width + i + width);
+					indices.push_back(j * width + i + width + 1);
+					indices.push_back(j * width + i + 1);
+				}
 			}
 		}
 
@@ -135,6 +143,8 @@ public:
 		setDefaultAttribLocations();
 	}
 
+private:
+	const PolygonType polygonType;
 };
 
 }

@@ -5,7 +5,9 @@
 
 GLWidget::GLWidget(QWidget *parent) : 
 		Tucano::QtFlycameraWidget(parent),
+		terrainMesh(Tucano::TerrainMesh::PolygonType::QUADS),
 		wireframeEnabled(true), 
+		showNormals(false),
 		currentMap(0), 
 		tessInnerLevel(1.0f), 
 		tessOuterLevel(1.0f), 
@@ -15,7 +17,7 @@ GLWidget::GLWidget(QWidget *parent) :
 		minTessLevel(1),
 		maxTessLevel(64),
 		minDepth(1),
-		maxDepth(2)
+		maxDepth(3)
 {
 }
 
@@ -72,6 +74,7 @@ void GLWidget::initializeGL (void)
 	glEnable(GL_DEPTH_TEST);					// Enable depth test
 	glDepthFunc(GL_LESS);						// Accept fragment if it closer to the camera than the former one
 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void GLWidget::paintGL (void)
@@ -109,6 +112,7 @@ void GLWidget::paintGL (void)
 	shader.setUniform("MinDepth", minDepth);
 	shader.setUniform("MaxDepth", maxDepth);
 	shader.setUniform("wireframeEnabled", wireframeEnabled);
+	shader.setUniform("showNormals", showNormals);
 
 	terrainMesh.setAttributeLocation(shader);
 
@@ -126,6 +130,12 @@ void GLWidget::paintGL (void)
 void GLWidget::onWireframeToggled(bool toggled)
 {
 	wireframeEnabled = toggled;
+	update();
+}
+
+void GLWidget::onNormalsToggled(bool toggled)
+{
+	showNormals = toggled;
 	update();
 }
 
