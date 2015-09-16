@@ -112,12 +112,16 @@ file(
   "${TUCANO_SHADERS_DIR}/*.frag"
   )
 
+
+
 add_library(
   TUCANO_LIBRARY 
-#OBJECT
+  #OBJECT
   ${TUCANO_SOURCES}
   ${TUCANO_SOURCES_UTILS}
   )
+
+set_target_properties(TUCANO_LIBRARY PROPERTIES LINKER_LANGUAGE CXX)
 
 install(
   FILES ${TUCANO_SOURCES}
