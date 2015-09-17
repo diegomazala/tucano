@@ -17,4 +17,4 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TUCANO_BINARY_DIR}/glfw)
 
 # Tip: you can comment out the examples you don't want to compile.
 add_subdirectory(helloglfw)
-
+add_subdirectory(flyscene)

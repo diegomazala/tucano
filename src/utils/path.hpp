@@ -25,6 +25,7 @@
 
 #include "camera.hpp"
 #include "mesh.hpp"
+#include "misc.hpp"
 #include "shapes/sphere.hpp"
 #include <Eigen/Dense>
 #include <cmath>
